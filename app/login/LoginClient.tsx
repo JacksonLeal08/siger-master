@@ -58,18 +58,19 @@ export default function LoginClient() {
           // Verifica se o perfil possui status ativo antes de redirecionar
           const statusClean = String(userProfile.status || '').toLowerCase();
           if (statusClean !== 'active' && statusClean !== 'ativo') {
-            // Perfil pendente/suspenso: não redireciona, o dashboard layout irá exibir a tela de acesso bloqueado
+            // Perfil pendente/suspenso: não redireciona
+            return;
           }
           redirectedRef.current = true;
           setIsRedirecting(true);
-          // Delay de 500ms para garantir que os cookies de sessão foram propagados
+          // Transição SPA suave e contínua via router.replace (mantém sessão e caches vivos)
           setTimeout(() => {
-            window.location.assign('/dashboard');
-          }, 500);
+            router.replace('/dashboard');
+          }, 300);
         }
       }
     }
-  }, [authChecking, currentUser, userProfile]);
+  }, [authChecking, currentUser, userProfile, router]);
 
   // Capturar e tratar erros de links de e-mail expirados / hash de autenticação
   useEffect(() => {
@@ -137,9 +138,11 @@ export default function LoginClient() {
       if (result) {
         setProgress(100);
         setLoadingStatus('Acesso autorizado! Conectando ao Cockpit...');
+        redirectedRef.current = true;
+        setIsRedirecting(true);
         setTimeout(() => {
-          window.location.assign('/dashboard');
-        }, 200);
+          router.replace('/dashboard');
+        }, 250);
       } else {
         setLoading(false);
         setErrorMsg('Credenciais inválidas.');
@@ -281,8 +284,9 @@ export default function LoginClient() {
                   <button
                     type="button"
                     onClick={() => {
+                      redirectedRef.current = true;
                       setIsRedirecting(true);
-                      window.location.assign('/dashboard');
+                      router.replace('/dashboard');
                     }}
                     className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none shadow-md flex items-center justify-center gap-1.5 active:scale-95"
                   >

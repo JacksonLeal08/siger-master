@@ -101,7 +101,8 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/alerts') ||
     path.startsWith('/mapa') ||
     path.startsWith('/logs') ||
-    path.startsWith('/gestao-ativo');
+    path.startsWith('/gestao-ativo') ||
+    path.startsWith('/viaturas');
 
   // Rotas exclusivas de nível administrativo
   const isAdminRoute = path.startsWith('/configuracoes');

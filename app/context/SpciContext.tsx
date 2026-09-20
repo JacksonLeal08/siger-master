@@ -26,7 +26,7 @@ import { SyncQueue } from '@/lib/syncQueue';
 import { playTelemetryPingSound } from '@/lib/audio';
 import { MediaQueue } from '@/lib/mediaQueue';
 import { NotificationItem } from '@/lib/types';
-import { createUserAction, deleteUserAction, updateUserStatusAction, updateFullUserAction, createLogAction } from '@/app/actions/userActions';
+import { createUserAction, deleteUserAction, updateUserStatusAction, updateFullUserAction, createLogAction, syncSessionCookieAction, clearSessionCookieAction } from '@/app/actions/userActions';
 import { getChecklistItemsAction } from '@/app/actions/checklistActions';
 import { DEFAULT_EXTINTOR_CHECKLIST, deduplicateChecklistItems } from '@/app/components/ChecklistEditModal';
 import { CustomAlertDialog, AlertType } from '@/app/components/CustomAlertDialog';
@@ -1206,6 +1206,22 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (isCancelled) return;
         setCurrentUser(user);
         
+        // Boot instantâneo (0ms): se já houver perfil no cache local, libera o cockpit imediatamente
+        const cacheKey = `spci_cached_profile_${user.uid}`;
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem(cacheKey);
+            if (raw) {
+              const cached = JSON.parse(raw);
+              setUserProfile(cached);
+              setProfileNameInput(cached.name || '');
+              setProfileLogoUrlInput(cached.logoUrl || '');
+              setAuthChecking(false);
+              clearTimeout(authTimeout);
+            }
+          } catch {}
+        }
+        
         try {
           // 1. Grava cookies de sessão imediatamente se a sessão do Supabase estiver disponível
           const { data: { session } } = await supabase.auth.getSession();
@@ -1237,8 +1253,15 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUserProfile(profile);
           setProfileNameInput(profile.name);
           setProfileLogoUrlInput(profile.logoUrl || '');
+
+          // Persiste cache local para inicializações futuras instantâneas
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify(profile));
+            } catch {}
+          }
           
-          // 3. Atualiza cookies com a role e expiração corporativa
+          // 3. Atualiza cookies no cliente e servidor HTTP com role e expiração corporativa
           if (typeof document !== 'undefined') {
             const isSecure = window.location.protocol === 'https:' ? '; Secure' : '';
             document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
@@ -1247,6 +1270,15 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else {
               document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax${isSecure}`;
             }
+          }
+
+          if (token) {
+            syncSessionCookieAction({
+              token,
+              role: profile.role,
+              expires: profile.dataExpiracao,
+              provider
+            }).catch(() => {});
           }
 
           // Registrar login pendente de OAuth (Google)
@@ -1841,13 +1873,19 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       await logout();
+      await clearSessionCookieAction().catch(() => {});
+      if (typeof window !== 'undefined' && currentUser?.uid) {
+        localStorage.removeItem(`spci_cached_profile_${currentUser.uid}`);
+      }
       setCurrentUser(null);
       setUserProfile(null);
       // Limpa cookies de segurança
-      document.cookie = `spci_session_token=; path=/; max-age=0; SameSite=Lax`;
-      document.cookie = `spci_user_role=; path=/; max-age=0; SameSite=Lax`;
-      document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
-      document.cookie = `spci_user_provider=; path=/; max-age=0; SameSite=Lax`;
+      if (typeof document !== 'undefined') {
+        document.cookie = `spci_session_token=; path=/; max-age=0; SameSite=Lax`;
+        document.cookie = `spci_user_role=; path=/; max-age=0; SameSite=Lax`;
+        document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+        document.cookie = `spci_user_provider=; path=/; max-age=0; SameSite=Lax`;
+      }
       setIsGoogleUser(false);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('spci_active_contract');
@@ -1885,7 +1923,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token || '';
 
-        // Grava cookies de segurança de forma imediata
+        // Grava cookies de segurança no cliente
         if (typeof document !== 'undefined') {
           const isSecure = window.location.protocol === 'https:' ? '; Secure' : '';
           document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
@@ -1897,6 +1935,23 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
             document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax${isSecure}`;
           }
         }
+
+        // Sincronização atômica de cookies no servidor HTTP (Next.js Set-Cookie)
+        if (token) {
+          await syncSessionCookieAction({
+            token,
+            role: profile.role,
+            expires: profile.dataExpiracao,
+            provider: 'email'
+          }).catch(console.warn);
+        }
+
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`spci_cached_profile_${user.uid}`, JSON.stringify(profile));
+          } catch {}
+        }
+
         setIsGoogleUser(false);
 
         addConsoleLog(`[Autenticação] Login com sucesso de ${profile.name} (${profile.role})`, 'SUCESSO');

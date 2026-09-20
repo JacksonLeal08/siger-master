@@ -705,19 +705,19 @@ export async function getAssetsList(collectionName: string, userSite?: string): 
     
     if (category === 'extintores') {
       let extintoresList: any[] = [];
-      const { data, error } = await supabase
-        .from('vw_extintores_publico')
+      const { data: viewData, error: viewErr } = await supabase
+        .from('view_extintores')
         .select('*');
 
-      if (error) {
-        console.warn('Erro ao buscar de vw_extintores_publico, tentando view_extintores...', error);
-        const { data: oldData, error: oldErr } = await supabase
-          .from('view_extintores')
-          .select('*');
-        if (oldErr) throw oldErr;
-        extintoresList = (oldData || []).map(deserializeExtintor);
+      if (!viewErr && viewData && viewData.length > 0) {
+        extintoresList = viewData.map(deserializeExtintor);
       } else {
-        extintoresList = (data || []).map(deserializeNewExtintor);
+        const { data: altData, error: altErr } = await supabase
+          .from('ativos_extintores')
+          .select('*');
+        if (!altErr && altData && altData.length > 0) {
+          extintoresList = altData.map(deserializeNewExtintor);
+        }
       }
 
       // Enriquecer com dados de movimentação, estoque e coordenadas da tabela assets (fonte mestre viva de 651 extintores)
@@ -1223,29 +1223,26 @@ export async function fetchAtivoParaInspecao(idOrPatrimonio: string, userSite?: 
     const isExtintor = idUpper.startsWith('EXT-');
 
     if (isUuid || isExtintor) {
-      const query = supabase.from('vw_extintores_publico').select('*');
-      if (isUuid) {
-        query.or(`id.eq.${idUpper},qr_code_hash.eq.${idUpper}`);
-      } else {
-        query.eq('numero_patrimonio', idUpper);
-      }
-      const { data, error } = await query.maybeSingle();
-      let oldData = null;
-      if (error || !data) {
-        console.warn('Erro ao buscar de vw_extintores_publico, tentando view_extintores...', error);
-        const oldQuery = supabase.from('view_extintores').select('*');
-        if (isUuid) {
-          oldQuery.or(`id.eq.${idUpper},qr_code_hash.eq.${idUpper}`);
-        } else {
-          oldQuery.eq('id_ativo', idUpper);
-        }
-        const { data: od, error: oldErr } = await oldQuery.maybeSingle();
-        if (!oldErr && od) oldData = od;
-      }
-
       let resolvedExt: any = null;
-      if (data) resolvedExt = deserializeNewExtintor(data);
-      else if (oldData) resolvedExt = deserializeExtintor(oldData);
+      const oldQuery = supabase.from('view_extintores').select('*');
+      if (isUuid) {
+        oldQuery.or(`id.eq.${idUpper},qr_code_hash.eq.${idUpper}`);
+      } else {
+        oldQuery.eq('id_ativo', idUpper);
+      }
+      const { data: od, error: oldErr } = await oldQuery.maybeSingle();
+      if (!oldErr && od) {
+        resolvedExt = deserializeExtintor(od);
+      } else {
+        const altQuery = supabase.from('ativos_extintores').select('*');
+        if (isUuid) {
+          altQuery.or(`id.eq.${idUpper},qr_code_hash.eq.${idUpper}`);
+        } else {
+          altQuery.eq('numero_patrimonio', idUpper);
+        }
+        const { data: ad, error: adErr } = await altQuery.maybeSingle();
+        if (!adErr && ad) resolvedExt = deserializeNewExtintor(ad);
+      }
 
       if (resolvedExt) {
         // Validação estrita de contrato
@@ -1294,19 +1291,19 @@ export async function fetchAtivoParaInspecao(idOrPatrimonio: string, userSite?: 
     if (!data) return null;
 
     if (data.category === 'extintores') {
-      const { data: extData, error: extErr } = await supabase
-        .from('vw_extintores_publico')
-        .select('*')
-        .eq('id', data.id)
-        .maybeSingle();
-      if (!extErr && extData) return deserializeNewExtintor(extData);
-
       const { data: oldExtData, error: oldExtErr } = await supabase
         .from('view_extintores')
         .select('*')
         .eq('id', data.id)
         .maybeSingle();
       if (!oldExtErr && oldExtData) return deserializeExtintor(oldExtData);
+
+      const { data: extData, error: extErr } = await supabase
+        .from('ativos_extintores')
+        .select('*')
+        .eq('id', data.id)
+        .maybeSingle();
+      if (!extErr && extData) return deserializeNewExtintor(extData);
     }
 
     return deserializeAsset(data);

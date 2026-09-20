@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 
 // Inicializa o cliente do Supabase com privilégios de Admin
 const getSupabaseAdminClient = () => {
@@ -922,4 +923,89 @@ export async function changeSelfPasswordAction(
     return { success: false, error: err.message || 'Erro inesperado ao alterar senha.' };
   }
 }
+
+/**
+ * Server Action para sincronizar os cookies de sessão HTTP de forma atômica no servidor.
+ * Garante que middleware.ts reconheça a sessão imediatamente, sem race conditions no cliente.
+ */
+export async function syncSessionCookieAction(payload: {
+  token: string;
+  role?: string;
+  expires?: string | null;
+  provider?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { token, role, expires, provider } = payload;
+    if (!token) {
+      return { success: false, error: 'Token ausente.' };
+    }
+
+    const cookieStore = await cookies();
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    cookieStore.set('spci_session_token', token, {
+      path: '/',
+      maxAge: 86400 * 7, // 7 dias
+      sameSite: 'lax',
+      httpOnly: false,
+      secure: isProduction
+    });
+
+    if (role) {
+      cookieStore.set('spci_user_role', role, {
+        path: '/',
+        maxAge: 86400 * 7,
+        sameSite: 'lax',
+        httpOnly: false,
+        secure: isProduction
+      });
+    }
+
+    if (provider) {
+      cookieStore.set('spci_user_provider', provider, {
+        path: '/',
+        maxAge: 86400 * 7,
+        sameSite: 'lax',
+        httpOnly: false,
+        secure: isProduction
+      });
+    }
+
+    if (expires) {
+      cookieStore.set('spci_user_expires', expires, {
+        path: '/',
+        maxAge: 86400 * 7,
+        sameSite: 'lax',
+        httpOnly: false,
+        secure: isProduction
+      });
+    } else {
+      cookieStore.delete('spci_user_expires');
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('[syncSessionCookieAction]', err);
+    return { success: false, error: err.message || 'Erro ao sincronizar cookies de sessão.' };
+  }
+}
+
+/**
+ * Server Action para limpar todos os cookies de sessão no logout.
+ */
+export async function clearSessionCookieAction(): Promise<{ success: boolean }> {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete('spci_session_token');
+    cookieStore.delete('spci_user_role');
+    cookieStore.delete('spci_user_expires');
+    cookieStore.delete('spci_user_provider');
+    cookieStore.delete('spci_shared_token');
+    return { success: true };
+  } catch (err: any) {
+    console.error('[clearSessionCookieAction]', err);
+    return { success: false };
+  }
+}
+
 

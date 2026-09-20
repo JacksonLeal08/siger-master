@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient';
-import { resolveEmailByUsernameAction } from '@/app/actions/userActions';
+import { resolveEmailByUsernameAction, syncSessionCookieAction, clearSessionCookieAction } from '@/app/actions/userActions';
 
 export interface CompatibleUser {
   uid: string;
@@ -28,6 +28,8 @@ export const initAuth = (
       if (typeof document !== 'undefined' && session.access_token) {
         const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
         document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+        // Sincronização atômica de cookies no servidor
+        syncSessionCookieAction({ token: session.access_token }).catch(() => {});
       }
       if (lastProcessedUserId !== session.user.id) {
         lastProcessedUserId = session.user.id;
@@ -47,6 +49,7 @@ export const initAuth = (
   const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') {
       lastProcessedUserId = null;
+      clearSessionCookieAction().catch(() => {});
       if (onAuthFailure) onAuthFailure();
       return;
     }
@@ -55,6 +58,7 @@ export const initAuth = (
       if (typeof document !== 'undefined') {
         const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
         document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+        syncSessionCookieAction({ token: session.access_token }).catch(() => {});
       }
     }
     handleSession(session);
@@ -149,9 +153,16 @@ export const signInWithEmailOrUsername = async (identifier: string, password: st
     });
 
     if (authError) throw authError;
-    if (authData?.session?.access_token && typeof document !== 'undefined') {
-      const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
-      document.cookie = `spci_session_token=${authData.session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+    if (authData?.session?.access_token) {
+      if (typeof document !== 'undefined') {
+        const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `spci_session_token=${authData.session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+      }
+      try {
+        await syncSessionCookieAction({ token: authData.session.access_token });
+      } catch (cErr) {
+        console.warn('[SupabaseAuth] Falha ao sincronizar cookie no servidor:', cErr);
+      }
     }
     return mapSupabaseUser(authData.user);
   } catch (error: any) {
@@ -169,5 +180,8 @@ export const signInWithEmailOrUsername = async (identifier: string, password: st
 };
 
 export const logout = async () => {
+  try {
+    await clearSessionCookieAction();
+  } catch {}
   await supabase.auth.signOut();
 };
