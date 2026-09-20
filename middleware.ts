@@ -30,7 +30,9 @@ export async function middleware(request: NextRequest) {
 
 
   // 2. Leitura dos cookies de sessão e governança corporativa
-  const sessionToken = request.cookies.get('spci_session_token')?.value;
+  const sessionToken = 
+    request.cookies.get('spci_session_token')?.value ||
+    request.cookies.getAll().find(c => c.name.startsWith('sb-') && c.name.includes('-auth-token'))?.value;
   const userRole = request.cookies.get('spci_user_role')?.value;
   const userExpires = request.cookies.get('spci_user_expires')?.value;
 
@@ -108,15 +110,6 @@ export async function middleware(request: NextRequest) {
   if (!sessionToken && isProtectedRoute) {
     url.pathname = '/login';
     return NextResponse.redirect(url);
-  }
-
-  // Se o usuário já possui sessão ativa e tenta acessar a tela de login, encaminha direto ao Cockpit (a menos que esteja trocando de conta com ?switch=true)
-  if (sessionToken && path === '/login') {
-    const isSwitching = url.searchParams.get('switch') === 'true' || url.searchParams.get('new_session') === 'true';
-    if (!isSwitching) {
-      url.pathname = '/dashboard';
-      return NextResponse.redirect(url);
-    }
   }
 
   // 6. Validação de Expiração de Acesso (ABAC Temporal)

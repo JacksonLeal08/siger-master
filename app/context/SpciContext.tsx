@@ -1181,9 +1181,12 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const token = session?.access_token || '';
           const provider = session?.user?.app_metadata?.provider || 'email';
           
-          if (typeof document !== 'undefined' && token) {
-            document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax`;
-            document.cookie = `spci_user_provider=${provider}; path=/; max-age=86400; SameSite=Lax`;
+          if (typeof document !== 'undefined') {
+            const isSecure = window.location.protocol === 'https:' ? '; Secure' : '';
+            if (token) {
+              document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+              document.cookie = `spci_user_provider=${provider}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+            }
           }
           setIsGoogleUser(provider === 'google');
 
@@ -1206,11 +1209,12 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           // 3. Atualiza cookies com a role e expiração corporativa
           if (typeof document !== 'undefined') {
-            document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax`;
+            const isSecure = window.location.protocol === 'https:' ? '; Secure' : '';
+            document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
             if (profile.dataExpiracao) {
-              document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax`;
+              document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
             } else {
-              document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+              document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax${isSecure}`;
             }
           }
 
@@ -1858,13 +1862,14 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Grava cookies de segurança de forma imediata
         if (typeof document !== 'undefined') {
-          document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax`;
-          document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax`;
-          document.cookie = `spci_user_provider=email; path=/; max-age=86400; SameSite=Lax`;
+          const isSecure = window.location.protocol === 'https:' ? '; Secure' : '';
+          document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+          document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+          document.cookie = `spci_user_provider=email; path=/; max-age=86400; SameSite=Lax${isSecure}`;
           if (profile.dataExpiracao) {
-            document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax`;
+            document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
           } else {
-            document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+            document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax${isSecure}`;
           }
         }
         setIsGoogleUser(false);

@@ -36,42 +36,43 @@ console.log('▶ Teste 1: Deduplicação de chamadas de sessão simultâneas...'
 }
 
 // 2. Teste de Regras de Middleware e Redirecionamento de Login
-console.log('\n▶ Teste 2: Lógica do Middleware para rotas protegidas e /login...');
+console.log('\n▶ Teste 2: Lógica do Middleware para rotas protegidas e suporte a cookies Supabase...');
 {
-  function evaluateMiddleware(path, sessionToken, searchParams = new URLSearchParams()) {
+  function evaluateMiddleware(path, cookies = {}) {
     const isProtectedRoute = 
       path.startsWith('/dashboard') || 
       path.startsWith('/configuracoes') || 
       path.startsWith('/extintores');
 
+    const sessionToken = 
+      cookies['spci_session_token'] || 
+      Object.keys(cookies).find(k => k.startsWith('sb-') && k.includes('-auth-token'));
+
     if (!sessionToken && isProtectedRoute) {
       return { redirect: '/login' };
     }
 
-    if (sessionToken && path === '/login') {
-      const isSwitching = searchParams.get('switch') === 'true' || searchParams.get('new_session') === 'true';
-      if (!isSwitching) {
-        return { redirect: '/dashboard' };
-      }
-      return { allow: true };
-    }
-
+    // Tela de login é sempre acessível sem loops de redirecionamento de servidor
     return { allow: true };
   }
 
   // Caso A: Usuário não logado tenta acessar /dashboard -> deve ir para /login
-  const resA = evaluateMiddleware('/dashboard', null);
+  const resA = evaluateMiddleware('/dashboard', {});
   assert.strictEqual(resA.redirect, '/login', 'Usuário não autenticado deve ser redirecionado para /login');
 
-  // Caso B: Usuário já logado acessa /login -> deve ir direto para /dashboard (SEM loop)
-  const resB = evaluateMiddleware('/login', 'valid_token_xyz');
-  assert.strictEqual(resB.redirect, '/dashboard', 'Usuário autenticado em /login deve ir direto para /dashboard');
+  // Caso B: Usuário com cookie nativo do Supabase acessa /dashboard -> permitido!
+  const resB = evaluateMiddleware('/dashboard', { 'sb-katqbezpcssrmicgnshg-auth-token': 'jwt_abc' });
+  assert.strictEqual(resB.allow, true, 'Usuário com cookie do Supabase deve ter acesso permitido ao dashboard');
 
-  // Caso C: Usuário logado clica em "Trocar de Conta" (?switch=true) -> deve permitir ver o login
-  const resC = evaluateMiddleware('/login', 'valid_token_xyz', new URLSearchParams('switch=true'));
-  assert.strictEqual(resC.allow, true, 'Usuário trocando de conta deve conseguir acessar /login?switch=true');
+  // Caso C: Usuário com spci_session_token acessa /dashboard -> permitido!
+  const resC = evaluateMiddleware('/dashboard', { 'spci_session_token': 'jwt_xyz' });
+  assert.strictEqual(resC.allow, true, 'Usuário com spci_session_token deve ter acesso permitido ao dashboard');
 
-  console.log('  ✅ Sucesso: Todas as regras de redirecionamento do middleware validadas contra loops.');
+  // Caso D: Acesso a /login é sempre permitido sem gerar loop de HTTP 307
+  const resD = evaluateMiddleware('/login', { 'spci_session_token': 'jwt_xyz' });
+  assert.strictEqual(resD.allow, true, 'Login deve ser acessível sem redirects no servidor para evitar loops');
+
+  console.log('  ✅ Sucesso: Middleware protege rotas privadas e suporta cookies do Supabase sem gerar loops.');
 }
 
 // 3. Teste de Auto-Redirecionamento no LoginClient

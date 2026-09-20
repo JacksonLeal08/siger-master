@@ -26,7 +26,8 @@ export const initAuth = (
   const handleSession = (session: any) => {
     if (session && session.user) {
       if (typeof document !== 'undefined' && session.access_token) {
-        document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
+        const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
       }
       if (lastProcessedUserId !== session.user.id) {
         lastProcessedUserId = session.user.id;
@@ -141,6 +142,10 @@ export const signInWithEmailOrUsername = async (identifier: string, password: st
     });
 
     if (authError) throw authError;
+    if (authData?.session?.access_token && typeof document !== 'undefined') {
+      const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = `spci_session_token=${authData.session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+    }
     return mapSupabaseUser(authData.user);
   } catch (error: any) {
     console.error('Erro em signInWithEmailOrUsername:', error);
