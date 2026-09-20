@@ -1163,11 +1163,31 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // --- AUTHENTICATION LISTENER ---
   useEffect(() => {
+    let isCancelled = false;
+
+    // Timeout de segurança: nunca deixar a interface travada em 'Verificando Sessão...' por mais de 3.5s
+    const authTimeout = setTimeout(() => {
+      setAuthChecking(false);
+    }, 3500);
+
     const unsubscribe = initAuth(
       async (user) => {
+        if (isCancelled) return;
         setCurrentUser(user);
-        setAuthChecking(true);
+        
         try {
+          // 1. Grava cookies de sessão imediatamente se a sessão do Supabase estiver disponível
+          const { data: { session } } = await supabase.auth.getSession();
+          const token = session?.access_token || '';
+          const provider = session?.user?.app_metadata?.provider || 'email';
+          
+          if (typeof document !== 'undefined' && token) {
+            document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+            document.cookie = `spci_user_provider=${provider}; path=/; max-age=86400; SameSite=Lax`;
+          }
+          setIsGoogleUser(provider === 'google');
+
+          // 2. Carrega perfil e permissões essenciais
           const profile = await registerOrLoginUserProfile({
             uid: user.uid,
             displayName: user.displayName,
@@ -1175,6 +1195,8 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
             photoURL: user.photoURL
           });
           
+          if (isCancelled) return;
+
           const permissions = await getUserPermissions(user.uid);
           profile.permissions = permissions;
           
@@ -1182,19 +1204,18 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setProfileNameInput(profile.name);
           setProfileLogoUrlInput(profile.logoUrl || '');
           
-          // Mapeia e grava o provedor
-          const { data: { session } } = await supabase.auth.getSession();
-          const token = session?.access_token || '';
-          const provider = session?.user?.app_metadata?.provider || 'email';
-          
-          // Grava cookies de segurança para o Middleware do servidor ler
-          document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax`;
-          document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax`;
-          document.cookie = `spci_user_provider=${provider}; path=/; max-age=86400; SameSite=Lax`;
-          setIsGoogleUser(provider === 'google');
+          // 3. Atualiza cookies com a role e expiração corporativa
+          if (typeof document !== 'undefined') {
+            document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax`;
+            if (profile.dataExpiracao) {
+              document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax`;
+            } else {
+              document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+            }
+          }
 
-          // Registrar login se estiver pendente após redirecionamento
-          if (sessionStorage.getItem('spci_login_pending') === 'true') {
+          // Registrar login pendente de OAuth (Google)
+          if (typeof window !== 'undefined' && sessionStorage.getItem('spci_login_pending') === 'true') {
             sessionStorage.removeItem('spci_login_pending');
             setTimeout(() => {
               logSystemAction('LOGIN', undefined, undefined, `Login efetuado com sucesso via autenticação Google.`, {
@@ -1206,68 +1227,76 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }, 500);
           }
 
-          if (profile.dataExpiracao) {
-            document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax`;
-          } else {
-            document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
-          }
+          // Libera a verificação de sessão IMEDIATAMENTE (não bloqueia a navegação do usuário!)
+          setAuthChecking(false);
+          clearTimeout(authTimeout);
 
-          // Se for Admin ou Desenvolvedor, carregar lista de usuários logo após login
+          // 4. Carregamento da lista de usuários em SEGUNDO PLANO (background) para Admin/Desenvolvedor
           if (profile.role === 'Administrador' || profile.role === 'Desenvolvedor') {
-            try {
-              const { getUsersListAction } = await import('@/app/actions/userActions');
-              const res = await getUsersListAction();
-              if (res.success && res.users) {
-                const list = res.users.map((u: any) => ({
-                  uid: u.uid,
-                  name: u.name,
-                  email: u.email,
-                  userName: u.username,
-                  photoURL: '',
-                  logoUrl: '',
-                  role: u.role as any,
-                  status: u.status,
-                  site: u.site || 'TODOS OS SITES (Acesso Global)',
-                  telefoneWhatsapp: u.phone || '',
-                  dataExpiracao: u.dataExpiracao,
-                  createdAt: u.createdAt || new Date().toISOString(),
-                  updatedAt: new Date().toISOString()
-                }));
-                setUserList(list);
+            (async () => {
+              try {
+                const { getUsersListAction } = await import('@/app/actions/userActions');
+                const res = await getUsersListAction();
+                if (!isCancelled && res?.success && res.users) {
+                  const list = res.users.map((u: any) => ({
+                    uid: u.uid,
+                    name: u.name,
+                    email: u.email,
+                    userName: u.username,
+                    photoURL: '',
+                    logoUrl: '',
+                    role: u.role as any,
+                    status: u.status,
+                    site: u.site || 'TODOS OS SITES (Acesso Global)',
+                    telefoneWhatsapp: u.phone || '',
+                    dataExpiracao: u.dataExpiracao,
+                    createdAt: u.createdAt || new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                  }));
+                  setUserList(list);
+                }
+              } catch (e) {
+                console.warn('[Auth] Falha ao carregar lista de usuários em background:', e);
               }
-            } catch (e) {
-              console.warn('[Auth] Falha ao carregar lista de usuários:', e);
-            }
+            })();
           }
         } catch (err: any) {
           console.error("Erro ao sincronizar perfil do usuário:", err);
-        } finally {
           setAuthChecking(false);
+          clearTimeout(authTimeout);
         }
       },
       () => {
+        if (isCancelled) return;
         // Auth failure callback
         setCurrentUser(null);
         setUserProfile(null);
         setIsGoogleUser(false);
         setAuthChecking(false);
+        clearTimeout(authTimeout);
         
         // Limpa cookies de segurança
-        document.cookie = `spci_session_token=; path=/; max-age=0; SameSite=Lax`;
-        document.cookie = `spci_user_role=; path=/; max-age=0; SameSite=Lax`;
-        document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
-        document.cookie = `spci_user_provider=; path=/; max-age=0; SameSite=Lax`;
+        if (typeof document !== 'undefined') {
+          document.cookie = `spci_session_token=; path=/; max-age=0; SameSite=Lax`;
+          document.cookie = `spci_user_role=; path=/; max-age=0; SameSite=Lax`;
+          document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+          document.cookie = `spci_user_provider=; path=/; max-age=0; SameSite=Lax`;
+        }
       }
     );
 
     // Renovação automática do cookie de sessão no evento de TOKEN_REFRESHED ou SIGNED_IN
     const { data: { subscription: refreshSub } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') && session?.access_token) {
-        document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
+        if (typeof document !== 'undefined') {
+          document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
+        }
       }
     });
 
     return () => {
+      isCancelled = true;
+      clearTimeout(authTimeout);
       if (typeof unsubscribe === 'function') {
         unsubscribe();
       }
@@ -1803,7 +1832,6 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [currentUser, userProfile, triggerSuccessNotification, addConsoleLog, logSystemAction]);
 
   const handleCredentialsLogin = useCallback(async (identifier: string, pass: string) => {
-    setAuthChecking(true);
     try {
       addConsoleLog(`[Autenticação] Autenticando credenciais do usuário...`);
       const user = await signInWithEmailOrUsername(identifier, pass);
@@ -1828,17 +1856,18 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token || '';
 
-        // Grava cookies de segurança
-        document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax`;
-        document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax`;
-        document.cookie = `spci_user_provider=email; path=/; max-age=86400; SameSite=Lax`;
-        setIsGoogleUser(false);
-        
-        if (profile.dataExpiracao) {
-          document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax`;
-        } else {
-          document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+        // Grava cookies de segurança de forma imediata
+        if (typeof document !== 'undefined') {
+          document.cookie = `spci_session_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+          document.cookie = `spci_user_role=${profile.role}; path=/; max-age=86400; SameSite=Lax`;
+          document.cookie = `spci_user_provider=email; path=/; max-age=86400; SameSite=Lax`;
+          if (profile.dataExpiracao) {
+            document.cookie = `spci_user_expires=${profile.dataExpiracao}; path=/; max-age=86400; SameSite=Lax`;
+          } else {
+            document.cookie = `spci_user_expires=; path=/; max-age=0; SameSite=Lax`;
+          }
         }
+        setIsGoogleUser(false);
 
         addConsoleLog(`[Autenticação] Login com sucesso de ${profile.name} (${profile.role})`, 'SUCESSO');
         triggerSuccessNotification("Login Realizado! 🟢", `Bem-vindo de volta, ${profile.name}!`);
@@ -1857,8 +1886,6 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error("Erro ao autenticar por credenciais:", err);
       addConsoleLog(`[Erro Autenticação] Falha no login: ${err.message || err}`, 'ERRO');
       throw err;
-    } finally {
-      setAuthChecking(false);
     }
   }, [addConsoleLog, triggerSuccessNotification, logSystemAction]);
 

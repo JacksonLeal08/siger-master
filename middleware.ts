@@ -110,10 +110,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Permite acesso à tela de login para que o usuário possa visualizar a conta conectada ou alternar credenciais
+  // Se o usuário já possui sessão ativa e tenta acessar a tela de login, encaminha direto ao Cockpit (a menos que esteja trocando de conta com ?switch=true)
   if (sessionToken && path === '/login') {
-    const isDirectNavigate = url.searchParams.get('redirect') === 'dashboard';
-    if (isDirectNavigate) {
+    const isSwitching = url.searchParams.get('switch') === 'true' || url.searchParams.get('new_session') === 'true';
+    if (!isSwitching) {
       url.pathname = '/dashboard';
       return NextResponse.redirect(url);
     }

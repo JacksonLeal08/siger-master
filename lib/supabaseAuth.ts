@@ -21,30 +21,42 @@ export const initAuth = (
   onAuthSuccess?: (user: CompatibleUser) => void,
   onAuthFailure?: () => void
 ) => {
-  // Listen for auth state changes
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+  let lastProcessedUserId: string | null = null;
+
+  const handleSession = (session: any) => {
     if (session && session.user) {
       if (typeof document !== 'undefined' && session.access_token) {
         document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
       }
-      if (onAuthSuccess) {
-        onAuthSuccess(mapSupabaseUser(session.user));
+      if (lastProcessedUserId !== session.user.id) {
+        lastProcessedUserId = session.user.id;
+        if (onAuthSuccess) {
+          onAuthSuccess(mapSupabaseUser(session.user));
+        }
       }
     } else {
-      if (onAuthFailure) onAuthFailure();
+      if (lastProcessedUserId !== null) {
+        lastProcessedUserId = null;
+        if (onAuthFailure) onAuthFailure();
+      }
     }
+  };
+
+  // Listen for auth state changes
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_OUT') {
+      lastProcessedUserId = null;
+      if (onAuthFailure) onAuthFailure();
+      return;
+    }
+    handleSession(session);
   });
 
-  // Check current session immediately on startup
+  // Check current session immediately on startup for faster bootstrap
   supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session && session.user) {
-      if (typeof document !== 'undefined' && session.access_token) {
-        document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
-      }
-      if (onAuthSuccess) {
-        onAuthSuccess(mapSupabaseUser(session.user));
-      }
-    }
+    handleSession(session);
+  }).catch((err) => {
+    console.warn('[SupabaseAuth] Falha ao ler sessão inicial:', err);
   });
 
   return () => {

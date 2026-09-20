@@ -84,7 +84,7 @@ export default function QuietLuxuryHome() {
             <ThemeToggle />
 
             <Link
-              href="/login"
+              href="/dashboard"
               className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all duration-300 active:scale-95 flex items-center gap-2"
             >
               <span>Acessar Cockpit</span>
@@ -136,7 +136,7 @@ export default function QuietLuxuryHome() {
             className="flex flex-wrap items-center justify-center gap-4 pt-4"
           >
             <Link
-              href="/login"
+              href="/dashboard"
               className="px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-red-950/20 transition-all duration-300 active:scale-95 flex items-center gap-3 border-none cursor-pointer"
             >
               <span>INICIAR VISTORIA DE CAMPO</span>
@@ -480,7 +480,7 @@ export default function QuietLuxuryHome() {
         </p>
         <div>
           <Link
-            href="/login"
+            href="/dashboard"
             className="inline-flex items-center gap-3 px-10 py-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl transition-all duration-300 active:scale-95 border-none"
           >
             <span>ENTRAR NO SISTEMA SPCI</span>
