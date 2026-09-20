@@ -43,12 +43,19 @@ export const initAuth = (
     }
   };
 
-  // Listen for auth state changes
+  // Listen for auth state changes (centralized: handles SIGNED_IN, TOKEN_REFRESHED, SIGNED_OUT)
   const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_OUT') {
       lastProcessedUserId = null;
       if (onAuthFailure) onAuthFailure();
       return;
+    }
+    // Renew session cookie on TOKEN_REFRESHED to keep middleware in sync
+    if (event === 'TOKEN_REFRESHED' && session?.access_token) {
+      if (typeof document !== 'undefined') {
+        const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+        document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
+      }
     }
     handleSession(session);
   });

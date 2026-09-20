@@ -48,17 +48,24 @@ export default function LoginClient() {
   const redirectedRef = React.useRef(false);
 
   // Redirecionamento automático quando já houver sessão ativa confirmada
+  // Aguarda currentUser + userProfile + authChecking=false para garantir que a sessão está 100% ativa
   useEffect(() => {
     if (!authChecking && currentUser && userProfile && !redirectedRef.current) {
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const isSwitch = params.get('switch') === 'true' || params.get('new_session') === 'true';
         if (!isSwitch) {
+          // Verifica se o perfil possui status ativo antes de redirecionar
+          const statusClean = String(userProfile.status || '').toLowerCase();
+          if (statusClean !== 'active' && statusClean !== 'ativo') {
+            // Perfil pendente/suspenso: não redireciona, o dashboard layout irá exibir a tela de acesso bloqueado
+          }
           redirectedRef.current = true;
           setIsRedirecting(true);
+          // Delay de 500ms para garantir que os cookies de sessão foram propagados
           setTimeout(() => {
             window.location.assign('/dashboard');
-          }, 150);
+          }, 500);
         }
       }
     }

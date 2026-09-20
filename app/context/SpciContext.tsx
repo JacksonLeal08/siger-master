@@ -736,11 +736,35 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isSyncingDatabaseRef.current) {
       return;
     }
+    // Guard: não tenta sync se não houver sessão ativa no Supabase
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        console.warn('[Sincronia] Sessão Supabase não disponível. Sync adiado.');
+        return;
+      }
+    } catch {
+      console.warn('[Sincronia] Não foi possível verificar sessão. Sync adiado.');
+      return;
+    }
     isSyncingDatabaseRef.current = true;
     try {
       addConsoleLog(`[Sincronia] Carregando dados atualizados do Banco de Dados...`, 'INFO');
+
+      // Helper resiliente: cada categoria é buscada isoladamente com retry
+      const safeFetch = async (cat: string): Promise<any[]> => {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            return await getAssetsList(cat);
+          } catch (err) {
+            console.warn(`[Sincronia] Falha ao buscar ${cat} (tentativa ${attempt + 1}):`, err);
+            if (attempt === 0) await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+        return [];
+      };
       
-      const extDb = await getAssetsList('extintores');
+      const extDb = await safeFetch('extintores');
       if (Array.isArray(extDb) && extDb.length > 0) {
         const cleanExtDb = deduplicateAssetsList(extDb);
         setExtintores(cleanExtDb);
@@ -749,7 +773,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           localStorage.setItem('spci_extintores', JSON.stringify(cleanExtDb));
         }
       }
-      const hidDb = await getAssetsList('hidrantes');
+      const hidDb = await safeFetch('hidrantes');
       if (Array.isArray(hidDb) && hidDb.length > 0) {
         setHidrantes(hidDb);
         await idb.setAll('hidrantes', hidDb);
@@ -757,7 +781,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           localStorage.setItem('spci_hidrantes', JSON.stringify(hidDb));
         }
       }
-      const sinDb = await getAssetsList('sinalizacoes');
+      const sinDb = await safeFetch('sinalizacoes');
       if (Array.isArray(sinDb) && sinDb.length > 0) {
         setSinalizacoes(sinDb);
         await idb.setAll('sinalizacoes', sinDb);
@@ -765,7 +789,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           localStorage.setItem('spci_sinalizacoes', JSON.stringify(sinDb));
         }
       }
-      const lumDb = await getAssetsList('iluminacao');
+      const lumDb = await safeFetch('iluminacao');
       if (Array.isArray(lumDb) && lumDb.length > 0) {
         setIluminacoes(lumDb);
         await idb.setAll('iluminacao', lumDb);
@@ -773,7 +797,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           localStorage.setItem('spci_iluminacao', JSON.stringify(lumDb));
         }
       }
-      const bomDb = await getAssetsList('bombas');
+      const bomDb = await safeFetch('bombas');
       if (Array.isArray(bomDb) && bomDb.length > 0) {
         setBombas(bomDb);
         await idb.setAll('bombas', bomDb);
@@ -877,12 +901,19 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [addConsoleLog]);
 
   // --- AUTOMATIC SUPABASE SYNC ON AUTH ---
+  // Delay sync por 1.5s após login para dar tempo ao Supabase de estabilizar a sessão
+  const syncDelayRef = React.useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
-    if (currentUser) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      syncWithRealDatabase();
+    if (currentUser && userProfile) {
+      if (syncDelayRef.current) clearTimeout(syncDelayRef.current);
+      syncDelayRef.current = setTimeout(() => {
+        syncWithRealDatabase();
+      }, 1500);
     }
-  }, [currentUser, syncWithRealDatabase]);
+    return () => {
+      if (syncDelayRef.current) clearTimeout(syncDelayRef.current);
+    };
+  }, [currentUser, userProfile, syncWithRealDatabase]);
 
   // Listener para sincronização reativa imediata quando houver trocas ou movimentações
   useEffect(() => {
@@ -1289,14 +1320,9 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Renovação automática do cookie de sessão no evento de TOKEN_REFRESHED ou SIGNED_IN
-    const { data: { subscription: refreshSub } } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') && session?.access_token) {
-        if (typeof document !== 'undefined') {
-          document.cookie = `spci_session_token=${session.access_token}; path=/; max-age=86400; SameSite=Lax`;
-        }
-      }
-    });
+    // NOTA: A renovação de cookie já é feita pelo initAuth via handleSession.
+    // Removida a segunda assinatura de onAuthStateChange que causava race conditions
+    // e callbacks duplicados, gerando o loop de autenticação.
 
     return () => {
       isCancelled = true;
@@ -1304,7 +1330,6 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (typeof unsubscribe === 'function') {
         unsubscribe();
       }
-      refreshSub.unsubscribe();
     };
   }, [addConsoleLog]);
 
