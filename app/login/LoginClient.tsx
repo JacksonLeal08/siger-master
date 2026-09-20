@@ -54,11 +54,11 @@ export default function LoginClient() {
         const isSwitch = params.get('switch') === 'true' || params.get('new_session') === 'true';
         if (!isSwitch && !isRedirecting) {
           setIsRedirecting(true);
-          router.push('/dashboard');
+          window.location.assign('/dashboard');
         }
       }
     }
-  }, [authChecking, currentUser, userProfile, isRedirecting, router]);
+  }, [authChecking, currentUser, userProfile, isRedirecting]);
 
   // Capturar e tratar erros de links de e-mail expirados / hash de autenticação
   useEffect(() => {
@@ -127,8 +127,8 @@ export default function LoginClient() {
         setProgress(100);
         setLoadingStatus('Acesso autorizado! Conectando ao Cockpit...');
         setTimeout(() => {
-          router.push('/dashboard');
-        }, 300);
+          window.location.assign('/dashboard');
+        }, 200);
       } else {
         setLoading(false);
         setErrorMsg('Credenciais inválidas.');
@@ -282,7 +282,7 @@ export default function LoginClient() {
                     type="button"
                     onClick={() => {
                       setIsRedirecting(true);
-                      router.push('/dashboard');
+                      window.location.assign('/dashboard');
                     }}
                     className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none shadow-md flex items-center justify-center gap-1.5 active:scale-95"
                   >

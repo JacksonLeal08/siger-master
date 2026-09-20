@@ -741,7 +741,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       addConsoleLog(`[Sincronia] Carregando dados atualizados do Banco de Dados...`, 'INFO');
       
       const extDb = await getAssetsList('extintores');
-      if (Array.isArray(extDb)) {
+      if (Array.isArray(extDb) && extDb.length > 0) {
         const cleanExtDb = deduplicateAssetsList(extDb);
         setExtintores(cleanExtDb);
         await idb.setAll('extintores', cleanExtDb);
@@ -750,7 +750,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       const hidDb = await getAssetsList('hidrantes');
-      if (Array.isArray(hidDb)) {
+      if (Array.isArray(hidDb) && hidDb.length > 0) {
         setHidrantes(hidDb);
         await idb.setAll('hidrantes', hidDb);
         if (typeof window !== 'undefined') {
@@ -758,7 +758,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       const sinDb = await getAssetsList('sinalizacoes');
-      if (Array.isArray(sinDb)) {
+      if (Array.isArray(sinDb) && sinDb.length > 0) {
         setSinalizacoes(sinDb);
         await idb.setAll('sinalizacoes', sinDb);
         if (typeof window !== 'undefined') {
@@ -766,7 +766,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       const lumDb = await getAssetsList('iluminacao');
-      if (Array.isArray(lumDb)) {
+      if (Array.isArray(lumDb) && lumDb.length > 0) {
         setIluminacoes(lumDb);
         await idb.setAll('iluminacao', lumDb);
         if (typeof window !== 'undefined') {
@@ -774,7 +774,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
       const bomDb = await getAssetsList('bombas');
-      if (Array.isArray(bomDb)) {
+      if (Array.isArray(bomDb) && bomDb.length > 0) {
         setBombas(bomDb);
         await idb.setAll('bombas', bomDb);
         if (typeof window !== 'undefined') {
