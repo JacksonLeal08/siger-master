@@ -134,6 +134,10 @@ class SoundNotificationService {
     }
   }
 
+  public playSuccessSound(): void {
+    this.playSuccessChime();
+  }
+
   /**
    * Notificação sutil / Bipe neutro
    */
@@ -161,6 +165,67 @@ class SoundNotificationService {
       console.warn('[SoundService] Falha ao sintetizar blip:', e);
     }
   }
+
+  /**
+   * Alerta Antifraude de Combustível (Bi-tonal descendente com ruído)
+   */
+  public playFuelAnomalyAlert(): void {
+    if (!this.isEnabled()) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const masterGain = ctx.createGain();
+      const vol = this.getVolume();
+      masterGain.gain.setValueAtTime(vol * 0.5, ctx.currentTime);
+      masterGain.connect(ctx.destination);
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.3);
+      osc.connect(masterGain);
+      osc.start(now);
+      osc.stop(now + 0.35);
+
+      masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    } catch (e) {
+      console.warn('[SoundService] Falha ao sintetizar som de anomalia de combustível:', e);
+    }
+  }
+
+  /**
+   * Alerta Crítico TWI (Pneu em limite ilegal <= 1.6mm - CONTRAN 558/80)
+   * Pulso estroboscópico de advertência severa (três bipes de alerta)
+   */
+  public playTwiCriticalAlert(): void {
+    if (!this.isEnabled()) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const masterGain = ctx.createGain();
+      const vol = this.getVolume();
+      masterGain.gain.setValueAtTime(vol * 0.6, ctx.currentTime);
+      masterGain.connect(ctx.destination);
+
+      const now = ctx.currentTime;
+      [0, 0.12, 0.24].forEach((delay) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(987.77, now + delay); // B5
+        osc.connect(masterGain);
+        osc.start(now + delay);
+        osc.stop(now + delay + 0.08);
+      });
+
+      masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    } catch (e) {
+      console.warn('[SoundService] Falha ao sintetizar som crítico TWI:', e);
+    }
+  }
 }
 
 export const soundNotificationService = new SoundNotificationService();
+

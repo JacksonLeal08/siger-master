@@ -217,6 +217,7 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
   // Itens da navegação padrão (satélites unificados fora do módulo Extintores)
   const navItems = [
     { id: 'dashboard', label: 'Dashboard / Visão Geral', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
+    { id: 'viaturas', label: 'Viaturas & Frota', icon: <Truck className="w-5 h-5" />, path: '/viaturas' },
     { id: 'hidrantes', label: 'Hidrantes & Abrigos', icon: <Droplet className="w-5 h-5" />, path: '/hidrantes' },
     { id: 'sinalizacao', label: 'Sinalização NBR', icon: <AlertTriangle className="w-5 h-5" />, path: '/sinalizacao' },
     { id: 'iluminacao', label: 'Iluminação Emergência', icon: <Lightbulb className="w-5 h-5" />, path: '/iluminacao' },
