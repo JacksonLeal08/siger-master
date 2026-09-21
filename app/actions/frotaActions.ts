@@ -10,7 +10,9 @@ import {
   FrotaKpisSummary,
   classificarSulcoTwi,
   RankingPostoInfo,
-  ViaturaTrackingTelemetry
+  ViaturaTrackingTelemetry,
+  ChecklistVeicular,
+  ChecklistItemAvaliacao
 } from '@/lib/types/frota';
 import { FuelAuditService } from '@/lib/fuelAuditService';
 import { FuelPricingService } from '@/lib/services/FuelPricingService';
@@ -562,3 +564,223 @@ export async function getFrotaKpisAction(contratoId?: string): Promise<{ success
     return { success: false, error: err?.message || 'Falha no cálculo dos KPIs' };
   }
 }
+
+// ==============================================================================
+// 6. CHECKLISTS TÉCNICOS AUTOMOTIVOS & DUAL-PHOTO EVIDENCE
+// ==============================================================================
+
+export async function salvarChecklistVeicularAction(
+  checklist: ChecklistVeicular
+): Promise<{ success: boolean; data?: ChecklistVeicular; osId?: string; error?: string }> {
+  try {
+    const supabase = getSupabaseAdminClient();
+
+    if (!checklist.viatura_id) {
+      throw new Error('Viatura ID é obrigatório para registrar checklist.');
+    }
+
+    // 1. Inserir cabeçalho do checklist
+    const checklistPayload = {
+      contrato_id: checklist.contrato_id || 'SALOBO',
+      viatura_id: checklist.viatura_id,
+      tecnico_nome: checklist.tecnico_nome,
+      tipo_checklist: checklist.tipo_checklist || 'DIARIO_PREVENTIVO',
+      odometro_km: Number(checklist.odometro_km || 0),
+      horimetro: checklist.horimetro ? Number(checklist.horimetro) : null,
+      status_aprovacao: checklist.status_aprovacao,
+      percentual_conformidade: Number(checklist.percentual_conformidade || 100),
+      total_itens: Number(checklist.total_itens || 0),
+      total_conformes: Number(checklist.total_conformes || 0),
+      total_nao_conformes: Number(checklist.total_nao_conformes || 0),
+      latitude: checklist.latitude ? Number(checklist.latitude) : null,
+      longitude: checklist.longitude ? Number(checklist.longitude) : null,
+      observacoes_gerais: checklist.observacoes_gerais || null,
+      created_at: new Date().toISOString()
+    };
+
+    const { data: savedChecklist, error: errChecklist } = await supabase
+      .from('checklists_veiculares')
+      .insert(checklistPayload)
+      .select('*')
+      .single();
+
+    if (errChecklist) {
+      console.error('[frotaActions] Erro ao gravar cabeçalho do checklist:', errChecklist);
+      throw errChecklist;
+    }
+
+    // 2. Inserir itens avaliados com as fotos duplas
+    if (checklist.itens && checklist.itens.length > 0) {
+      const itensComChecklistId = checklist.itens.map(item => ({
+        checklist_id: savedChecklist.id,
+        sistema_grupo: item.sistema_grupo,
+        item_nome: item.item_nome,
+        parecer: item.parecer,
+        gravidade_anomalia: item.gravidade_anomalia || null,
+        observacao_anomalia: item.observacao_anomalia || null,
+        foto_evidencia_1_url: item.foto_evidencia_1_url || null,
+        foto_evidencia_2_url: item.foto_evidencia_2_url || null
+      }));
+
+      const { error: errItens } = await supabase
+        .from('checklist_itens_avaliacao')
+        .insert(itensComChecklistId);
+
+      if (errItens) {
+        console.error('[frotaActions] Erro ao gravar itens avaliados:', errItens);
+      }
+    }
+
+    // 3. Disparo Automático de Ordem de Serviço se houver anomalias MÉDIAS ou CRÍTICAS
+    const itensComAvaria = checklist.itens?.filter(
+      i => i.parecer === 'NAO_CONFORME' && 
+           (i.gravidade_anomalia === 'MEDIA' || i.gravidade_anomalia === 'CRITICA')
+    ) || [];
+
+    let generatedOsId: string | null = null;
+
+    if (itensComAvaria.length > 0) {
+      const temCritico = itensComAvaria.some(i => i.gravidade_anomalia === 'CRITICA');
+      const discriminacao = itensComAvaria
+        .map(i => `• [${i.sistema_grupo}] ${i.item_nome} (${i.gravidade_anomalia === 'CRITICA' ? 'IMPEDITIVA' : 'MÉDIA'})\n  Relato: ${i.observacao_anomalia || 'Sem detalhes informados'}`)
+        .join('\n\n');
+
+      const osPayload = {
+        contrato_id: checklist.contrato_id || 'SALOBO',
+        viatura_id: checklist.viatura_id,
+        numero_os: `OS-CHK-${Date.now().toString().slice(-6)}`,
+        tipo_os: 'INTERNA',
+        natureza_manutencao: 'CORRETIVA',
+        odometro_km: Number(checklist.odometro_km || 0),
+        descricao_servico: `[Abertura Automática via Checklist Veicular]\nVistoriador: ${checklist.tecnico_nome}\n\nANOMALIAS IDENTIFICADAS:\n${discriminacao}`,
+        status: 'ABERTA',
+        data_abertura: new Date().toISOString()
+      };
+
+      const { data: osGerada, error: osErr } = await supabase
+        .from('ordens_servico_frota')
+        .insert(osPayload)
+        .select('id')
+        .single();
+
+      if (!osErr && osGerada?.id) {
+        generatedOsId = osGerada.id;
+
+        // Vínculo da OS no checklist
+        await supabase
+          .from('checklists_veiculares')
+          .update({ ordem_servico_gerada_id: generatedOsId })
+          .eq('id', savedChecklist.id);
+
+        // Atualização do status operacional da viatura
+        const novoStatusViatura = temCritico ? 'INTERDITADO' : 'EM_MANUTENCAO_INTERNA';
+        await supabase
+          .from('viaturas')
+          .update({ status_operacional: novoStatusViatura })
+          .eq('id', checklist.viatura_id);
+      }
+    }
+
+    // 4. Atualizar odômetro da viatura se maior que o atual
+    const { data: vtrAtual } = await supabase
+      .from('viaturas')
+      .select('odometro_atual_km')
+      .eq('id', checklist.viatura_id)
+      .single();
+
+    if (checklist.odometro_km && (!vtrAtual?.odometro_atual_km || checklist.odometro_km > vtrAtual.odometro_atual_km)) {
+      await supabase
+        .from('viaturas')
+        .update({ odometro_atual_km: checklist.odometro_km })
+        .eq('id', checklist.viatura_id);
+    }
+
+    return { 
+      success: true, 
+      data: savedChecklist as ChecklistVeicular, 
+      osId: generatedOsId || undefined 
+    };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao salvar checklist veicular:', err);
+    return { success: false, error: err?.message || 'Falha ao processar checklist veicular' };
+  }
+}
+
+export async function listChecklistsAction(
+  viaturaId?: string, 
+  contratoId?: string
+): Promise<{ success: boolean; data?: ChecklistVeicular[]; error?: string }> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    let query = supabase
+      .from('checklists_veiculares')
+      .select(`
+        *,
+        viatura:viaturas (
+          id,
+          prefixo_frota,
+          placa,
+          tipo_veiculo,
+          marca,
+          modelo
+        )
+      `)
+      .order('created_at', { ascending: false });
+
+    if (viaturaId) {
+      query = query.eq('viatura_id', viaturaId);
+    }
+    if (contratoId && contratoId !== 'TODOS' && contratoId !== 'GLOBAL') {
+      query = query.eq('contrato_id', contratoId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return { success: true, data: (data || []) as ChecklistVeicular[] };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao listar checklists:', err);
+    return { success: false, error: err?.message || 'Erro ao carregar histórico de checklists' };
+  }
+}
+
+export async function getChecklistByIdAction(
+  checklistId: string
+): Promise<{ success: boolean; data?: ChecklistVeicular; error?: string }> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { data: checklist, error: chkErr } = await supabase
+      .from('checklists_veiculares')
+      .select(`
+        *,
+        viatura:viaturas (
+          id,
+          prefixo_frota,
+          placa,
+          tipo_veiculo,
+          marca,
+          modelo,
+          chassi
+        )
+      `)
+      .eq('id', checklistId)
+      .single();
+
+    if (chkErr || !checklist) throw chkErr || new Error('Checklist não encontrado');
+
+    const { data: itens, error: itensErr } = await supabase
+      .from('checklist_itens_avaliacao')
+      .select('*')
+      .eq('checklist_id', checklistId)
+      .order('sistema_grupo', { ascending: true });
+
+    if (!itensErr && itens) {
+      checklist.itens = itens as ChecklistItemAvaliacao[];
+    }
+
+    return { success: true, data: checklist as ChecklistVeicular };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao buscar checklist por ID:', err);
+    return { success: false, error: err?.message || 'Erro ao carregar detalhes do checklist' };
+  }
+}
+

@@ -30,6 +30,7 @@ import { AbastecimentoModal } from '@/app/components/frota/AbastecimentoModal';
 import { OrdemServicoModal } from '@/app/components/frota/OrdemServicoModal';
 import { OficinaModal } from '@/app/components/frota/OficinaModal';
 import { TerminalMobileShareModal } from '@/app/components/frota/TerminalMobileShareModal';
+import { ChecklistsFrotaTab } from '@/app/components/frota/ChecklistsFrotaTab';
 import { FrotaDockBar, MinimizedWindow } from '@/app/components/frota/FrotaDockBar';
 import { 
   Truck, 
@@ -38,6 +39,7 @@ import {
   Fuel, 
   Wrench, 
   Disc, 
+  ClipboardCheck,
   ShieldAlert, 
   AlertTriangle, 
   CheckCircle2, 
@@ -83,7 +85,7 @@ export default function ViaturasPage() {
   }, [activeSite, userProfile]);
 
   // Aba Ativa Principal
-  const [activeTab, setActiveTab] = useState<'painel' | 'mapa' | 'abastecimentos' | 'oficinas'>('painel');
+  const [activeTab, setActiveTab] = useState<'painel' | 'mapa' | 'abastecimentos' | 'oficinas' | 'checklists'>('painel');
 
   // Estados de Dados
   const [viaturas, setViaturas] = useState<Viatura[]>([]);
@@ -342,6 +344,18 @@ export default function ViaturasPage() {
         >
           <Building2 className="w-4 h-4 text-blue-500" />
           Oficinas Credenciadas ({oficinas.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('checklists')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'checklists'
+              ? 'bg-red-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <ClipboardCheck className="w-4 h-4 text-emerald-500" />
+          Checklists & Vistorias Técnicas
         </button>
       </div>
 
@@ -696,6 +710,11 @@ export default function ViaturasPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* ABA 5: CHECKLISTS & VISTORIAS TÉCNICAS */}
+      {activeTab === 'checklists' && (
+        <ChecklistsFrotaTab contratoId={currentContratoId} />
       )}
 
       {/* Modal: Cadastro & Edição de Viatura */}

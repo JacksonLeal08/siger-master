@@ -26,13 +26,20 @@ import {
   ChevronRight,
   ShieldCheck,
   Check,
-  Info
+  Info,
+  Sun,
+  Moon,
+  Wrench,
+  ClipboardCheck
 } from 'lucide-react';
 import { Viatura, TipoCombustivel, TipoVeiculo } from '@/lib/types/frota';
-import { listViaturasAction, registrarAbastecimentoAction } from '@/app/actions/frotaActions';
+import { listViaturasAction, registrarAbastecimentoAction, salvarChecklistVeicularAction } from '@/app/actions/frotaActions';
 import { FuelPricingService } from '@/lib/services/FuelPricingService';
 import { FleetLoadingScreen } from '@/app/components/frota/FleetLoadingScreen';
 import { terminalOfflineSync, QueuedAbastecimento } from '@/lib/services/terminalOfflineSync';
+import { TerminalActionHub } from '@/app/components/frota/TerminalActionHub';
+import { VeiculoChecklistForm } from '@/app/components/frota/VeiculoChecklistForm';
+import { VeiculoOrdemServicoForm } from '@/app/components/frota/VeiculoOrdemServicoForm';
 
 // Tipos de Categorias com Ícones para as Pílulas Horizontais
 const CATEGORIAS_PILULAS: { id: string; label: string; icon: string }[] = [
@@ -52,6 +59,15 @@ const POSTOS_SUGERIDOS_REGIAO = [
   'Posto Pioneiro - Serra dos Carajás',
 ];
 
+export type EtapaTerminal = 
+  | 'LOADING' 
+  | 'CATALOG' 
+  | 'HUB' 
+  | 'FORM_ABASTECER' 
+  | 'FORM_OS' 
+  | 'FORM_CHECKLIST' 
+  | 'SUCCESS';
+
 function TerminalAbastecerContent() {
   const searchParams = useSearchParams();
   const contratoQuery = searchParams?.get('contrato') || 'SALOBO';
@@ -60,9 +76,13 @@ function TerminalAbastecerContent() {
   // Etapas do Fluxo Operacional:
   // 1: LOADING (FleetLoadingScreen)
   // 2: CATALOG (Catálogo de Viaturas)
-  // 3: FORM (Formulário de Abastecimento com GPS e Trava)
-  // 4: SUCCESS (Confirmação com Recibo Digital)
-  const [etapa, setEtapa] = useState<'LOADING' | 'CATALOG' | 'FORM' | 'SUCCESS'>('LOADING');
+  // 3: HUB (Hub Tático com 3 Cards de Ação)
+  // 4: FORM_ABASTECER (Abastecimento, Cupom, Calibração, GPS)
+  // 5: FORM_OS (Abertura Direta de OS Interna/Oficina Externa)
+  // 6: FORM_CHECKLIST (Checklist Técnico Veicular com Dual-Photo Evidence)
+  // 7: SUCCESS (Confirmação com Recibo Digital)
+  const [etapa, setEtapa] = useState<EtapaTerminal>('LOADING');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
   // Estado de Conectividade e Fila
   const [isOnline, setIsOnline] = useState(true);
@@ -277,7 +297,7 @@ function TerminalAbastecerContent() {
     return !houveCalibracao || !fotoCalibrador;
   }, [statusCalibracaoViatura, houveCalibracao, fotoCalibrador]);
 
-  // Selecionar Viatura e avançar para o formulário
+  // Selecionar Viatura e avançar para o Hub Tático
   const handleSelectViatura = (v: Viatura) => {
     setSelectedViatura(v);
     setTipoCombustivel(v.tipo_combustivel || 'DIESEL_S10');
@@ -286,7 +306,7 @@ function TerminalAbastecerContent() {
     setFotoCalibrador(null);
     setFotoCupom(null);
     setErroValidacao(null);
-    setEtapa('FORM');
+    setEtapa('HUB');
   };
 
   // Upload da foto do Cupom Fiscal
@@ -465,24 +485,45 @@ function TerminalAbastecerContent() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col items-center justify-start pb-safe pt-safe selection:bg-red-500 selection:text-white">
+    <div className={`min-h-screen font-sans flex flex-col items-center justify-start pb-safe pt-safe selection:bg-red-500 selection:text-white transition-colors duration-200 ${
+      theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-slate-100 text-slate-900'
+    }`}>
       {/* Background sutil com vinheta esportiva */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black pointer-events-none" />
+      {theme === 'dark' ? (
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black pointer-events-none" />
+      ) : (
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200 via-slate-100 to-slate-200 pointer-events-none" />
+      )}
 
       {/* Container Mobile App Shell */}
-      <div className="relative z-10 w-full max-w-lg min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/80 shadow-2xl">
+      <div className={`relative z-10 w-full max-w-lg min-h-screen flex flex-col shadow-2xl transition-colors duration-200 ${
+        theme === 'dark' ? 'bg-zinc-950 border-x border-zinc-900/80 text-zinc-100' : 'bg-slate-50 border-x border-slate-200 text-slate-900'
+      }`}>
         
         {/* ==================================================================== */}
         {/* BARRA SUPERIOR FIXA (APP SHELL HEADER) */}
         {/* ==================================================================== */}
-        <header className="sticky top-0 z-30 px-4 py-3.5 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900 flex items-center justify-between">
+        <header className={`sticky top-0 z-30 px-4 py-3.5 backdrop-blur-md border-b flex items-center justify-between transition-colors duration-200 ${
+          theme === 'dark' ? 'bg-zinc-950/90 border-zinc-900' : 'bg-white/95 border-slate-200'
+        }`}>
           <div className="flex items-center gap-3">
-            {etapa === 'FORM' && (
+            {etapa !== 'CATALOG' && (
               <button
                 type="button"
-                onClick={() => setEtapa('CATALOG')}
-                className="p-1.5 -ml-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 active:scale-95 transition-all"
-                title="Voltar ao catálogo"
+                onClick={() => {
+                  if (etapa === 'HUB') {
+                    setSelectedViatura(null);
+                    setEtapa('CATALOG');
+                  } else {
+                    setEtapa('HUB');
+                  }
+                }}
+                className={`p-1.5 -ml-1 rounded-xl border active:scale-95 transition-all ${
+                  theme === 'dark'
+                    ? 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border-zinc-800'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+                }`}
+                title={etapa === 'HUB' ? 'Voltar ao Catálogo' : 'Voltar ao Hub'}
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -495,19 +536,41 @@ function TerminalAbastecerContent() {
                   <span className="text-[10px] font-black tracking-widest text-red-500 uppercase">
                     SPCI // TERMINAL
                   </span>
-                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-800 font-bold text-zinc-300">
+                  <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-bold border ${
+                    theme === 'dark' ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-slate-100 border-slate-300 text-slate-700'
+                  }`}>
                     SITE: {contratoNome}
                   </span>
                 </div>
-                <h1 className="text-xs font-black text-white tracking-wide uppercase">
-                  {etapa === 'FORM' ? 'Registro de Abastecimento' : 'Catálogo de Viaturas'}
+                <h1 className={`text-xs font-black tracking-wide uppercase ${
+                  theme === 'dark' ? 'text-white' : 'text-slate-900'
+                }`}>
+                  {etapa === 'CATALOG' && 'Catálogo de Viaturas'}
+                  {etapa === 'HUB' && 'Hub Operacional Tático'}
+                  {etapa === 'FORM_ABASTECER' && 'Registro de Abastecimento'}
+                  {etapa === 'FORM_OS' && 'Abertura de Ordem de Serviço'}
+                  {etapa === 'FORM_CHECKLIST' && 'Checklist Técnico Veicular'}
+                  {etapa === 'SUCCESS' && 'Comprovante Digital'}
                 </h1>
               </div>
             </div>
           </div>
 
-          {/* Badge de Conectividade e Fila */}
+          {/* Badge de Conectividade, Fila e Tema */}
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+              className={`p-1.5 rounded-xl border transition-all active:scale-95 ${
+                theme === 'dark'
+                  ? 'bg-zinc-900 hover:bg-zinc-800 text-amber-400 border-zinc-800'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
+              }`}
+              title={theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'}
+            >
+              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            </button>
+
             {pendingSyncCount > 0 && (
               <button
                 type="button"
@@ -687,7 +750,7 @@ function TerminalAbastecerContent() {
                         )}
 
                         <span className="text-xs font-bold text-red-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                          Abastecer <ChevronRight className="w-3.5 h-3.5" />
+                          Acessar Hub <ChevronRight className="w-3.5 h-3.5" />
                         </span>
                       </div>
                     </div>
@@ -699,9 +762,67 @@ function TerminalAbastecerContent() {
         )}
 
         {/* ==================================================================== */}
-        {/* ETAPA 3: FORMULÁRIO DE ABASTECIMENTO COM GPS & TRAVA */}
+        {/* ETAPA 3: HUB TÁTICO COM 3 CARDS INTERATIVOS DE AÇÃO */}
         {/* ==================================================================== */}
-        {etapa === 'FORM' && selectedViatura && (
+        {etapa === 'HUB' && selectedViatura && (
+          <main className="flex-1 p-4">
+            <TerminalActionHub
+              viatura={selectedViatura}
+              contratoId={contratoNome}
+              theme={theme}
+              onToggleTheme={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+              onSelectAction={(action) => {
+                if (action === 'ABASTECER') setEtapa('FORM_ABASTECER');
+                else if (action === 'ORDEM_SERVICO') setEtapa('FORM_OS');
+                else if (action === 'CHECKLIST') setEtapa('FORM_CHECKLIST');
+              }}
+              onChangeViatura={() => {
+                setSelectedViatura(null);
+                setEtapa('CATALOG');
+              }}
+            />
+          </main>
+        )}
+
+        {/* ==================================================================== */}
+        {/* ETAPA 4: ABERTURA DE ORDEM DE SERVIÇO (OS) */}
+        {/* ==================================================================== */}
+        {etapa === 'FORM_OS' && selectedViatura && (
+          <main className="flex-1 p-4">
+            <VeiculoOrdemServicoForm
+              viatura={selectedViatura}
+              contratoId={contratoNome}
+              theme={theme}
+              onBack={() => setEtapa('HUB')}
+              onSuccess={(_os) => {
+                setEtapa('HUB');
+              }}
+            />
+          </main>
+        )}
+
+        {/* ==================================================================== */}
+        {/* ETAPA 5: CHECKLIST TÉCNICO VEICULAR (DUAL-PHOTO EVIDENCE) */}
+        {/* ==================================================================== */}
+        {etapa === 'FORM_CHECKLIST' && selectedViatura && (
+          <main className="flex-1 p-4">
+            <VeiculoChecklistForm
+              viatura={selectedViatura}
+              contratoId={contratoNome}
+              theme={theme}
+              onBack={() => setEtapa('HUB')}
+              onSubmitChecklist={async (chk) => {
+                const res = await salvarChecklistVeicularAction(chk);
+                return res;
+              }}
+            />
+          </main>
+        )}
+
+        {/* ==================================================================== */}
+        {/* ETAPA 6: FORMULÁRIO DE ABASTECIMENTO COM GPS & TRAVA */}
+        {/* ==================================================================== */}
+        {etapa === 'FORM_ABASTECER' && selectedViatura && (
           <main className="flex-1 p-4 space-y-4">
             {/* Card da Viatura Selecionada */}
             <div className="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between">
@@ -1071,16 +1192,30 @@ function TerminalAbastecerContent() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedViatura(null);
-                setEtapa('CATALOG');
-              }}
-              className="w-full py-3.5 px-4 bg-zinc-900 hover:bg-zinc-850 border border-zinc-800 text-white rounded-2xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95"
-            >
-              Voltar ao Catálogo de Viaturas
-            </button>
+            <div className="w-full space-y-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setEtapa('HUB')}
+                className="w-full py-3.5 px-4 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-lg shadow-red-900/30"
+              >
+                Voltar ao Hub da Viatura
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedViatura(null);
+                  setEtapa('CATALOG');
+                }}
+                className={`w-full py-3 px-4 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95 border ${
+                  theme === 'dark'
+                    ? 'bg-zinc-900 hover:bg-zinc-850 border-zinc-800 text-zinc-300'
+                    : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700 shadow-xs'
+                }`}
+              >
+                Trocar de Viatura (Catálogo)
+              </button>
+            </div>
           </main>
         )}
 

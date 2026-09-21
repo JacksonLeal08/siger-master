@@ -251,3 +251,57 @@ export function classificarSulcoTwi(sulcoMm: number): StatusTwi {
   }
   return 'CONFORME';
 }
+
+// ==============================================================================
+// 6. CHECKLIST TÉCNICO AUTOMOTIVO & DUAL-PHOTO EVIDENCE
+// ==============================================================================
+
+export type ParecerChecklist = 'CONFORME' | 'NAO_CONFORME' | 'NA';
+export type GravidadeAnomalia = 'LEVE' | 'MEDIA' | 'CRITICA';
+export type StatusAprovacaoChecklist = 'APROVADO' | 'ATENCAO' | 'INTERDITADO';
+
+export type SistemaGrupoChecklist = 
+  | 'FREIOS' 
+  | 'SUSPENSAO' 
+  | 'MOTOR_CAMBIO' 
+  | 'ELETRICA' 
+  | 'ILUMINACAO' 
+  | 'PNEUS' 
+  | 'EQUIPAMENTOS' 
+  | 'IMPLEMENTOS_ESPECIFICOS';
+
+export interface ChecklistItemAvaliacao {
+  id?: string;
+  checklist_id?: string;
+  sistema_grupo: SistemaGrupoChecklist;
+  item_nome: string;
+  parecer: ParecerChecklist;
+  gravidade_anomalia?: GravidadeAnomalia | null;
+  observacao_anomalia?: string | null;
+  foto_evidencia_1_url?: string | null; // Foto 1: Visão Geral / Contexto da Avaria
+  foto_evidencia_2_url?: string | null; // Foto 2: Detalhe / Macro da Avaria
+  created_at?: string;
+}
+
+export interface ChecklistVeicular {
+  id?: string;
+  contrato_id: string;
+  viatura_id: string;
+  viatura?: Viatura;
+  tecnico_nome: string;
+  tipo_checklist?: string;
+  odometro_km: number;
+  horimetro?: number | null;
+  status_aprovacao: StatusAprovacaoChecklist;
+  percentual_conformidade: number;
+  total_itens: number;
+  total_conformes: number;
+  total_nao_conformes: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  ordem_servico_gerada_id?: string | null;
+  observacoes_gerais?: string | null;
+  itens?: ChecklistItemAvaliacao[];
+  created_at?: string;
+  updated_at?: string;
+}
