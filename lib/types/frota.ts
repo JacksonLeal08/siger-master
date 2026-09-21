@@ -75,6 +75,8 @@ export interface Viatura {
   foto_veiculo_url?: string | null;
   foto_documento_url?: string | null;
   data_ultima_calibracao?: string | null;
+  data_ultima_preventiva?: string | null;
+  odometro_ultima_preventiva_km?: number | null;
   observacoes?: string | null;
   created_at?: string;
   updated_at?: string;

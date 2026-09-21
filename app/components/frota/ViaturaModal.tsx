@@ -55,6 +55,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   const [odometro, setOdometro] = useState<string>('0');
   const [status, setStatus] = useState<StatusOperacionalViatura>('DISPONIVEL');
   const [dataUltimaCalibracao, setDataUltimaCalibracao] = useState<string>('');
+  const [dataUltimaPreventiva, setDataUltimaPreventiva] = useState<string>('');
+  const [odometroUltimaPreventiva, setOdometroUltimaPreventiva] = useState<string>('');
   const [fotoVeiculoUrl, setFotoVeiculoUrl] = useState<string | null>(null);
   
   // Documentos & Seguros
@@ -82,6 +84,12 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setDataUltimaCalibracao(
         viaturaToEdit.data_ultima_calibracao ? viaturaToEdit.data_ultima_calibracao.split('T')[0] : ''
       );
+      setDataUltimaPreventiva(
+        viaturaToEdit.data_ultima_preventiva ? viaturaToEdit.data_ultima_preventiva.split('T')[0] : ''
+      );
+      setOdometroUltimaPreventiva(
+        viaturaToEdit.odometro_ultima_preventiva_km ? String(viaturaToEdit.odometro_ultima_preventiva_km) : ''
+      );
       setFotoVeiculoUrl(viaturaToEdit.foto_veiculo_url || null);
       setVencimentoCrlv(viaturaToEdit.vencimento_crlv || '');
       setSeguradora(viaturaToEdit.seguradora || '');
@@ -103,6 +111,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setOdometro('0');
       setStatus('DISPONIVEL');
       setDataUltimaCalibracao('');
+      setDataUltimaPreventiva('');
+      setOdometroUltimaPreventiva('');
       setFotoVeiculoUrl(null);
       setVencimentoCrlv('');
       setSeguradora('');
@@ -154,6 +164,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
         status_operacional: status,
         foto_veiculo_url: fotoVeiculoUrl,
         data_ultima_calibracao: dataUltimaCalibracao ? new Date(dataUltimaCalibracao).toISOString() : null,
+        data_ultima_preventiva: dataUltimaPreventiva ? dataUltimaPreventiva : null,
+        odometro_ultima_preventiva_km: odometroUltimaPreventiva ? parseFloat(odometroUltimaPreventiva) : null,
         vencimento_crlv: vencimentoCrlv || null,
         seguradora: seguradora || null,
         apolice_seguro: apolice || null,
@@ -398,6 +410,31 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
                 value={odometro}
                 onChange={(e) => setOdometro(e.target.value)}
                 className="w-full text-xs font-bold font-mono px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                KM Última Preventiva (Revisão)
+              </label>
+              <input
+                type="number"
+                value={odometroUltimaPreventiva}
+                onChange={(e) => setOdometroUltimaPreventiva(e.target.value)}
+                placeholder="Ex: 80000"
+                className="w-full text-xs font-bold font-mono px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Data da Última Preventiva
+              </label>
+              <input
+                type="date"
+                value={dataUltimaPreventiva}
+                onChange={(e) => setDataUltimaPreventiva(e.target.value)}
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
               />
             </div>
 

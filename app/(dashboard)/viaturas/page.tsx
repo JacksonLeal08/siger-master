@@ -422,7 +422,13 @@ export default function ViaturasPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredViaturas.map((v) => {
                 const badge = getStatusBadge(v.status_operacional);
-                const preventivas = MaintenancePlanEngine.evaluateVehicle(v.odometro_atual_km);
+                const preventivas = MaintenancePlanEngine.evaluateVehicle(
+                  v.odometro_atual_km,
+                  [],
+                  undefined,
+                  v.odometro_ultima_preventiva_km,
+                  v.data_ultima_preventiva
+                );
                 const proximaPreventiva = preventivas.find((p) => p.status !== 'CONFORME') || preventivas[0];
 
                 return (
@@ -472,6 +478,15 @@ export default function ViaturasPage() {
                           <strong className="text-slate-800 dark:text-slate-100">{v.odometro_atual_km} km</strong>
                         </div>
 
+                        {v.odometro_ultima_preventiva_km ? (
+                          <div className="flex justify-between items-center text-[10px]">
+                            <span className="text-slate-400">ÚLTIMA PREVENTIVA:</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-300">
+                              {v.odometro_ultima_preventiva_km} km {v.data_ultima_preventiva ? `• ${new Date(v.data_ultima_preventiva).toLocaleDateString('pt-BR')}` : ''}
+                            </span>
+                          </div>
+                        ) : null}
+
                         <div className="flex justify-between items-center">
                           <span className="text-slate-400 text-[10px]">COMBUSTÍVEL:</span>
                           <span className="font-bold text-[10px] uppercase text-amber-600 dark:text-amber-400">
@@ -483,7 +498,7 @@ export default function ViaturasPage() {
                         {proximaPreventiva && (
                           <div className="pt-1.5 border-t border-slate-200/60 dark:border-slate-800 text-[10px] flex items-center justify-between">
                             <span className="text-slate-400 flex items-center gap-1">
-                              <Wrench className="w-3 h-3 text-blue-500" /> Preventiva:
+                              <Wrench className="w-3 h-3 text-blue-500" /> Próxima Preventiva:
                             </span>
                             <span
                               className={`font-bold ${

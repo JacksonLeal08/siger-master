@@ -56,7 +56,9 @@ export class MaintenancePlanEngine {
   public static evaluateVehicle(
     odometroAtualKm: number,
     historicoServicos: Array<{ regraId: string; dataServico: string; odometroKm: number }> = [],
-    rules: MaintenanceItemRule[] = DEFAULT_MAINTENANCE_RULES
+    rules: MaintenanceItemRule[] = DEFAULT_MAINTENANCE_RULES,
+    baseKmManual?: number | null,
+    baseDataManual?: string | null
   ): MaintenanceAlert[] {
     const hoje = new Date();
 
@@ -67,8 +69,17 @@ export class MaintenancePlanEngine {
         .sort((a, b) => new Date(b.dataServico).getTime() - new Date(a.dataServico).getTime());
 
       const ultimoServico = servicosRegra[0];
-      const baseKm = ultimoServico ? ultimoServico.odometroKm : 0;
-      const baseData = ultimoServico ? new Date(ultimoServico.dataServico) : new Date(hoje.getFullYear() - 1, hoje.getMonth(), hoje.getDate());
+      const baseKm = ultimoServico 
+        ? Number(ultimoServico.odometroKm) 
+        : (baseKmManual !== undefined && baseKmManual !== null && !isNaN(Number(baseKmManual)) 
+            ? Number(baseKmManual) 
+            : 0);
+
+      const baseData = ultimoServico 
+        ? new Date(ultimoServico.dataServico) 
+        : (baseDataManual && !isNaN(new Date(baseDataManual).getTime()) 
+            ? new Date(baseDataManual) 
+            : new Date(hoje.getFullYear() - 1, hoje.getMonth(), hoje.getDate()));
 
       // Próxima revisão por KM
       const proximoKm = baseKm + regra.intervaloKm;
