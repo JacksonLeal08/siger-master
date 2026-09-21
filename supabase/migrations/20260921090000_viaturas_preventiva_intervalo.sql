@@ -37,6 +37,8 @@ SET motorista_nome = condutor_nome
 WHERE motorista_nome IS NULL AND condutor_nome IS NOT NULL;
 
 -- 3. ATUALIZAÇÃO DA VIEW CONSOLIDADA VW_VIATURAS_COCKPIT
+DROP VIEW IF EXISTS public.vw_viaturas_cockpit CASCADE;
+
 CREATE OR REPLACE VIEW public.vw_viaturas_cockpit AS
 SELECT 
     v.id,
