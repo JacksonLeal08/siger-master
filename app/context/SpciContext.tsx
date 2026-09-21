@@ -886,8 +886,50 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return merged;
           });
         }
-      } catch (err) {
-        console.warn('Erro ao carregar logs de auditoria:', err);
+      } catch (auditCatchErr) {
+        console.warn('Erro ao sincronizar logs de auditoria:', auditCatchErr);
+      }
+
+      // Sincronizar checklists veiculares recentes para a central de notificações
+      try {
+        const { data: recentChecklists, error: chkErr } = await supabase
+          .from('checklists_veiculares')
+          .select('id, tecnico_nome, status_aprovacao, percentual_conformidade, total_nao_conformes, created_at, viatura_id, viaturas(prefixo_frota, placa)')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (!chkErr && recentChecklists && recentChecklists.length > 0) {
+          const chkNotifs: NotificationItem[] = recentChecklists.map((c: any) => {
+            const viat = c.viaturas ? `${c.viaturas.prefixo_frota} (${c.viaturas.placa})` : 'Viatura';
+            const isCrit = c.status_aprovacao === 'INTERDITADO';
+            const isAten = c.status_aprovacao === 'ATENCAO';
+            return {
+              id: `chk-notif-${c.id}`,
+              title: isCrit 
+                ? `🚨 Viatura Interditada: ${viat}` 
+                : isAten 
+                  ? `⚠️ Vistoria com NCs: ${viat}` 
+                  : `📋 Checklist Aprovado: ${viat}`,
+              message: `Vistoriador ${c.tecnico_nome} registrou checklist (${c.percentual_conformidade}% conformidade, ${c.total_nao_conformes} NCs). Status: ${c.status_aprovacao}.`,
+              type: (isCrit || isAten ? 'alerta' : 'inspecao') as any,
+              category: 'frota',
+              patrimonio: viat,
+              read: false,
+              created_at: c.created_at || new Date().toISOString()
+            };
+          });
+
+          setNotifications(prev => {
+            const existingIds = new Set(prev.map(n => n.id));
+            const toAdd = chkNotifs.filter(n => !existingIds.has(n.id));
+            if (toAdd.length === 0) return prev;
+            const updated = [...toAdd, ...prev];
+            idb.setAll('notificacoes', updated).catch(console.error);
+            return updated;
+          });
+        }
+      } catch (chkErr) {
+        console.warn('Erro ao carregar checklists para notificações:', chkErr);
       }
 
       setLastSyncTime(new Date());
@@ -1098,6 +1140,82 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       )
       .on(
         'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'checklists_veiculares' },
+        (payload) => {
+          console.log('[Realtime] Novo checklist veicular registrado:', payload);
+          const chk = payload.new;
+          if (chk) {
+            playTelemetryPingSound();
+            const isCrit = chk.status_aprovacao === 'INTERDITADO';
+            const isAten = chk.status_aprovacao === 'ATENCAO';
+
+            triggerSuccessNotification(
+              isCrit 
+                ? "🚨 Viatura Interditada via Checklist!" 
+                : isAten 
+                  ? "⚠️ Checklist com Anomalias (Atenção)" 
+                  : "📋 Novo Checklist Veicular Concluído!",
+              `Vistoriador ${chk.tecnico_nome || 'Técnico'} registrou checklist (${chk.percentual_conformidade}% conformidade). Status: ${chk.status_aprovacao}.`,
+              isCrit ? 'critical' : isAten ? 'warning' : 'success'
+            );
+
+            const newNotif: NotificationItem = {
+              id: `chk-${chk.id || generateUUID()}`,
+              title: isCrit 
+                ? "🚨 Viatura Interditada via Vistoria" 
+                : isAten 
+                  ? "⚠️ Checklist com Apontamento de Defeitos" 
+                  : "📋 Checklist Técnico Veicular Concluído",
+              message: `Vistoriador ${chk.tecnico_nome} registrou checklist com ${chk.total_nao_conformes || 0} NCs (${chk.percentual_conformidade}% conformidade).`,
+              type: (isCrit || isAten ? 'alerta' : 'inspecao') as any,
+              category: 'frota',
+              patrimonio: chk.viatura_id,
+              read: false,
+              created_at: chk.created_at || new Date().toISOString()
+            };
+
+            setNotifications(prev => {
+              if (prev.some(n => n.id === newNotif.id)) return prev;
+              const next = [newNotif, ...prev];
+              idb.setAll('notificacoes', next).catch(console.error);
+              return next;
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'ordens_servico_frota' },
+        (payload) => {
+          console.log('[Realtime] Nova OS de frota registrada:', payload);
+          const os = payload.new;
+          if (os) {
+            playTelemetryPingSound();
+            triggerSuccessNotification(
+              "🛠️ Nova Ordem de Serviço de Frota!",
+              `OS ${os.numero_os} aberta para manutenção ${os.natureza_manutencao || 'corretiva'}.`,
+              'warning'
+            );
+            const newNotif: NotificationItem = {
+              id: `os-${os.id || generateUUID()}`,
+              title: `🛠️ OS Aberta: ${os.numero_os}`,
+              message: `${os.natureza_manutencao} (${os.tipo_os}): ${os.descricao_servico?.slice(0, 80) || 'Manutenção programada.'}`,
+              type: 'alerta',
+              category: 'frota',
+              read: false,
+              created_at: os.created_at || new Date().toISOString()
+            };
+            setNotifications(prev => {
+              if (prev.some(n => n.id === newNotif.id)) return prev;
+              const next = [newNotif, ...prev];
+              idb.setAll('notificacoes', next).catch(console.error);
+              return next;
+            });
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'logs_auditoria' },
         (payload) => {
           console.log('[Realtime] Novo log de auditoria:', payload);
@@ -1105,6 +1223,45 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (newLog) {
             // Atualizar lista local de auditLogs
             setAuditLogs(prev => [newLog, ...prev]);
+
+            // Tratar notificações de Checklist Técnico de Frota via Logs de Auditoria
+            if (newLog.acao && String(newLog.acao).startsWith('CHECKLIST_')) {
+              playTelemetryPingSound();
+              const isCrit = newLog.acao === 'CHECKLIST_INTERDITADO';
+              const isAten = newLog.acao === 'CHECKLIST_ATENCAO';
+
+              triggerSuccessNotification(
+                isCrit 
+                  ? "🚨 Viatura Interditada via Checklist!" 
+                  : isAten 
+                    ? "⚠️ Checklist com Anomalias (Atenção)" 
+                    : "📋 Checklist Técnico Veicular Concluído!",
+                `${newLog.patrimonio || 'Viatura'}: ${newLog.detalhes}`,
+                isCrit ? 'critical' : isAten ? 'warning' : 'success'
+              );
+
+              const chkNotif: NotificationItem = {
+                id: newLog.id || generateUUID(),
+                title: isCrit 
+                  ? `🚨 Viatura Interditada: ${newLog.patrimonio || ''}` 
+                  : isAten 
+                    ? `⚠️ Vistoria com NCs: ${newLog.patrimonio || ''}` 
+                    : `📋 Checklist Aprovado: ${newLog.patrimonio || ''}`,
+                message: `${newLog.usuario_nome || 'Vistoriador'}: ${newLog.detalhes}`,
+                type: (isCrit || isAten ? 'alerta' : 'inspecao') as any,
+                category: 'frota',
+                patrimonio: newLog.patrimonio || undefined,
+                read: false,
+                created_at: newLog.created_at || new Date().toISOString()
+              };
+
+              setNotifications(prev => {
+                if (prev.some(n => n.id === chkNotif.id || (n.patrimonio === chkNotif.patrimonio && Math.abs(new Date(n.created_at).getTime() - new Date(chkNotif.created_at).getTime()) < 5000))) return prev;
+                const next = [chkNotif, ...prev];
+                idb.setAll('notificacoes', next).catch(console.error);
+                return next;
+              });
+            }
 
             // Se a ação for LOGIN e for de outro usuário recente, notifica com sinal sonoro e aviso no sininho
             const logTime = newLog.created_at ? new Date(newLog.created_at).getTime() : 0;

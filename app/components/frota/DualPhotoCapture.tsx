@@ -13,10 +13,11 @@ interface DualPhotoCaptureProps {
 }
 
 /**
- * Utilitário de compressão de imagem em Canvas no smartphone:
- * Redimensiona para no máximo 1280px e exporta em JPEG 0.75
+ * Utilitário de alta performance para compressão de imagem em Canvas no smartphone:
+ * Redimensiona para no máximo 960px e exporta em JPEG 0.65 (~60KB por foto)
+ * Proporciona envio ultrarrápido sem perder fidelidade pericial/mecânica.
  */
-export async function compressImageToCanvas(file: File, maxDim = 1280, quality = 0.75): Promise<string> {
+export async function compressImageToCanvas(file: File, maxDim = 960, quality = 0.65): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (event) => {

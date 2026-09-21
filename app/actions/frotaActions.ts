@@ -695,6 +695,30 @@ export async function salvarChecklistVeicularAction(
         .eq('id', checklist.viatura_id);
     }
 
+    // 5. Inserir registro no log de auditoria para acionamento imediato de notificações na web
+    try {
+      const vtrInfo = checklist.viatura 
+        ? `${checklist.viatura.prefixo_frota} (${checklist.viatura.placa})`
+        : `Viatura ${checklist.viatura_id.slice(0, 8)}`;
+
+      await supabase.from('logs_auditoria').insert([{
+        usuario_id: null,
+        usuario_nome: checklist.tecnico_nome,
+        usuario_email: 'terminal.frota@siger.com',
+        acao: checklist.status_aprovacao === 'INTERDITADO' 
+          ? 'CHECKLIST_INTERDITADO' 
+          : checklist.status_aprovacao === 'ATENCAO' 
+            ? 'CHECKLIST_ATENCAO' 
+            : 'CHECKLIST_APROVADO',
+        tipo_ativo: 'VIATURA',
+        patrimonio: vtrInfo,
+        detalhes: `Vistoria concluída: ${checklist.percentual_conformidade}% de conformidade. Status: ${checklist.status_aprovacao}. Total NCs: ${checklist.total_nao_conformes}.`,
+        created_at: new Date().toISOString()
+      }]);
+    } catch (audErr) {
+      console.warn('[salvarChecklistVeicularAction] Aviso ao gravar logs_auditoria:', audErr);
+    }
+
     return { 
       success: true, 
       data: savedChecklist as ChecklistVeicular, 

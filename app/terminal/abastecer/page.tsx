@@ -811,6 +811,9 @@ function TerminalAbastecerContent() {
               contratoId={contratoNome}
               theme={theme}
               onBack={() => setEtapa('HUB')}
+              onSuccess={(_chk) => {
+                setEtapa('HUB');
+              }}
               onSubmitChecklist={async (chk) => {
                 const res = await salvarChecklistVeicularAction(chk);
                 return res;
