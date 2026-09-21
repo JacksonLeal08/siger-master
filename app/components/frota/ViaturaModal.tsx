@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { 
   Viatura, 
   TipoVeiculo, 
@@ -10,14 +9,26 @@ import {
 } from '@/lib/types/frota';
 import { saveViaturaAction } from '@/app/actions/frotaActions';
 import { soundNotificationService } from '@/lib/soundNotificationService';
-import { Truck, Minus, Maximize2, Minimize2, X, Save, AlertCircle } from 'lucide-react';
+import ModalBaseCorporativo from '@/app/components/ui/ModalBaseCorporativo';
+import { 
+  Truck, 
+  Camera, 
+  Calendar, 
+  Shield, 
+  AlertCircle, 
+  UploadCloud, 
+  Car, 
+  FileText,
+  Clock,
+  Gauge
+} from 'lucide-react';
 
 interface ViaturaModalProps {
   isOpen: boolean;
   viaturaToEdit?: Viatura | null;
   contratoId: string;
   onClose: () => void;
-  onMinimize: () => void;
+  onMinimize?: () => void;
   onSuccess: (saved: Viatura) => void;
 }
 
@@ -26,10 +37,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   viaturaToEdit,
   contratoId,
   onClose,
-  onMinimize,
   onSuccess
 }) => {
-  const [isMaximized, setIsMaximized] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -45,6 +54,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   const [tipoCombustivel, setTipoCombustivel] = useState<TipoCombustivel>('DIESEL_S10');
   const [odometro, setOdometro] = useState<string>('0');
   const [status, setStatus] = useState<StatusOperacionalViatura>('DISPONIVEL');
+  const [dataUltimaCalibracao, setDataUltimaCalibracao] = useState<string>('');
+  const [fotoVeiculoUrl, setFotoVeiculoUrl] = useState<string | null>(null);
   
   // Documentos & Seguros
   const [vencimentoCrlv, setVencimentoCrlv] = useState('');
@@ -68,6 +79,10 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setTipoCombustivel(viaturaToEdit.tipo_combustivel || 'DIESEL_S10');
       setOdometro(String(viaturaToEdit.odometro_atual_km || 0));
       setStatus(viaturaToEdit.status_operacional || 'DISPONIVEL');
+      setDataUltimaCalibracao(
+        viaturaToEdit.data_ultima_calibracao ? viaturaToEdit.data_ultima_calibracao.split('T')[0] : ''
+      );
+      setFotoVeiculoUrl(viaturaToEdit.foto_veiculo_url || null);
       setVencimentoCrlv(viaturaToEdit.vencimento_crlv || '');
       setSeguradora(viaturaToEdit.seguradora || '');
       setApolice(viaturaToEdit.apolice_seguro || '');
@@ -87,6 +102,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setTipoCombustivel('DIESEL_S10');
       setOdometro('0');
       setStatus('DISPONIVEL');
+      setDataUltimaCalibracao('');
+      setFotoVeiculoUrl(null);
       setVencimentoCrlv('');
       setSeguradora('');
       setApolice('');
@@ -98,7 +115,17 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
     setErrorMsg(null);
   }, [viaturaToEdit, isOpen]);
 
-  if (!isOpen) return null;
+  // Upload simulado / base64 para Foto do Veículo
+  const handleFotoVeiculoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFotoVeiculoUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,7 +140,7 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
     try {
       const payload: Partial<Viatura> = {
         id: viaturaToEdit?.id,
-        contrato_id: contratoId || 'ONÇA PUMA',
+        contrato_id: contratoId || viaturaToEdit?.contrato_id || 'ONÇA PUMA',
         prefixo_frota: prefixo,
         placa: placa,
         chassi: chassi || null,
@@ -125,6 +152,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
         tipo_combustivel: tipoCombustivel,
         odometro_atual_km: parseFloat(odometro) || 0,
         status_operacional: status,
+        foto_veiculo_url: fotoVeiculoUrl,
+        data_ultima_calibracao: dataUltimaCalibracao ? new Date(dataUltimaCalibracao).toISOString() : null,
         vencimento_crlv: vencimentoCrlv || null,
         seguradora: seguradora || null,
         apolice_seguro: apolice || null,
@@ -150,349 +179,306 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-3 sm:p-5 select-none font-sans">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.96 }}
-        className={`bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl flex flex-col overflow-hidden transition-all duration-200 ${
-          isMaximized ? 'w-full h-full rounded-none' : 'w-full max-w-3xl max-h-[92vh]'
-        }`}
-      >
-        {/* Barra Superior de Controles (Minimizar / Maximizar / Fechar) */}
-        <div className="flex items-center justify-between px-5 py-3.5 bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600">
-              <Truck className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                {viaturaToEdit ? `Editar Viatura: ${viaturaToEdit.prefixo_frota}` : 'Cadastrar Nova Viatura'}
-              </h3>
-              <p className="text-[10px] text-slate-500 font-mono">
-                Contrato Operacional: <strong>{contratoId}</strong>
-              </p>
-            </div>
+    <ModalBaseCorporativo
+      isOpen={isOpen}
+      onClose={onClose}
+      modalId="modal-viatura-form"
+      badgeSistema="SPCI FROTA OPERACIONAL"
+      badgeContrato={contratoId || 'ONÇA PUMA'}
+      titulo={viaturaToEdit ? `EDITAR VIATURA • ${viaturaToEdit.prefixo_frota}` : 'CADASTRAR NOVA VIATURA'}
+      subtitulo="Rastreabilidade veicular, conformidade de CRLV, seguro de frota e gestão de hodômetro"
+      icon={Truck}
+      maxWidthClass="max-w-4xl"
+      footer={
+        <div className="flex w-full items-center justify-between">
+          <div className="text-xs text-slate-500 font-sans">
+            Prefixo: <strong className="text-slate-800">{prefixo || 'Não informado'}</strong> | Placa: <strong className="text-slate-800">{placa || 'Não informada'}</strong>
           </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={onMinimize}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all cursor-pointer border-none bg-transparent"
-              title="Minimizar para Dock"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsMaximized(!isMaximized)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-all cursor-pointer border-none bg-transparent"
-              title={isMaximized ? 'Restaurar Tamanho' : 'Maximizar'}
-            >
-              {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </button>
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition-all cursor-pointer border-none bg-transparent"
-              title="Fechar"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Formulário com Scroll Suave */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-5">
-          {errorMsg && (
-            <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-xl text-xs text-red-600 dark:text-red-400 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
-
-          {/* Seção 1: Identificação Operacional */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1.5">
-              1. Identificação Operacional & Placa
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Prefixo da Frota *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: VTR-01, AMB-02"
-                  value={prefixo}
-                  onChange={(e) => setPrefixo(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold uppercase outline-none focus:border-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Placa do Veículo *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: BRA2E19"
-                  value={placa}
-                  onChange={(e) => setPlaca(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold uppercase outline-none focus:border-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Tipo de Veículo *
-                </label>
-                <select
-                  value={tipoVeiculo}
-                  onChange={(e) => setTipoVeiculo(e.target.value as TipoVeiculo)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none cursor-pointer focus:border-red-600"
-                  required
-                >
-                  <option value="CAMINHONETE">CAMINHONETE (4x4 Operacional)</option>
-                  <option value="AMBULANCIA">AMBULÂNCIA (Resgate / UTI)</option>
-                  <option value="CAMINHAO_INCENDIO">CAMINHÃO DE INCÊNDIO / ABT</option>
-                  <option value="UTILITARIO">UTILITÁRIO / VAN</option>
-                  <option value="OUTRO">OUTRO VEÍCULO</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Chassi
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: 9BWZZZ377VT004251"
-                  value={chassi}
-                  onChange={(e) => setChassi(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold uppercase outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  RENAVAM
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: 00123456789"
-                  value={renavam}
-                  onChange={(e) => setRenavam(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold uppercase outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Seção 2: Especificações Mecânicas & Telemetria */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1.5">
-              2. Ficha Técnica & Telemetria
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Marca *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Toyota, Mercedes-Benz, Ford"
-                  value={marca}
-                  onChange={(e) => setMarca(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none focus:border-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Modelo *
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Hilux CD 4x4, Sprinter 415"
-                  value={modelo}
-                  onChange={(e) => setModelo(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none focus:border-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Ano de Fabricação
-                </label>
-                <input
-                  type="number"
-                  min="1990"
-                  max="2035"
-                  value={anoFabricacao}
-                  onChange={(e) => setAnoFabricacao(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Combustível *
-                </label>
-                <select
-                  value={tipoCombustivel}
-                  onChange={(e) => setTipoCombustivel(e.target.value as TipoCombustivel)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none cursor-pointer"
-                >
-                  <option value="DIESEL_S10">Diesel S-10</option>
-                  <option value="GASOLINA">Gasolina Comum</option>
-                  <option value="FLEX">Flex (Etanol/Gasolina)</option>
-                  <option value="ETANOL">Etanol</option>
-                  <option value="ELETRICO">100% Elétrico</option>
-                  <option value="HIBRIDO">Híbrido</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Odômetro Atual (KM) *
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  value={odometro}
-                  onChange={(e) => setOdometro(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none focus:border-red-600"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Status Operacional *
-                </label>
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as StatusOperacionalViatura)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none cursor-pointer"
-                >
-                  <option value="DISPONIVEL">Disponível na Base</option>
-                  <option value="EM_DESLOCAMENTO">Em Deslocamento / Ronda</option>
-                  <option value="EM_MANUTENCAO_INTERNA">Manutenção Interna</option>
-                  <option value="EM_OFICINA_EXTERNA">Oficina Credenciada Externa</option>
-                  <option value="BAIXADO">Baixado / Fora de Operação</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Seção 3: Documentação & Seguradora */}
-          <div className="space-y-3">
-            <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1.5">
-              3. Documentação, Seguro & Garantia
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Vencimento CRLV
-                </label>
-                <input
-                  type="date"
-                  value={vencimentoCrlv}
-                  onChange={(e) => setVencimentoCrlv(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Seguradora
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex: Porto Seguro, Tokio Marine"
-                  value={seguradora}
-                  onChange={(e) => setSeguradora(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Vencimento do Seguro
-                </label>
-                <input
-                  type="date"
-                  value={vencimentoSeguro}
-                  onChange={(e) => setVencimentoSeguro(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Apólice de Seguro
-                </label>
-                <input
-                  type="text"
-                  placeholder="Nº da Apólice"
-                  value={apolice}
-                  onChange={(e) => setApolice(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-                  Garantia de Fábrica (Limite KM)
-                </label>
-                <input
-                  type="number"
-                  placeholder="Ex: 100000"
-                  value={limiteGarantiaKm}
-                  onChange={(e) => setLimiteGarantiaKm(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Observações */}
-          <div>
-            <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1">
-              Observações Operacionais
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Acessórios instalados (giroflex, sirene, rádio VHF, engate)..."
-              value={observacoes}
-              onChange={(e) => setObservacoes(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-medium outline-none"
-            />
-          </div>
-
-          {/* Footer Ações */}
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 uppercase tracking-wider"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer"
             >
               Cancelar
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               disabled={isSaving}
-              className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-5 py-2 text-xs font-bold text-white rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800"
             >
-              <Save className="w-4 h-4" />
-              {isSaving ? 'Salvando Viatura...' : 'Salvar Viatura'}
+              {isSaving ? 'Gravando...' : 'Salvar Viatura'}
             </button>
           </div>
-        </form>
-      </motion.div>
-    </div>
+        </div>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5 font-sans">
+        {errorMsg && (
+          <div className="p-3 bg-red-100 border border-red-300 rounded-xl text-xs text-red-800 font-semibold flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {/* SEÇÃO 1: FOTO OFICIAL & IDENTIFICAÇÃO PRINCIPAL */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+              <Car className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+              1. Identificação Operacional & Foto Oficial
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+            {/* Box da Foto Oficial */}
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-2xl p-3 bg-slate-50/50 hover:bg-slate-50 transition-all text-center">
+              {fotoVeiculoUrl ? (
+                <div className="relative group w-full">
+                  <img
+                    src={fotoVeiculoUrl}
+                    alt="Foto da Viatura"
+                    className="w-full h-36 object-cover rounded-xl shadow-xs"
+                  />
+                  <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 rounded-xl flex items-center justify-center text-white text-xs font-bold cursor-pointer transition-all">
+                    <Camera className="w-4 h-4 mr-1.5" /> Trocar Foto
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFotoVeiculoChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-36 cursor-pointer text-slate-500 hover:text-slate-800">
+                  <Camera className="w-8 h-8 mb-2 text-slate-400" />
+                  <span className="text-xs font-bold text-slate-700">Foto Oficial do Veículo</span>
+                  <span className="text-[10px] text-slate-400">Usada no mapa GIS e relatórios</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFotoVeiculoChange}
+                    className="hidden"
+                  />
+                </label>
+              )}
+            </div>
+
+            {/* Campos Principais */}
+            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Prefixo da Frota *
+                </label>
+                <input
+                  type="text"
+                  value={prefixo}
+                  onChange={(e) => setPrefixo(e.target.value.toUpperCase())}
+                  placeholder="Ex: VTR-04 ou AMB-01"
+                  className="w-full text-xs font-black uppercase px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Placa do Veículo *
+                </label>
+                <input
+                  type="text"
+                  value={placa}
+                  onChange={(e) => setPlaca(e.target.value.toUpperCase())}
+                  placeholder="Ex: FVZ3H91"
+                  className="w-full text-xs font-black uppercase px-3 py-2 border border-slate-200 rounded-xl font-mono focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Tipo de Viatura
+                </label>
+                <select
+                  value={tipoVeiculo}
+                  onChange={(e) => setTipoVeiculo(e.target.value as TipoVeiculo)}
+                  className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+                >
+                  <option value="CAMINHONETE">CAMINHONETE 4X4</option>
+                  <option value="AMBULANCIA">AMBULÂNCIA DE RESGATE 4X2</option>
+                  <option value="CAMINHAO_INCENDIO">CAMINHÃO AUTO BOMBA TANQUE (ABT)</option>
+                  <option value="UTILITARIO">UTILITÁRIO / VAN</option>
+                  <option value="OUTRO">OUTRO</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Status Operacional
+                </label>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as StatusOperacionalViatura)}
+                  className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+                >
+                  <option value="DISPONIVEL">DISPONÍVEL</option>
+                  <option value="EM_DESLOCAMENTO">EM DESLOCAMENTO</option>
+                  <option value="EM_MANUTENCAO_INTERNA">EM MANUTENÇÃO INTERNA</option>
+                  <option value="EM_OFICINA_EXTERNA">EM OFICINA EXTERNA</option>
+                  <option value="BAIXADO">BAIXADO / INATIVO</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SEÇÃO 2: DETALHES TÉCNICOS & MOTORIZAÇÃO */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
+              <Gauge className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+              2. Ficha Mecânica & Calibragem
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Marca / Montadora *
+              </label>
+              <input
+                type="text"
+                value={marca}
+                onChange={(e) => setMarca(e.target.value.toUpperCase())}
+                placeholder="Ex: TOYOTA, FORD, MERCEDES"
+                className="w-full text-xs font-semibold uppercase px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Modelo *
+              </label>
+              <input
+                type="text"
+                value={modelo}
+                onChange={(e) => setModelo(e.target.value.toUpperCase())}
+                placeholder="Ex: HILUX 2.8 4X4 ou SPRINTER"
+                className="w-full text-xs font-semibold uppercase px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Tipo de Combustível
+              </label>
+              <select
+                value={tipoCombustivel}
+                onChange={(e) => setTipoCombustivel(e.target.value as TipoCombustivel)}
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              >
+                <option value="DIESEL_S10">DIESEL S10</option>
+                <option value="GASOLINA">GASOLINA COMUM</option>
+                <option value="ETANOL">ETANOL</option>
+                <option value="FLEX">FLEX</option>
+                <option value="ELETRICO">ELÉTRICO</option>
+                <option value="HIBRIDO">HÍBRIDO</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Odômetro Atual (KM)
+              </label>
+              <input
+                type="number"
+                value={odometro}
+                onChange={(e) => setOdometro(e.target.value)}
+                className="w-full text-xs font-bold font-mono px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Última Calibragem de Pneus
+              </label>
+              <input
+                type="date"
+                value={dataUltimaCalibracao}
+                onChange={(e) => setDataUltimaCalibracao(e.target.value)}
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Ano de Fabricação
+              </label>
+              <input
+                type="number"
+                value={anoFabricacao}
+                onChange={(e) => setAnoFabricacao(e.target.value ? Number(e.target.value) : '')}
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* SEÇÃO 3: DOCUMENTAÇÃO & SEGURO */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
+          <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+              <Shield className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+              3. Documentação, Seguro & CRLV
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Vencimento do CRLV
+              </label>
+              <input
+                type="date"
+                value={vencimentoCrlv}
+                onChange={(e) => setVencimentoCrlv(e.target.value)}
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Seguradora
+              </label>
+              <input
+                type="text"
+                value={seguradora}
+                onChange={(e) => setSeguradora(e.target.value)}
+                placeholder="Ex: PORTO SEGURO, AZUL"
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Vencimento do Seguro
+              </label>
+              <input
+                type="date"
+                value={vencimentoSeguro}
+                onChange={(e) => setVencimentoSeguro(e.target.value)}
+                className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </ModalBaseCorporativo>
   );
 };

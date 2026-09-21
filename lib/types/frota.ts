@@ -74,6 +74,7 @@ export interface Viatura {
   limite_garantia_km?: number | null;
   foto_veiculo_url?: string | null;
   foto_documento_url?: string | null;
+  data_ultima_calibracao?: string | null;
   observacoes?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -84,6 +85,8 @@ export interface Viatura {
   status_seguro?: 'SEGURO_REGULAR' | 'SEGURO_A_VENCER' | 'SEGURO_VENCIDO';
   ultimo_km_litro?: number | null;
   ultimo_abastecimento_discrepante?: boolean;
+  dias_desde_calibracao?: number;
+  calibracao_vencida?: boolean;
 }
 
 export interface OficinaPrestador {
@@ -94,11 +97,14 @@ export interface OficinaPrestador {
   cnpj?: string | null;
   especialidades: string[];
   responsavel?: string | null;
+  contato_responsavel?: string | null;
   telefone?: string | null;
+  telefone_plantao?: string | null;
   contato_emergencia?: string | null;
   email?: string | null;
   endereco?: string | null;
-  ativo: boolean;
+  ativo?: boolean;
+  status?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -143,18 +149,62 @@ export interface Abastecimento {
   viatura_id: string;
   data_hora: string;
   posto: string;
+  nome_posto?: string;
   tipo_combustivel: TipoCombustivel | string;
   litros: number;
   valor_litro: number;
   valor_total: number;
   odometro_km: number;
+  km_registro?: number;
   condutor_nome: string;
+  motorista_nome?: string;
   km_rodados?: number | null;
   km_por_litro?: number | null;
-  is_discrepante: boolean;
+  is_discrepante?: boolean;
   motivo_discrepancia?: string | null;
   comprovante_foto_url?: string | null;
+  foto_cupom_url?: string | null;
+  
+  // Georreferenciamento e Telemetria
+  latitude_posto?: number;
+  longitude_posto?: number;
+  variacao_preco_litro?: number | null;
+  percentual_variacao?: number | null;
+  houve_calibracao_pneus?: boolean;
+  foto_calibracao_url?: string | null;
   created_at?: string;
+
+  // Relação opcional
+  viatura?: Viatura;
+}
+
+export interface ViaturaTrackingTelemetry {
+  id: string;
+  viatura_id: string;
+  placa: string;
+  prefixo: string;
+  tipo_veiculo: TipoVeiculo;
+  empresa: string;
+  velocidade_kmh: number;
+  status_movimento: 'ralenti' | 'em_transito' | 'desligado';
+  heading_graus: number; // 0 - 360 graus
+  latitude: number;
+  longitude: number;
+  odometro_km: number;
+  foto_veiculo_url?: string | null;
+  ultima_atualizacao: string;
+}
+
+export interface RankingPostoInfo {
+  nome_posto: string;
+  tipo_combustivel: string;
+  preco_medio: number;
+  menor_preco: number;
+  maior_preco: number;
+  total_abastecimentos: number;
+  percentual_economia?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface InspecaoPneu {

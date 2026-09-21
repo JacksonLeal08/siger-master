@@ -8,9 +8,13 @@ import {
   OrdemServicoFrota, 
   OficinaPrestador, 
   FrotaKpisSummary,
-  classificarSulcoTwi 
+  classificarSulcoTwi,
+  RankingPostoInfo,
+  ViaturaTrackingTelemetry
 } from '@/lib/types/frota';
 import { FuelAuditService } from '@/lib/fuelAuditService';
+import { FuelPricingService } from '@/lib/services/FuelPricingService';
+import { FleetTrackingAdapter } from '@/lib/adapters/FleetTrackingAdapter';
 
 const getSupabaseAdminClient = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -90,6 +94,22 @@ export async function saveViaturaAction(viatura: Partial<Viatura>): Promise<{ su
   }
 }
 
+export async function updateViaturaFotoAction(viaturaId: string, fotoUrl: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const { error } = await supabase
+      .from('viaturas')
+      .update({ foto_veiculo_url: fotoUrl })
+      .eq('id', viaturaId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao atualizar foto da viatura:', err);
+    return { success: false, error: err?.message || 'Falha ao salvar foto da viatura' };
+  }
+}
+
 // ==============================================================================
 // 2. ABASTECIMENTOS & AUDITORIA
 // ==============================================================================
@@ -119,13 +139,45 @@ export async function saveAbastecimentoAction(
   abastecimento: Partial<Abastecimento>, 
   tipoVeiculo: any = 'CAMINHONETE'
 ): Promise<{ success: boolean; data?: Abastecimento; error?: string }> {
+  return registrarAbastecimentoAction(abastecimento, tipoVeiculo);
+}
+
+export async function registrarAbastecimentoAction(
+  abastecimento: Partial<Abastecimento>, 
+  tipoVeiculo: any = 'CAMINHONETE'
+): Promise<{ success: boolean; data?: Abastecimento; error?: string }> {
   try {
     const supabase = getSupabaseAdminClient();
     if (!abastecimento.viatura_id) {
       throw new Error('Viatura ID é obrigatório para registrar abastecimento.');
     }
 
-    // Busca o último abastecimento para calcular autonomia
+    // 1. Busca dados da viatura para validar trava de 15 dias de pneus e odômetro
+    const { data: vtr } = await supabase
+      .from('viaturas')
+      .select('id, data_ultima_calibracao, contrato_id, odometro_atual_km, tipo_veiculo')
+      .eq('id', abastecimento.viatura_id)
+      .single();
+
+    const veiculoTipoFinal = vtr?.tipo_veiculo || tipoVeiculo || 'CAMINHONETE';
+
+    // 2. Trava de 15 Dias de Calibração de Pneus
+    const statusCalibracao = FuelPricingService.validarCalibracaoPneus(vtr?.data_ultima_calibracao);
+    if (statusCalibracao.bloqueioObrigatorio && !abastecimento.houve_calibracao_pneus) {
+      return {
+        success: false,
+        error: statusCalibracao.mensagem
+      };
+    }
+
+    if (abastecimento.houve_calibracao_pneus && !abastecimento.foto_calibracao_url) {
+      return {
+        success: false,
+        error: 'É obrigatório anexar a foto do manômetro/calibrador para validar o registro de calibragem.'
+      };
+    }
+
+    // 3. Busca o último abastecimento para calcular autonomia
     const { data: ultimos } = await supabase
       .from('abastecimentos')
       .select('odometro_km')
@@ -135,17 +187,41 @@ export async function saveAbastecimentoAction(
 
     const odometroAnterior = ultimos && ultimos.length > 0 ? Number(ultimos[0].odometro_km) : null;
 
-    // Executa auditoria antifraude de consumo
+    // 4. Busca último abastecimento do mesmo combustível para calcular Delta Valor e % Variação
+    let queryPreco = supabase
+      .from('abastecimentos')
+      .select('valor_litro')
+      .eq('tipo_combustivel', abastecimento.tipo_combustivel || 'DIESEL_S10')
+      .order('data_hora', { ascending: false })
+      .limit(1);
+
+    if (abastecimento.contrato_id && abastecimento.contrato_id !== 'TODOS' && abastecimento.contrato_id !== 'GLOBAL') {
+      queryPreco = queryPreco.eq('contrato_id', abastecimento.contrato_id);
+    }
+
+    const { data: ultPrecoData } = await queryPreco;
+    const ultimoValorLitro = ultPrecoData && ultPrecoData.length > 0 ? Number(ultPrecoData[0].valor_litro) : null;
+    const variacaoPreco = FuelPricingService.calcularVariacaoPreco(
+      Number(abastecimento.valor_litro || 0),
+      ultimoValorLitro
+    );
+
+    // 5. Executa auditoria antifraude de consumo
     const analise = FuelAuditService.analyze({
       odometroAtualKm: Number(abastecimento.odometro_km || 0),
       odometroAnteriorKm: odometroAnterior,
       litros: Number(abastecimento.litros || 0),
-      tipoVeiculo,
+      tipoVeiculo: veiculoTipoFinal,
       tipoCombustivel: abastecimento.tipo_combustivel
     });
 
     const payload = {
       ...abastecimento,
+      contrato_id: abastecimento.contrato_id || vtr?.contrato_id || 'ONÇA PUMA',
+      posto: abastecimento.nome_posto || abastecimento.posto || 'Posto Petrobras',
+      nome_posto: abastecimento.nome_posto || abastecimento.posto || 'Posto Petrobras',
+      variacao_preco_litro: variacaoPreco.deltaValor,
+      percentual_variacao: variacaoPreco.percentualVariacao,
       km_rodados: analise.kmRodados,
       km_por_litro: analise.kmPorLitro,
       is_discrepante: analise.isDiscrepante,
@@ -160,19 +236,49 @@ export async function saveAbastecimentoAction(
 
     if (error) throw error;
 
-    // Atualiza odômetro atual da viatura se o novo for maior
-    if (abastecimento.odometro_km) {
+    // 6. Atualiza viatura: odômetro e calibragem se aplicável
+    const updatesViatura: Record<string, any> = {};
+    if (abastecimento.odometro_km && (!vtr?.odometro_atual_km || abastecimento.odometro_km > vtr.odometro_atual_km)) {
+      updatesViatura.odometro_atual_km = abastecimento.odometro_km;
+    }
+    if (abastecimento.houve_calibracao_pneus) {
+      updatesViatura.data_ultima_calibracao = abastecimento.data_hora || new Date().toISOString();
+    }
+
+    if (Object.keys(updatesViatura).length > 0) {
       await supabase
         .from('viaturas')
-        .update({ odometro_atual_km: abastecimento.odometro_km })
-        .eq('id', abastecimento.viatura_id)
-        .lt('odometro_atual_km', abastecimento.odometro_km);
+        .update(updatesViatura)
+        .eq('id', abastecimento.viatura_id);
     }
 
     return { success: true, data: data as Abastecimento };
   } catch (err: any) {
     console.error('[frotaActions] Erro ao salvar abastecimento:', err);
     return { success: false, error: err?.message || 'Falha ao registrar abastecimento' };
+  }
+}
+
+export async function getRankingPostosAction(
+  contratoId?: string, 
+  tipoCombustivel?: string
+): Promise<{ success: boolean; data?: RankingPostoInfo[]; postoMaisEconomico?: RankingPostoInfo | null; error?: string }> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    let query = supabase.from('abastecimentos').select('*').order('data_hora', { ascending: false }).limit(200);
+
+    if (contratoId && contratoId !== 'TODOS' && contratoId !== 'GLOBAL') {
+      query = query.eq('contrato_id', contratoId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const res = FuelPricingService.getPostoMaisEconomico(data || [], tipoCombustivel);
+    return { success: true, data: res.ranking, postoMaisEconomico: res.postoMaisEconomico };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao calcular ranking de postos:', err);
+    return { success: false, error: err?.message || 'Falha ao obter ranking de postos' };
   }
 }
 
@@ -296,6 +402,51 @@ export async function listOficinasAction(contratoId?: string): Promise<{ success
   } catch (err: any) {
     console.error('[frotaActions] Erro ao listar oficinas:', err);
     return { success: false, error: err?.message || 'Erro ao carregar oficinas credenciadas' };
+  }
+}
+
+export async function saveOficinaAction(oficina: Partial<OficinaPrestador>): Promise<{ success: boolean; data?: OficinaPrestador; error?: string }> {
+  try {
+    const supabase = getSupabaseAdminClient();
+    const payload = {
+      ...oficina,
+      razao_social: oficina.razao_social?.trim().toUpperCase(),
+      contrato_id: oficina.contrato_id || 'ONÇA PUMA',
+      ativo: oficina.ativo !== undefined ? oficina.ativo : true
+    };
+
+    const { data, error } = await supabase
+      .from('oficinas_prestadores')
+      .upsert(payload)
+      .select('*')
+      .single();
+
+    if (error) throw error;
+    return { success: true, data: data as OficinaPrestador };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao salvar oficina:', err);
+    return { success: false, error: err?.message || 'Falha ao salvar oficina credenciada' };
+  }
+}
+
+// ==============================================================================
+// 5. TELEMETRIA & RASTREAMENTO GIS (LEAFLET)
+// ==============================================================================
+
+export async function getFrotaTrackingAction(contratoId?: string): Promise<{
+  success: boolean;
+  viaturas: ViaturaTrackingTelemetry[];
+  postos: any[];
+  error?: string;
+}> {
+  try {
+    const listRes = await listViaturasAction(contratoId);
+    const telemetry = FleetTrackingAdapter.getTelemetryPositions(listRes.data || []);
+    const postos = FleetTrackingAdapter.getPostosGeorreferenciados();
+    return { success: true, viaturas: telemetry, postos };
+  } catch (err: any) {
+    console.error('[frotaActions] Erro ao carregar telemetria:', err);
+    return { success: false, viaturas: [], postos: [], error: err?.message || 'Erro ao carregar telemetria da frota' };
   }
 }
 
