@@ -28,6 +28,7 @@ import { ViaturaModal } from '@/app/components/frota/ViaturaModal';
 import { AbastecimentoModal } from '@/app/components/frota/AbastecimentoModal';
 import { OrdemServicoModal } from '@/app/components/frota/OrdemServicoModal';
 import { OficinaModal } from '@/app/components/frota/OficinaModal';
+import { TerminalMobileShareModal } from '@/app/components/frota/TerminalMobileShareModal';
 import { FrotaDockBar, MinimizedWindow } from '@/app/components/frota/FrotaDockBar';
 import { 
   Truck, 
@@ -112,6 +113,9 @@ export default function ViaturasPage() {
   const [isTireModalOpen, setIsTireModalOpen] = useState(false);
   const [selectedViaturaForTire, setSelectedViaturaForTire] = useState<Viatura | null>(null);
   const [inspecoesPneusAtuais, setInspecoesPneusAtuais] = useState<InspecaoPneu[]>([]);
+
+  // Modal Terminal Mobile (QR Code Share)
+  const [isTerminalShareOpen, setIsTerminalShareOpen] = useState(false);
 
   // Dock Bar (Janelas Minimizadas)
   const [minimizedWindows, setMinimizedWindows] = useState<MinimizedWindow[]>([]);
@@ -616,14 +620,13 @@ export default function ViaturasPage() {
                 Acompanhamento metrológico de preços, auditoria antifraude de consumo e comprovação de calibração
               </p>
             </div>
-            <a
-              href="/frota/abastecer"
-              target="_blank"
-              rel="noreferrer"
-              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase flex items-center gap-1.5 shadow-xs"
+            <button
+              type="button"
+              onClick={() => setIsTerminalShareOpen(true)}
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95 transition-all"
             >
               <ExternalLink className="w-3.5 h-3.5" /> Abrir Terminal Mobile
-            </a>
+            </button>
           </div>
 
           {abastecimentos.length === 0 ? (
@@ -910,6 +913,13 @@ export default function ViaturasPage() {
           </div>
         </div>
       )}
+
+      {/* Modal: Compartilhamento do Terminal Mobile via QR Code */}
+      <TerminalMobileShareModal
+        isOpen={isTerminalShareOpen}
+        onClose={() => setIsTerminalShareOpen(false)}
+        contratoId={currentContratoId}
+      />
 
       {/* Dock Bar de Janelas Minimizadas */}
       <FrotaDockBar
