@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spci-pwa-cache-v9';
+const CACHE_NAME = 'spci-pwa-cache-v10';
 const ASSETS_TO_CACHE = [
   '/',
   '/favicon.svg',
@@ -14,7 +14,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Cache inicial v9 carregado.');
+      console.log('[Service Worker] Cache inicial v10 carregado.');
       return cache.addAll(ASSETS_TO_CACHE);
     }).catch(err => console.warn('[Service Worker] Erro no cache install:', err))
   );
@@ -48,8 +48,16 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // Ignora APIs, manifest e rotas internas do Next.js no cache rígido para evitar erros offline no dev/prod
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/_next/') || url.pathname.includes('manifest')) {
+  // Ignora APIs, manifest, rotas internas do Next.js e requisições RSC no cache para evitar conflitos de versão
+  if (
+    url.pathname.startsWith('/api/') || 
+    url.pathname.startsWith('/_next/') || 
+    url.pathname.includes('manifest') ||
+    url.searchParams.has('_rsc') ||
+    event.request.headers.get('RSC') === '1' ||
+    event.request.headers.get('Next-Router-State-Tree') ||
+    event.request.headers.get('Next-Url')
+  ) {
     return;
   }
 

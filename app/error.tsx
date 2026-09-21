@@ -24,10 +24,47 @@ export default function ErrorPage({
   const [copied, setCopied] = useState(false);
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
+  const isChunkOrCallError = 
+    error?.message?.includes("Cannot read properties of undefined (reading 'call')") ||
+    error?.message?.includes('Loading chunk') ||
+    error?.name === 'ChunkLoadError' ||
+    error?.message?.includes('is not a function');
+
+  const purgeCachesAndReload = () => {
+    if (typeof window === 'undefined') return;
+    if (typeof caches !== 'undefined' && caches.keys) {
+      caches.keys().then((names) => Promise.all(names.map((n) => caches.delete(n)))).finally(() => {
+        window.location.reload();
+      });
+    } else {
+      window.location.reload();
+    }
+  };
+
   useEffect(() => {
     // Loga o erro em ambiente de desenvolvimento ou telemetria
     console.error('[SPCI Route Error]', error);
-  }, [error]);
+
+    // Auto-recuperação para erros de incompatibilidade de versão (chunks do webpack)
+    if (isChunkOrCallError && typeof window !== 'undefined') {
+      const reloadKey = 'spci_auto_reload_chunk';
+      const lastReload = sessionStorage.getItem(reloadKey);
+      const now = Date.now();
+      // Executa apenas uma vez a cada 15 segundos para evitar loops infinitos
+      if (!lastReload || now - parseInt(lastReload, 10) > 15000) {
+        sessionStorage.setItem(reloadKey, String(now));
+        purgeCachesAndReload();
+      }
+    }
+  }, [error, isChunkOrCallError]);
+
+  const handleSmartReset = () => {
+    if (isChunkOrCallError) {
+      purgeCachesAndReload();
+      return;
+    }
+    reset();
+  };
 
   const handleCopyDiagnostics = () => {
     const diagnostics = `[SPCI SYSTEM RECOVERY DIAGNOSTICS]
@@ -68,10 +105,12 @@ URL: ${typeof window !== 'undefined' ? window.location.href : 'N/A'}`;
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-white mt-1 uppercase tracking-tight">
-              Instabilidade Temporária
+              {isChunkOrCallError ? 'Sincronizando Nova Versão' : 'Instabilidade Temporária'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">
-              Ocorreu uma oscilação na renderização desta página. Nenhum dado de vistoria, foto ou ativo foi perdido.
+              {isChunkOrCallError
+                ? 'Uma atualização do sistema foi publicada. Sincronizando componentes para restabelecer a interface sem perda de dados.'
+                : 'Ocorreu uma oscilação na renderização desta página. Nenhum dado de vistoria, foto ou ativo foi perdido.'}
             </p>
           </div>
         </div>
@@ -113,7 +152,7 @@ URL: ${typeof window !== 'undefined' ? window.location.href : 'N/A'}`;
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
           <button
             type="button"
-            onClick={() => reset()}
+            onClick={handleSmartReset}
             className="px-4 py-3 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-950/30 min-h-[48px]"
           >
             <RefreshCw className="w-4 h-4" />
@@ -122,11 +161,7 @@ URL: ${typeof window !== 'undefined' ? window.location.href : 'N/A'}`;
 
           <button
             type="button"
-            onClick={() => {
-              if (typeof window !== 'undefined') {
-                window.location.reload();
-              }
-            }}
+            onClick={purgeCachesAndReload}
             className="px-4 py-3 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[48px]"
           >
             <RefreshCw className="w-4 h-4" />

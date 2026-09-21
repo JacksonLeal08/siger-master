@@ -247,3 +247,6 @@ export const TerminalMobileShareModal: React.FC<TerminalMobileShareModalProps> =
     document.body
   );
 };
+
+export default TerminalMobileShareModal;
+
