@@ -17,7 +17,7 @@ import AssetInspectionModal from '../components/AssetInspectionModal';
 import AssetAddModal from '../components/AssetAddModal';
 import AssetHistoryModal from '../components/AssetHistoryModal';
 import SpciChatIa from '../components/SpciChatIa';
-import PremiumHUDAlert from '../components/ui/PremiumHUDAlert';
+import ActionToastNotification from '../components/ui/ActionToastNotification';
 import QrCameraScanner from '../components/QrCameraScanner';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import AppFooter from '../components/AppFooter';
@@ -741,12 +741,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       </AnimatePresence>
 
-      {/* 8. Componente de Notificações Gerais de Sucesso */}
-      <PremiumHUDAlert
+      {/* 8. Componente Global de Toast Executivo Não-Bloqueante */}
+      <ActionToastNotification
         isOpen={!!(premiumAlert && premiumAlert.show && !premiumAlert.dispatchData)}
-        title={premiumAlert?.title || ''}
+        title={premiumAlert?.title || 'Operação Realizada'}
         message={premiumAlert?.message || ''}
-        type={premiumAlert?.type === 'success' ? 'success' : premiumAlert?.type === 'critical' ? 'critical' : 'warning'}
+        type={premiumAlert?.type === 'success' ? 'success' : premiumAlert?.type === 'critical' ? 'critical' : premiumAlert?.type === 'info' ? 'info' : 'warning'}
+        operadorNome={userProfile?.name || userProfile?.nome || currentUser?.displayName || 'Jackson Leal'}
+        operadorEmail={userProfile?.email || currentUser?.email || 'jackson602@gmail.com'}
         onClose={() => setPremiumAlert(null)}
       />
 

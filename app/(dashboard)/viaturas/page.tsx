@@ -24,6 +24,7 @@ import {
 import { MaintenancePlanEngine } from '@/lib/maintenancePlanEngine';
 import { TwiEducationalCard } from '@/app/components/frota/TwiEducationalCard';
 import { TireMapInspection } from '@/app/components/frota/TireMapInspection';
+import { ViaturaCard } from '@/app/components/frota/ViaturaCard';
 import { ViaturaModal } from '@/app/components/frota/ViaturaModal';
 import { AbastecimentoModal } from '@/app/components/frota/AbastecimentoModal';
 import { OrdemServicoModal } from '@/app/components/frota/OrdemServicoModal';
@@ -424,163 +425,28 @@ export default function ViaturasPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {filteredViaturas.map((v) => {
-                const badge = getStatusBadge(v.status_operacional);
-                const preventivas = MaintenancePlanEngine.evaluateVehicle(
-                  v.odometro_atual_km,
-                  [],
-                  undefined,
-                  v.odometro_ultima_preventiva_km,
-                  v.data_ultima_preventiva
-                );
-                const proximaPreventiva = preventivas.find((p) => p.status !== 'CONFORME') || preventivas[0];
-
-                return (
-                  <div
-                    key={v.id}
-                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
-                  >
-                    <div>
-                      {/* Topo do Card */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-2.5">
-                          {v.foto_veiculo_url ? (
-                            <img
-                              src={v.foto_veiculo_url}
-                              alt={v.prefixo_frota}
-                              className="w-12 h-12 rounded-xl object-cover border border-slate-200 shadow-xs shrink-0"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 rounded-xl bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-600 shrink-0">
-                              <Truck className="w-5 h-5" />
-                            </div>
-                          )}
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono font-black text-base text-slate-900 dark:text-slate-100">
-                                {v.prefixo_frota}
-                              </span>
-                              <span className="font-mono text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded font-bold">
-                                {v.placa}
-                              </span>
-                            </div>
-                            <p className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate">
-                              {v.marca} {v.modelo} {v.ano_fabricacao ? `(${v.ano_fabricacao})` : ''}
-                            </p>
-                          </div>
-                        </div>
-
-                        <span className={`text-[9px] font-mono font-bold px-2.5 py-1 rounded-full border ${badge.bg}`}>
-                          {badge.label}
-                        </span>
-                      </div>
-
-                      {/* Informações de Telemetria e Preventiva */}
-                      <div className="space-y-2 bg-slate-50 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 font-mono">
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-400 text-[10px]">ODÔMETRO:</span>
-                          <strong className="text-slate-800 dark:text-slate-100">{v.odometro_atual_km} km</strong>
-                        </div>
-
-                        {v.odometro_ultima_preventiva_km ? (
-                          <div className="flex justify-between items-center text-[10px]">
-                            <span className="text-slate-400">ÚLTIMA PREVENTIVA:</span>
-                            <span className="font-bold text-slate-700 dark:text-slate-300">
-                              {v.odometro_ultima_preventiva_km} km {v.data_ultima_preventiva ? `• ${new Date(v.data_ultima_preventiva).toLocaleDateString('pt-BR')}` : ''}
-                            </span>
-                          </div>
-                        ) : null}
-
-                        <div className="flex justify-between items-center">
-                          <span className="text-slate-400 text-[10px]">COMBUSTÍVEL:</span>
-                          <span className="font-bold text-[10px] uppercase text-amber-600 dark:text-amber-400">
-                            {v.tipo_combustivel.replace('_', ' ')}
-                          </span>
-                        </div>
-
-                        {/* Previsão da Próxima Revisão Preventiva */}
-                        {proximaPreventiva && (
-                          <div className="pt-1.5 border-t border-slate-200/60 dark:border-slate-800 text-[10px] flex items-center justify-between">
-                            <span className="text-slate-400 flex items-center gap-1">
-                              <Wrench className="w-3 h-3 text-blue-500" /> Próxima Preventiva:
-                            </span>
-                            <span
-                              className={`font-bold ${
-                                proximaPreventiva.status === 'VENCIDO'
-                                  ? 'text-red-500 animate-pulse'
-                                  : proximaPreventiva.status === 'ALERTA_PROXIMO'
-                                  ? 'text-amber-500'
-                                  : 'text-emerald-500'
-                              }`}
-                            >
-                              {proximaPreventiva.restanteKm} km restantes
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Botões de Ação Rápida */}
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-4 gap-1.5">
-                      {/* Pneus TWI */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedViaturaForTire(v);
-                          setIsTireModalOpen(true);
-                        }}
-                        className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer border-none shadow-2xs"
-                        title="Mapeamento de Pneus & TWI"
-                      >
-                        <Disc className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Pneus</span>
-                      </button>
-
-                      {/* Abastecer */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedViaturaForFuel(v);
-                          setIsAbastecimentoModalOpen(true);
-                        }}
-                        className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer border-none shadow-2xs"
-                        title="Registrar Abastecimento"
-                      >
-                        <Fuel className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Abastecer</span>
-                      </button>
-
-                      {/* Ordem de Serviço */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedViaturaForOs(v);
-                          setIsOsModalOpen(true);
-                        }}
-                        className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer border-none shadow-2xs"
-                        title="Abrir Ordem de Serviço (OS)"
-                      >
-                        <Wrench className="w-3.5 h-3.5 text-blue-500" />
-                        <span>OS</span>
-                      </button>
-
-                      {/* Editar Ficha */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedViaturaForEdit(v);
-                          setIsViaturaModalOpen(true);
-                        }}
-                        className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-1 transition-all cursor-pointer border-none shadow-2xs"
-                        title="Editar Cadastro da Viatura"
-                      >
-                        <FileText className="w-3.5 h-3.5 text-slate-500" />
-                        <span>Ficha</span>
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
+              {filteredViaturas.map((v) => (
+                <ViaturaCard
+                  key={v.id}
+                  viatura={v}
+                  onOpenTires={(viatura) => {
+                    setSelectedViaturaForTire(viatura);
+                    setIsTireModalOpen(true);
+                  }}
+                  onOpenFuel={(viatura) => {
+                    setSelectedViaturaForFuel(viatura);
+                    setIsAbastecimentoModalOpen(true);
+                  }}
+                  onOpenOs={(viatura) => {
+                    setSelectedViaturaForOs(viatura);
+                    setIsOsModalOpen(true);
+                  }}
+                  onOpenEdit={(viatura) => {
+                    setSelectedViaturaForEdit(viatura);
+                    setIsViaturaModalOpen(true);
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -657,10 +523,14 @@ export default function ViaturasPage() {
                         {new Date(a.data_hora).toLocaleString('pt-BR')}
                       </td>
                       <td className="py-3 px-3">
-                        <div className="font-bold text-slate-800 dark:text-slate-200 font-mono">
-                          {a.viatura?.prefixo_frota || 'VTR'} • {a.viatura?.placa || ''}
+                        <div className="flex items-center gap-1.5">
+                          <span className="inline-flex items-center font-mono font-black text-[11px] bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 px-2.5 py-0.5 rounded-lg text-slate-900 dark:text-slate-100 shadow-2xs">
+                            {a.viatura?.prefixo_frota || 'VTR'} • {a.viatura?.placa || 'PLACA'}
+                          </span>
                         </div>
-                        <div className="text-[10px] text-slate-400">{a.condutor_nome}</div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                          Condutor: <strong className="text-slate-700 dark:text-slate-200 font-bold">{a.motorista_nome || a.condutor_nome || 'Não informado'}</strong>
+                        </div>
                       </td>
                       <td className="py-3 px-3 font-semibold text-slate-700 dark:text-slate-300">
                         {a.nome_posto || a.posto}

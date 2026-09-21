@@ -57,6 +57,7 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   const [dataUltimaCalibracao, setDataUltimaCalibracao] = useState<string>('');
   const [dataUltimaPreventiva, setDataUltimaPreventiva] = useState<string>('');
   const [odometroUltimaPreventiva, setOdometroUltimaPreventiva] = useState<string>('');
+  const [intervaloRevisaoKm, setIntervaloRevisaoKm] = useState<string>('10000');
   const [fotoVeiculoUrl, setFotoVeiculoUrl] = useState<string | null>(null);
   
   // Documentos & Seguros
@@ -87,8 +88,12 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setDataUltimaPreventiva(
         viaturaToEdit.data_ultima_preventiva ? viaturaToEdit.data_ultima_preventiva.split('T')[0] : ''
       );
-      setOdometroUltimaPreventiva(
-        viaturaToEdit.odometro_ultima_preventiva_km ? String(viaturaToEdit.odometro_ultima_preventiva_km) : ''
+      const kmPrevInit = viaturaToEdit.km_ultima_preventiva !== undefined && viaturaToEdit.km_ultima_preventiva !== null
+        ? String(viaturaToEdit.km_ultima_preventiva)
+        : (viaturaToEdit.odometro_ultima_preventiva_km ? String(viaturaToEdit.odometro_ultima_preventiva_km) : '');
+      setOdometroUltimaPreventiva(kmPrevInit);
+      setIntervaloRevisaoKm(
+        viaturaToEdit.intervalo_revisao_km ? String(viaturaToEdit.intervalo_revisao_km) : '10000'
       );
       setFotoVeiculoUrl(viaturaToEdit.foto_veiculo_url || null);
       setVencimentoCrlv(viaturaToEdit.vencimento_crlv || '');
@@ -113,6 +118,7 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setDataUltimaCalibracao('');
       setDataUltimaPreventiva('');
       setOdometroUltimaPreventiva('');
+      setIntervaloRevisaoKm('10000');
       setFotoVeiculoUrl(null);
       setVencimentoCrlv('');
       setSeguradora('');
@@ -148,6 +154,9 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
 
     setIsSaving(true);
     try {
+      const kmPrevParsed = odometroUltimaPreventiva ? parseFloat(odometroUltimaPreventiva) : null;
+      const intervaloParsed = intervaloRevisaoKm ? parseFloat(intervaloRevisaoKm) : 10000;
+
       const payload: Partial<Viatura> = {
         id: viaturaToEdit?.id,
         contrato_id: contratoId || viaturaToEdit?.contrato_id || 'ONÇA PUMA',
@@ -165,7 +174,9 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
         foto_veiculo_url: fotoVeiculoUrl,
         data_ultima_calibracao: dataUltimaCalibracao ? new Date(dataUltimaCalibracao).toISOString() : null,
         data_ultima_preventiva: dataUltimaPreventiva ? dataUltimaPreventiva : null,
-        odometro_ultima_preventiva_km: odometroUltimaPreventiva ? parseFloat(odometroUltimaPreventiva) : null,
+        km_ultima_preventiva: kmPrevParsed,
+        odometro_ultima_preventiva_km: kmPrevParsed,
+        intervalo_revisao_km: intervaloParsed,
         vencimento_crlv: vencimentoCrlv || null,
         seguradora: seguradora || null,
         apolice_seguro: apolice || null,
@@ -435,6 +446,19 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
                 value={dataUltimaPreventiva}
                 onChange={(e) => setDataUltimaPreventiva(e.target.value)}
                 className="w-full text-xs font-semibold px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Intervalo de Revisão (KM)
+              </label>
+              <input
+                type="number"
+                value={intervaloRevisaoKm}
+                onChange={(e) => setIntervaloRevisaoKm(e.target.value)}
+                placeholder="Padrão: 10000"
+                className="w-full text-xs font-bold font-mono px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-hidden"
               />
             </div>
 

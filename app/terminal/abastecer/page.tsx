@@ -107,6 +107,25 @@ function TerminalAbastecerContent() {
 
   // Sugestões de Postos em cache
   const [postosDisponiveis, setPostosDisponiveis] = useState<string[]>(POSTOS_SUGERIDOS_REGIAO);
+  const [isManualSyncing, setIsManualSyncing] = useState(false);
+
+  // Forçar sincronização imediata
+  const handleForcarSincronizacao = async () => {
+    if (isManualSyncing || !navigator.onLine) return;
+    setIsManualSyncing(true);
+    try {
+      const res = await terminalOfflineSync.syncPendingAbastecimentos();
+      const q = await terminalOfflineSync.getPendingQueue();
+      setPendingSyncCount(q.length);
+      if (res.synced > 0) {
+        carregarViaturas();
+      }
+    } catch (e) {
+      console.warn('Erro ao forçar sincronização:', e);
+    } finally {
+      setIsManualSyncing(false);
+    }
+  };
 
   // 1. Inicializa listeners de rede (Online/Offline) e fila IndexedDB
   useEffect(() => {
@@ -116,6 +135,11 @@ function TerminalAbastecerContent() {
 
     const updateOnlineStatus = () => {
       setIsOnline(navigator.onLine);
+      if (navigator.onLine) {
+        terminalOfflineSync.syncPendingAbastecimentos().then(() => {
+          terminalOfflineSync.getPendingQueue().then((q) => setPendingSyncCount(q.length));
+        });
+      }
     };
 
     window.addEventListener('online', updateOnlineStatus);
@@ -136,9 +160,24 @@ function TerminalAbastecerContent() {
       }
     });
 
+    // Verificação periódica a cada 20 segundos se houver pendências e rede ativa
+    const periodicTimer = setInterval(() => {
+      if (navigator.onLine) {
+        terminalOfflineSync.getPendingQueue().then((q) => {
+          setPendingSyncCount(q.length);
+          if (q.length > 0) {
+            terminalOfflineSync.syncPendingAbastecimentos().then(() => {
+              terminalOfflineSync.getPendingQueue().then((updated) => setPendingSyncCount(updated.length));
+            });
+          }
+        });
+      }
+    }, 20000);
+
     return () => {
       window.removeEventListener('online', updateOnlineStatus);
       window.removeEventListener('offline', updateOnlineStatus);
+      clearInterval(periodicTimer);
       removeSyncListener();
     };
   }, []);
@@ -367,11 +406,13 @@ function TerminalAbastecerContent() {
 
           setEtapa('SUCCESS');
         } else {
-          // Falha de validação do servidor
-          throw new Error(res.error || 'Falha ao registrar abastecimento.');
+          // Falha de validação do servidor (exibe alerta na tela sem salvar como offline)
+          setErroValidacao(res.error || 'Falha ao registrar abastecimento.');
+          setIsSubmitting(false);
+          return;
         }
       } else {
-        // Modo Offline: Gravação transparente no IndexedDB
+        // Modo Offline Real: Gravação transparente no IndexedDB
         await terminalOfflineSync.enqueueAbastecimento(payload);
         setPendingSyncCount((prev) => prev + 1);
 
@@ -386,8 +427,8 @@ function TerminalAbastecerContent() {
         setEtapa('SUCCESS');
       }
     } catch (err: any) {
-      console.warn('Tentando enfileirar offline devido a erro de rede:', err);
-      // Se falhou por instabilidade de rede mesmo com navigator.onLine == true
+      console.warn('Falha inesperada de comunicação de rede, enfileirando offline:', err);
+      // Se falhou por queda física de rede
       try {
         await terminalOfflineSync.enqueueAbastecimento(payload);
         setPendingSyncCount((prev) => prev + 1);
@@ -402,7 +443,7 @@ function TerminalAbastecerContent() {
 
         setEtapa('SUCCESS');
       } catch (offlineErr: any) {
-        setErroValidacao(offlineErr?.message || err?.message || 'Erro ao gravar registro.');
+        setErroValidacao(offlineErr?.message || err?.message || 'Erro ao gravar registro no aparelho.');
       }
     } finally {
       setIsSubmitting(false);
@@ -468,10 +509,16 @@ function TerminalAbastecerContent() {
           {/* Badge de Conectividade e Fila */}
           <div className="flex items-center gap-2">
             {pendingSyncCount > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                <RefreshCw className="w-3 h-3 animate-spin" />
-                {pendingSyncCount} pendente{pendingSyncCount > 1 ? 's' : ''}
-              </span>
+              <button
+                type="button"
+                onClick={handleForcarSincronizacao}
+                disabled={isManualSyncing}
+                title="Toque para enviar e sincronizar agora"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 cursor-pointer active:scale-95 transition-all shadow-xs"
+              >
+                <RefreshCw className={`w-3 h-3 ${isManualSyncing ? 'animate-spin text-amber-400' : ''}`} />
+                <span>{isManualSyncing ? 'Enviando...' : `${pendingSyncCount} pendente${pendingSyncCount > 1 ? 's' : ''}`}</span>
+              </button>
             )}
 
             <div

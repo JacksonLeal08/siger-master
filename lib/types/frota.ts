@@ -77,6 +77,8 @@ export interface Viatura {
   data_ultima_calibracao?: string | null;
   data_ultima_preventiva?: string | null;
   odometro_ultima_preventiva_km?: number | null;
+  km_ultima_preventiva?: number | null;
+  intervalo_revisao_km?: number | null;
   observacoes?: string | null;
   created_at?: string;
   updated_at?: string;

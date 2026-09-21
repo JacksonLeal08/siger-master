@@ -73,11 +73,24 @@ export async function listViaturasAction(contratoId?: string): Promise<{ success
 export async function saveViaturaAction(viatura: Partial<Viatura>): Promise<{ success: boolean; data?: Viatura; error?: string }> {
   try {
     const supabase = getSupabaseAdminClient();
+    
+    const kmPrev = viatura.km_ultima_preventiva !== undefined && viatura.km_ultima_preventiva !== null
+      ? Number(viatura.km_ultima_preventiva)
+      : (viatura.odometro_ultima_preventiva_km !== undefined && viatura.odometro_ultima_preventiva_km !== null
+          ? Number(viatura.odometro_ultima_preventiva_km)
+          : null);
+
+    const intervalo = viatura.intervalo_revisao_km ? Number(viatura.intervalo_revisao_km) : 10000;
+
     const payload = {
       ...viatura,
       prefixo_frota: viatura.prefixo_frota?.trim().toUpperCase(),
       placa: viatura.placa?.trim().toUpperCase(),
-      contrato_id: viatura.contrato_id || 'ONÇA PUMA'
+      contrato_id: viatura.contrato_id || 'ONÇA PUMA',
+      data_ultima_preventiva: viatura.data_ultima_preventiva || null,
+      km_ultima_preventiva: kmPrev,
+      odometro_ultima_preventiva_km: kmPrev,
+      intervalo_revisao_km: intervalo
     };
 
     const { data, error } = await supabase
@@ -117,7 +130,18 @@ export async function updateViaturaFotoAction(viaturaId: string, fotoUrl: string
 export async function listAbastecimentosAction(viaturaId?: string, contratoId?: string): Promise<{ success: boolean; data?: Abastecimento[]; error?: string }> {
   try {
     const supabase = getSupabaseAdminClient();
-    let query = supabase.from('abastecimentos').select('*').order('data_hora', { ascending: false });
+    let query = supabase
+      .from('abastecimentos')
+      .select(`
+        *,
+        viatura:viaturas (
+          id,
+          prefixo_frota,
+          placa,
+          tipo_veiculo
+        )
+      `)
+      .order('data_hora', { ascending: false });
 
     if (viaturaId) {
       query = query.eq('viatura_id', viaturaId);
@@ -127,7 +151,16 @@ export async function listAbastecimentosAction(viaturaId?: string, contratoId?: 
     }
 
     const { data, error } = await query;
-    if (error) throw error;
+    if (error) {
+      // Fallback em caso de erro no join
+      console.warn('[frotaActions] Fallback query abastecimentos sem join:', error);
+      const fallbackQuery = supabase.from('abastecimentos').select('*').order('data_hora', { ascending: false });
+      if (viaturaId) fallbackQuery.eq('viatura_id', viaturaId);
+      if (contratoId && contratoId !== 'TODOS' && contratoId !== 'GLOBAL') fallbackQuery.eq('contrato_id', contratoId);
+      const fbRes = await fallbackQuery;
+      if (fbRes.error) throw fbRes.error;
+      return { success: true, data: (fbRes.data || []) as Abastecimento[] };
+    }
     return { success: true, data: (data || []) as Abastecimento[] };
   } catch (err: any) {
     console.error('[frotaActions] Erro ao listar abastecimentos:', err);
@@ -215,22 +248,38 @@ export async function registrarAbastecimentoAction(
       tipoCombustivel: abastecimento.tipo_combustivel
     });
 
-    const payload = {
-      ...abastecimento,
+    const motoristaFinal = abastecimento.motorista_nome || abastecimento.condutor_nome || 'Condutor Operacional';
+
+    const dbPayload = {
       contrato_id: abastecimento.contrato_id || vtr?.contrato_id || 'ONÇA PUMA',
-      posto: abastecimento.nome_posto || abastecimento.posto || 'Posto Petrobras',
-      nome_posto: abastecimento.nome_posto || abastecimento.posto || 'Posto Petrobras',
+      viatura_id: abastecimento.viatura_id,
+      data_hora: abastecimento.data_hora || new Date().toISOString(),
+      posto: (abastecimento.nome_posto || abastecimento.posto || 'Posto Convencionado').trim(),
+      nome_posto: (abastecimento.nome_posto || abastecimento.posto || 'Posto Convencionado').trim(),
+      tipo_combustivel: abastecimento.tipo_combustivel || 'DIESEL_S10',
+      litros: Number(abastecimento.litros || 0),
+      valor_litro: Number(abastecimento.valor_litro || 0),
+      valor_total: Number(abastecimento.valor_total || 0),
+      odometro_km: Number(abastecimento.odometro_km || 0),
+      condutor_nome: motoristaFinal,
+      motorista_nome: motoristaFinal,
       variacao_preco_litro: variacaoPreco.deltaValor,
       percentual_variacao: variacaoPreco.percentualVariacao,
       km_rodados: analise.kmRodados,
       km_por_litro: analise.kmPorLitro,
       is_discrepante: analise.isDiscrepante,
-      motivo_discrepancia: analise.motivoDiscrepancia
+      motivo_discrepancia: analise.motivoDiscrepancia,
+      houve_calibracao_pneus: Boolean(abastecimento.houve_calibracao_pneus),
+      foto_calibracao_url: abastecimento.foto_calibracao_url || null,
+      foto_cupom_url: abastecimento.foto_cupom_url || abastecimento.comprovante_foto_url || null,
+      comprovante_foto_url: abastecimento.comprovante_foto_url || abastecimento.foto_cupom_url || null,
+      latitude_posto: abastecimento.latitude_posto ? Number(abastecimento.latitude_posto) : null,
+      longitude_posto: abastecimento.longitude_posto ? Number(abastecimento.longitude_posto) : null
     };
 
     const { data, error } = await supabase
       .from('abastecimentos')
-      .insert(payload)
+      .insert(dbPayload)
       .select('*')
       .single();
 
