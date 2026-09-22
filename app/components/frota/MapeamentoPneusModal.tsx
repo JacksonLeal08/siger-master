@@ -377,72 +377,70 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
         </header>
 
         {/* ==================================================================== */}
-        {/* CORPO DO MODAL (DUAS COLUNAS: CHASSI ESQUERDA + METROLOGIA DIREITA) */}
+        {/* CORPO DO MODAL (OPÇÃO A: CHASSI PANORÂMICO SUPERIOR + BENTO CARDS INFERIORES) */}
         {/* ==================================================================== */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 flex flex-col gap-6">
           
           {/* ------------------------------------------------------------------ */}
-          {/* ÁREA ESQUERDA: CHASSI INTERATIVO VETORIAL (5 colunas) */}
+          {/* SEÇÃO SUPERIOR: DIAGRAMA ESQUEMÁTICO DO CHASSI EM EXTENSÃO TOTAL */}
           {/* ------------------------------------------------------------------ */}
-          <div className="lg:col-span-5 flex flex-col gap-3">
-            <div className={`p-4 rounded-2xl border ${
-              isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
+          <div className={`p-4 sm:p-5 rounded-3xl border shadow-xs transition-colors ${
+            isDark ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+          }`}>
+            {/* Header do Esquema com Título, Subtítulo e Legenda de Cores */}
+            <div className={`flex flex-col md:flex-row items-start md:items-center justify-between pb-3.5 border-b gap-3 mb-4 ${
+              isDark ? 'border-slate-800' : 'border-slate-200'
             }`}>
-              <div className={`flex items-center justify-between pb-2 border-b mb-3 ${
-                isDark ? 'border-slate-800' : 'border-slate-200'
-              }`}>
-                <span className={`text-[11px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 ${
-                  isDark ? 'text-slate-400' : 'text-slate-600'
+              <div className="flex items-center gap-2.5">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  isDark ? 'bg-red-600/10 border border-red-600/30 text-red-500' : 'bg-red-50 border border-red-200 text-red-600'
                 }`}>
-                  <Gauge className="w-3.5 h-3.5 text-red-500" />
-                  Diagrama Esquemático do Chassi
-                </span>
-                <span className={`text-[10px] font-mono ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
-                }`}>
-                  Toque na roda para inspecionar
-                </span>
+                  <Gauge className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className={`font-mono font-bold text-xs uppercase tracking-wider ${
+                    isDark ? 'text-slate-100' : 'text-slate-900'
+                  }`}>
+                    Diagrama Esquemático do Chassi & Mapa de Rodagem
+                  </h4>
+                  <p className={`text-[10.5px] font-mono ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    Toque em qualquer roda para inspecionar, calibrar ou detalhar medições
+                  </p>
+                </div>
               </div>
 
-              {/* Chassi do Veículo */}
-              <div className="relative w-full max-w-[310px] mx-auto py-4">
-                {/* Linha Longitudinal do Chassi */}
-                <div className={`absolute top-8 bottom-8 left-1/2 -translate-x-1/2 w-1.5 rounded-full ${
-                  isDark ? 'bg-slate-700/60' : 'bg-slate-300'
-                }`} />
-
-                {/* Eixo Dianteiro */}
-                <div className={`absolute top-16 left-6 right-6 h-1 rounded-full ${
-                  isDark ? 'bg-slate-700/80' : 'bg-slate-300'
-                }`} />
-                {/* Eixo Traseiro */}
-                <div className={`absolute top-52 left-6 right-6 h-1 rounded-full ${
-                  isDark ? 'bg-slate-700/80' : 'bg-slate-300'
-                }`} />
-
-                {/* Silhueta Central da Cabine */}
-                <div className={`mx-auto w-32 h-64 border-2 border-dashed rounded-3xl flex flex-col items-center justify-between p-3 relative ${
-                  isDark ? 'border-slate-700/60 bg-slate-950/30' : 'border-slate-300 bg-slate-50/70'
+              {/* Guia Rápido Normativo de Cores */}
+              <div className="flex items-center gap-2 flex-wrap text-[10px] font-mono font-bold">
+                <span className={`px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${
+                  isDark ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
                 }`}>
-                  <div className={`text-[9px] font-mono font-bold uppercase tracking-widest mt-1 ${
-                    isDark ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
-                    FRENTE
-                  </div>
-                  <div className={`text-[9px] font-mono font-bold text-center px-1 truncate max-w-[110px] ${
-                    isDark ? 'text-slate-300' : 'text-slate-700'
-                  }`}>
-                    {viatura.modelo}
-                  </div>
-                  <div className={`text-[9px] font-mono font-bold uppercase tracking-widest mb-1 ${
-                    isDark ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
-                    TRASEIRA
-                  </div>
-                </div>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  ≥ 3.0 mm (Conforme)
+                </span>
+                <span className={`px-2.5 py-1 rounded-lg border flex items-center gap-1.5 ${
+                  isDark ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-700'
+                }`}>
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  1.7 a 2.9 mm (Atenção)
+                </span>
+                <span className={`px-2.5 py-1 rounded-lg border flex items-center gap-1.5 animate-pulse ${
+                  isDark ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-red-50 border-red-200 text-red-700'
+                }`}>
+                  <span className="w-2 h-2 rounded-full bg-red-600" />
+                  ≤ 1.6 mm (Crítico / TWI Proibido)
+                </span>
+              </div>
+            </div>
 
-                {/* Posição DE (Dianteiro Esquerdo) */}
-                <div className="absolute top-10 left-0">
+            {/* Esquema Espaçoso e Panorâmico do Chassi */}
+            <div className="relative w-full max-w-5xl mx-auto py-2">
+              
+              {/* EIXO DIANTEIRO (DE e DD) */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center relative z-10">
+                {/* Roda DE */}
+                <div className="sm:col-span-5 flex justify-center sm:justify-end">
                   <RodaCard
                     slot={SLOTS_RODAS[0]}
                     medicao={medicoes.DE}
@@ -452,8 +450,18 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                   />
                 </div>
 
-                {/* Posição DD (Dianteiro Direito) */}
-                <div className="absolute top-10 right-0">
+                {/* Eixo Dianteiro Direcional e Indicador Frente */}
+                <div className="sm:col-span-2 hidden sm:flex flex-col items-center justify-center">
+                  <div className={`h-2 w-full rounded-full ${isDark ? 'bg-slate-700/80' : 'bg-slate-300'}`} />
+                  <div className={`mt-2 px-3 py-0.5 rounded-full border text-[9px] font-mono font-black uppercase tracking-widest text-center shadow-2xs ${
+                    isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-300'
+                  }`}>
+                    ▲ FRENTE ▲
+                  </div>
+                </div>
+
+                {/* Roda DD */}
+                <div className="sm:col-span-5 flex justify-center sm:justify-start">
                   <RodaCard
                     slot={SLOTS_RODAS[1]}
                     medicao={medicoes.DD}
@@ -462,9 +470,35 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                     isDark={isDark}
                   />
                 </div>
+              </div>
 
-                {/* Posição TE (Traseiro Esquerdo) */}
-                <div className="absolute top-46 left-0">
+              {/* SEÇÃO CENTRAL: VIGA DO CHASSI + CABINE DO VEÍCULO */}
+              <div className="relative py-4 flex items-center justify-center">
+                {/* Linha Longitudinal do Chassi */}
+                <div className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-2 rounded-full ${
+                  isDark ? 'bg-slate-700/60' : 'bg-slate-300'
+                }`} />
+
+                {/* Silhueta Central da Cabine */}
+                <div className={`relative z-10 px-8 py-3 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center text-center backdrop-blur-xs shadow-xs ${
+                  isDark ? 'border-slate-700/80 bg-slate-950/80 text-slate-300' : 'border-slate-300 bg-slate-50/90 text-slate-700'
+                }`}>
+                  <span className="text-[11px] font-mono font-black text-red-600 uppercase tracking-wider">
+                    {viatura.prefixo_frota}
+                  </span>
+                  <span className="text-xs font-mono font-bold">
+                    {viatura.marca} {viatura.modelo}
+                  </span>
+                  <span className={`text-[9.5px] font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Placa: {viatura.placa} • Tração 4x4 / Chassi Longarinas
+                  </span>
+                </div>
+              </div>
+
+              {/* EIXO TRASEIRO (TE e TD) */}
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center relative z-10">
+                {/* Roda TE */}
+                <div className="sm:col-span-5 flex justify-center sm:justify-end">
                   <RodaCard
                     slot={SLOTS_RODAS[2]}
                     medicao={medicoes.TE}
@@ -474,8 +508,18 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                   />
                 </div>
 
-                {/* Posição TD (Traseiro Direito) */}
-                <div className="absolute top-46 right-0">
+                {/* Eixo Traseiro de Carga */}
+                <div className="sm:col-span-2 hidden sm:flex flex-col items-center justify-center">
+                  <div className={`h-2 w-full rounded-full ${isDark ? 'bg-slate-700/80' : 'bg-slate-300'}`} />
+                  <div className={`mt-2 px-3 py-0.5 rounded-full border text-[9px] font-mono font-black uppercase tracking-widest text-center shadow-2xs ${
+                    isDark ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-300'
+                  }`}>
+                    ▼ TRASEIRA ▼
+                  </div>
+                </div>
+
+                {/* Roda TD */}
+                <div className="sm:col-span-5 flex justify-center sm:justify-start">
                   <RodaCard
                     slot={SLOTS_RODAS[3]}
                     medicao={medicoes.TD}
@@ -484,364 +528,352 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                     isDark={isDark}
                   />
                 </div>
+              </div>
 
-                {/* Posição ESTEPE */}
-                <div className="mt-4 flex justify-center">
-                  <RodaCard
-                    slot={SLOTS_RODAS[4]}
-                    medicao={medicoes.ESTEPE}
-                    isSelected={selectedPosicao === 'ESTEPE'}
-                    onClick={() => setSelectedPosicao('ESTEPE')}
-                    isDark={isDark}
-                  />
-                </div>
+              {/* ESTEPE OPERACIONAL (COMPARTIMENTO TÉCNICO INFERIOR) */}
+              <div className="mt-5 pt-3.5 border-t border-dashed border-slate-200/80 dark:border-slate-800/80 flex flex-col items-center justify-center gap-1.5">
+                <span className={`text-[9.5px] font-mono font-bold uppercase tracking-widest ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>
+                  Compartimento Técnico de Reserva
+                </span>
+                <RodaCard
+                  slot={SLOTS_RODAS[4]}
+                  medicao={medicoes.ESTEPE}
+                  isSelected={selectedPosicao === 'ESTEPE'}
+                  onClick={() => setSelectedPosicao('ESTEPE')}
+                  isDark={isDark}
+                />
               </div>
-            </div>
 
-            {/* Guia Rápido de Cores Normativas */}
-            <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-mono font-bold">
-              <div className={`p-2 rounded-xl border ${
-                isDark ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-              }`}>
-                <span>≥ 3.0 mm</span>
-                <p className={`text-[9px] font-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Conforme Pleno</p>
-              </div>
-              <div className={`p-2 rounded-xl border ${
-                isDark ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 'bg-amber-50 border-amber-200 text-amber-700'
-              }`}>
-                <span>1.7 a 2.9 mm</span>
-                <p className={`text-[9px] font-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Atenção Preventiva</p>
-              </div>
-              <div className={`p-2 rounded-xl border animate-pulse ${
-                isDark ? 'bg-red-500/10 border-red-500/30 text-red-400' : 'bg-red-50 border-red-200 text-red-700'
-              }`}>
-                <span>≤ 1.6 mm</span>
-                <p className={`text-[9px] font-normal ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Crítico / TWI Proibido</p>
-              </div>
             </div>
           </div>
 
           {/* ------------------------------------------------------------------ */}
-          {/* ÁREA DIREITA: ENTRADA & MEMÓRIA DE CÁLCULO METROLÓGICO (7 colunas) */}
+          {/* EXTREMIDADE INFERIOR: BENTO GRID DE DADOS E MEMÓRIA DE CÁLCULO */}
           {/* ------------------------------------------------------------------ */}
-          <div className="lg:col-span-7 flex flex-col gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            {/* Card de Entrada da Roda Selecionada */}
-            <div className={`p-4 rounded-2xl border ${
-              isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
-            }`}>
-              <div className={`flex items-center justify-between pb-3 border-b mb-3 ${
-                isDark ? 'border-slate-800' : 'border-slate-200'
+            {/* BLOCO ESQUERDA (5 COLUNAS): ENTRADA DA RODA ATIVA + SESSÃO + GUIA */}
+            <div className="lg:col-span-5 flex flex-col gap-4">
+              
+              {/* Card de Entrada da Roda Selecionada */}
+              <div className={`p-4 rounded-2xl border ${
+                isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200 shadow-xs'
               }`}>
-                <div className="flex items-center gap-2">
-                  <span className="w-7 h-7 rounded-lg bg-red-600 text-white font-mono font-black text-xs flex items-center justify-center shadow-xs">
-                    {selectedPosicao}
-                  </span>
-                  <div>
-                    <h4 className={`font-mono font-bold text-xs uppercase ${
-                      isDark ? 'text-slate-200' : 'text-slate-800'
-                    }`}>
-                      {SLOTS_RODAS.find(s => s.posicao === selectedPosicao)?.label}
-                    </h4>
-                    <p className={`text-[10px] font-mono ${
-                      isDark ? 'text-slate-400' : 'text-slate-500'
-                    }`}>
-                      {SLOTS_RODAS.find(s => s.posicao === selectedPosicao)?.descricao}
-                    </p>
-                  </div>
-                </div>
-
-                <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold border ${
-                  metrologiaAtual.statusTwi === 'CRITICO_PROIBIDO'
-                    ? (isDark ? 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse' : 'bg-red-50 text-red-700 border-red-200 animate-pulse')
-                    : metrologiaAtual.statusTwi === 'ATENCAO'
-                    ? (isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-amber-50 text-amber-700 border-amber-200')
-                    : (isDark ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                <div className={`flex items-center justify-between pb-3 border-b mb-3 ${
+                  isDark ? 'border-slate-800' : 'border-slate-200'
                 }`}>
-                  {metrologiaAtual.statusTwi === 'CRITICO_PROIBIDO' ? '⚠️ CRÍTICO (TWI)' : metrologiaAtual.statusTwi}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Catálogo Mestre */}
-                <div className="sm:col-span-3">
-                  <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
-                    isDark ? 'text-slate-400' : 'text-slate-600'
-                  }`}>
-                    Pneu de Referência Homologado (Fábrica)
-                  </label>
-                  <select
-                    value={selectedCatalogoId}
-                    onChange={(e) => handleSelectPneuReferencia(e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2 text-xs font-mono focus:border-red-500 outline-none transition-colors ${
-                      isDark 
-                        ? 'bg-slate-950 border-slate-700 text-slate-100' 
-                        : 'bg-slate-50 border-slate-300 text-slate-800'
-                    }`}
-                  >
-                    {catalogo.map((pneu) => (
-                      <option key={pneu.id} value={pneu.id}>
-                        {pneu.marca} {pneu.modelo} • {pneu.medida} (S_orig: {pneu.profundidade_original_mm.toFixed(2)} mm • {pneu.pressao_recomendada_psi} PSI)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Profundidade Aferida (S_aferido) */}
-                <div>
-                  <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
-                    isDark ? 'text-slate-400' : 'text-slate-600'
-                  }`}>
-                    Sulco Aferido (mm) *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="20"
-                      value={sulcoInput}
-                      onChange={(e) => setSulcoInput(e.target.value)}
-                      className={`w-full border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:border-red-500 outline-none pr-8 transition-colors ${
-                        isDark 
-                          ? 'bg-slate-950 border-slate-700 text-slate-100' 
-                          : 'bg-slate-50 border-slate-300 text-slate-800'
-                      }`}
-                    />
-                    <span className={`absolute right-2.5 top-2 text-[10px] font-mono ${
-                      isDark ? 'text-slate-400' : 'text-slate-500'
-                    }`}>mm</span>
-                  </div>
-                </div>
-
-                {/* Pressão PSI */}
-                <div>
-                  <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
-                    isDark ? 'text-slate-400' : 'text-slate-600'
-                  }`}>
-                    Pressão Aferida (PSI) *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      step="1"
-                      min="10"
-                      max="120"
-                      value={pressaoInput}
-                      onChange={(e) => setPressaoInput(e.target.value)}
-                      className={`w-full border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:border-red-500 outline-none pr-8 transition-colors ${
-                        isDark 
-                          ? 'bg-slate-950 border-slate-700 text-slate-100' 
-                          : 'bg-slate-50 border-slate-300 text-slate-800'
-                      }`}
-                    />
-                    <span className={`absolute right-2.5 top-2 text-[10px] font-mono ${
-                      isDark ? 'text-slate-400' : 'text-slate-500'
-                    }`}>PSI</span>
-                  </div>
-                </div>
-
-                {/* Botão de Salvar Roda Atual */}
-                <div className="flex items-end">
-                  <button
-                    type="button"
-                    onClick={handleSalvarRodaAtual}
-                    className={`w-full rounded-xl py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border active:scale-95 shadow-xs ${
-                      isDark 
-                        ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-600' 
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
-                    }`}
-                  >
-                    <Save className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
-                    Salvar Roda
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* ================================================================ */}
-            {/* CARD EXECUTIVO: MEMÓRIA DE CÁLCULO & PARÂMETROS METROLÓGICOS */}
-            {/* ================================================================ */}
-            <div className={`p-4 rounded-2xl border relative overflow-hidden ${
-              isDark ? 'bg-slate-900/95 border-slate-800 shadow-xl' : 'bg-white border-slate-200 shadow-xs'
-            }`}>
-              <div className={`flex items-center justify-between pb-3 border-b mb-3 ${
-                isDark ? 'border-slate-800' : 'border-slate-200'
-              }`}>
-                <div className="flex items-center gap-2">
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                    isDark ? 'bg-blue-500/10 border border-blue-500/30 text-blue-400' : 'bg-blue-50 border border-blue-200 text-blue-600'
-                  }`}>
-                    <Calculator className="w-4 h-4" />
-                  </div>
-                  <h4 className={`font-mono font-bold text-xs uppercase ${
-                    isDark ? 'text-slate-200' : 'text-slate-800'
-                  }`}>
-                    Memória de Cálculo & Parâmetros Metrológicos
-                  </h4>
-                </div>
-                <span className={`text-[10px] font-mono ${
-                  isDark ? 'text-slate-400' : 'text-slate-500'
-                }`}>
-                  Normatização CONTRAN nº 558/80
-                </span>
-              </div>
-
-              {/* Tabela de Parâmetros Metrológicos */}
-              <div className="space-y-2 text-xs font-mono">
-                <div className={`flex items-center justify-between py-1 border-b ${
-                  isDark ? 'border-slate-800/60' : 'border-slate-200/80'
-                }`}>
-                  <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Profundidade Original de Fábrica (S_orig):</span>
-                  <span className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{metrologiaAtual.sOrig.toFixed(2)} mm</span>
-                </div>
-
-                <div className={`flex items-center justify-between py-1 border-b ${
-                  isDark ? 'border-slate-800/60' : 'border-slate-200/80'
-                }`}>
-                  <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Limite Legal Mandatório (CONTRAN 558/80):</span>
-                  <span className={`font-bold ${isDark ? 'text-red-400' : 'text-red-600'}`}>1.60 mm (TWI)</span>
-                </div>
-
-                <div className={`flex items-center justify-between py-1 border-b ${
-                  isDark ? 'border-slate-800/60' : 'border-slate-200/80'
-                }`}>
-                  <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Borracha Útil Total de Projeto (B_útil):</span>
-                  <span className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{metrologiaAtual.bUtilTotal.toFixed(2)} mm</span>
-                </div>
-
-                <div className={`flex items-center justify-between py-1 border-b ${
-                  isDark ? 'border-slate-800/60' : 'border-slate-200/80'
-                }`}>
-                  <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Desgaste Acumulado da Rodagem (Δ_desgaste):</span>
-                  <span className={`font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>
-                    {metrologiaAtual.deltaDesgaste.toFixed(2)} mm ({metrologiaAtual.percentualDesgasteConsumido.toFixed(1)}% consumido)
-                  </span>
-                </div>
-
-                <div className={`flex items-center justify-between py-1 border-b ${
-                  isDark ? 'border-slate-800/60' : 'border-slate-200/80'
-                }`}>
-                  <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Saldo de Borracha Restante até o Limite:</span>
-                  <span className={`font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{metrologiaAtual.saldoBorrachaRestante.toFixed(2)} mm</span>
-                </div>
-
-                <div className={`flex items-center justify-between py-1 border-b ${
-                  isDark ? 'border-slate-800/60' : 'border-slate-200/80'
-                }`}>
-                  <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Percentual de Vida Útil Restante (% V_útil):</span>
-                  <span className={`font-black text-sm ${
-                    metrologiaAtual.percentualVidaUtil < 20 
-                      ? (isDark ? 'text-red-400' : 'text-red-600') 
-                      : metrologiaAtual.percentualVidaUtil < 40 
-                      ? (isDark ? 'text-amber-400' : 'text-amber-600') 
-                      : (isDark ? 'text-emerald-400' : 'text-emerald-600')
-                  }`}>
-                    {metrologiaAtual.percentualVidaUtil.toFixed(2)}%
-                  </span>
-                </div>
-
-                {/* Barra Gráfica de Vida Útil */}
-                <div className="pt-1 pb-2">
-                  <div className={`w-full h-3 rounded-full border overflow-hidden flex ${
-                    isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-200 border-slate-300'
-                  }`}>
-                    <div 
-                      style={{ width: `${metrologiaAtual.percentualVidaUtil}%` }}
-                      className={`h-full transition-all duration-500 rounded-full ${
-                        metrologiaAtual.percentualVidaUtil < 20 
-                          ? 'bg-red-500' 
-                          : metrologiaAtual.percentualVidaUtil < 40 
-                          ? 'bg-amber-500' 
-                          : 'bg-emerald-500'
-                      }`}
-                    />
-                  </div>
-                </div>
-
-                {/* Demonstrativo Formal da Equação Matemática */}
-                <div className={`p-2.5 rounded-xl border text-[11px] ${
-                  isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
-                }`}>
-                  <span className={`text-[10px] uppercase font-bold block mb-1 ${
-                    isDark ? 'text-slate-400' : 'text-slate-500'
-                  }`}>
-                    Demonstrativo Formal da Equação:
-                  </span>
-                  <code className={`block break-words font-mono font-bold ${
-                    isDark ? 'text-emerald-400' : 'text-emerald-700'
-                  }`}>
-                    {metrologiaAtual.demonstrativoEquacao}
-                  </code>
-                </div>
-
-                {/* Quilometragem Projetada para Troca */}
-                {metrologiaAtual.kmProjetadoTwi && (
-                  <div className="flex items-center justify-between pt-1">
-                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Quilometragem Projetada para Atingimento do TWI:</span>
-                    <span className={`font-mono font-black ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-                      {metrologiaAtual.kmProjetadoTwi.toLocaleString('pt-BR')} km
+                  <div className="flex items-center gap-2">
+                    <span className="w-7 h-7 rounded-lg bg-red-600 text-white font-mono font-black text-xs flex items-center justify-center shadow-xs">
+                      {selectedPosicao}
                     </span>
+                    <div>
+                      <h4 className={`font-mono font-bold text-xs uppercase ${
+                        isDark ? 'text-slate-200' : 'text-slate-800'
+                      }`}>
+                        {SLOTS_RODAS.find(s => s.posicao === selectedPosicao)?.label}
+                      </h4>
+                      <p className={`text-[10px] font-mono ${
+                        isDark ? 'text-slate-400' : 'text-slate-500'
+                      }`}>
+                        {SLOTS_RODAS.find(s => s.posicao === selectedPosicao)?.descricao}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold border ${
+                    metrologiaAtual.statusTwi === 'CRITICO_PROIBIDO'
+                      ? (isDark ? 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse' : 'bg-red-50 text-red-700 border-red-200 animate-pulse')
+                      : metrologiaAtual.statusTwi === 'ATENCAO'
+                      ? (isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-amber-50 text-amber-700 border-amber-200')
+                      : (isDark ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+                  }`}>
+                    {metrologiaAtual.statusTwi === 'CRITICO_PROIBIDO' ? '⚠️ CRÍTICO (TWI)' : metrologiaAtual.statusTwi}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Catálogo Mestre */}
+                  <div className="sm:col-span-3">
+                    <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
+                      isDark ? 'text-slate-400' : 'text-slate-600'
+                    }`}>
+                      Pneu de Referência Homologado (Fábrica)
+                    </label>
+                    <select
+                      value={selectedCatalogoId}
+                      onChange={(e) => handleSelectPneuReferencia(e.target.value)}
+                      className={`w-full border rounded-xl px-3 py-2 text-xs font-mono focus:border-red-500 outline-none transition-colors ${
+                        isDark 
+                          ? 'bg-slate-950 border-slate-700 text-slate-100' 
+                          : 'bg-slate-50 border-slate-300 text-slate-800'
+                      }`}
+                    >
+                      {catalogo.map((pneu) => (
+                        <option key={pneu.id} value={pneu.id}>
+                          {pneu.marca} {pneu.modelo} • {pneu.medida} (S_orig: {pneu.profundidade_original_mm.toFixed(2)} mm • {pneu.pressao_recomendada_psi} PSI)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Profundidade Aferida (S_aferido) */}
+                  <div>
+                    <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
+                      isDark ? 'text-slate-400' : 'text-slate-600'
+                    }`}>
+                      Sulco Aferido (mm) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="20"
+                        value={sulcoInput}
+                        onChange={(e) => setSulcoInput(e.target.value)}
+                        className={`w-full border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:border-red-500 outline-none pr-8 transition-colors ${
+                          isDark 
+                            ? 'bg-slate-950 border-slate-700 text-slate-100' 
+                            : 'bg-slate-50 border-slate-300 text-slate-800'
+                        }`}
+                      />
+                      <span className={`absolute right-2.5 top-2 text-[10px] font-mono ${
+                        isDark ? 'text-slate-400' : 'text-slate-500'
+                      }`}>mm</span>
+                    </div>
+                  </div>
+
+                  {/* Pressão PSI */}
+                  <div>
+                    <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
+                      isDark ? 'text-slate-400' : 'text-slate-600'
+                    }`}>
+                      Pressão Aferida (PSI) *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        step="1"
+                        min="10"
+                        max="120"
+                        value={pressaoInput}
+                        onChange={(e) => setPressaoInput(e.target.value)}
+                        className={`w-full border rounded-xl px-3 py-2 text-xs font-mono font-bold focus:border-red-500 outline-none pr-8 transition-colors ${
+                          isDark 
+                            ? 'bg-slate-950 border-slate-700 text-slate-100' 
+                            : 'bg-slate-50 border-slate-300 text-slate-800'
+                        }`}
+                      />
+                      <span className={`absolute right-2.5 top-2 text-[10px] font-mono ${
+                        isDark ? 'text-slate-400' : 'text-slate-500'
+                      }`}>PSI</span>
+                    </div>
+                  </div>
+
+                  {/* Botão de Salvar Roda Atual */}
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={handleSalvarRodaAtual}
+                      className={`w-full rounded-xl py-2 px-3 text-xs font-mono font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border active:scale-95 shadow-xs ${
+                        isDark 
+                          ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-600' 
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+                      }`}
+                    >
+                      <Save className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                      Salvar Roda
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Parâmetros da Sessão: Calibração e Odômetro */}
+              <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-2xl border ${
+                isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-2xs'
+              }`}>
+                <label className={`flex items-center gap-2 cursor-pointer text-xs font-mono ${
+                  isDark ? 'text-slate-300' : 'text-slate-700'
+                }`}>
+                  <input
+                    type="checkbox"
+                    checked={houveCalibracao}
+                    onChange={(e) => setHouveCalibracao(e.target.checked)}
+                    className={`w-4 h-4 rounded text-red-600 focus:ring-0 ${
+                      isDark ? 'border-slate-700 bg-slate-950' : 'border-slate-300 bg-white'
+                    }`}
+                  />
+                  <span>Houve Calibração dos Pneus nesta sessão</span>
+                </label>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Odômetro:</span>
+                  <input
+                    type="number"
+                    value={odometroInput}
+                    onChange={(e) => setOdometroInput(e.target.value)}
+                    className={`w-28 border rounded-lg px-2 py-1 text-xs font-mono font-bold ${
+                      isDark ? 'bg-slate-950 border-slate-700 text-slate-100' : 'bg-slate-50 border-slate-300 text-slate-800'
+                    }`}
+                  />
+                  <span className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>km</span>
+                </div>
+              </div>
+
+              {/* Guia Didático TWI Integrado (Expansível) */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowTwiGuide(!showTwiGuide)}
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer ${
+                    isDark 
+                      ? 'bg-slate-800/40 hover:bg-slate-800/80 border-slate-700/80 text-slate-300' 
+                      : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-amber-500" />
+                    <span>Guia Técnico Normativo: O que é TWI e Amparo Legal CONTRAN?</span>
+                  </div>
+                  {showTwiGuide ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </button>
+
+                {showTwiGuide && (
+                  <div className="mt-2 animate-in fade-in duration-200">
+                    <TwiEducationalCard isDark={isDark} />
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Parâmetros da Sessão: Calibração e Odômetro */}
-            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-2xl border ${
-              isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-2xs'
-            }`}>
-              <label className={`flex items-center gap-2 cursor-pointer text-xs font-mono ${
-                isDark ? 'text-slate-300' : 'text-slate-700'
+            {/* BLOCO DIREITA (7 COLUNAS): MEMÓRIA DE CÁLCULO E PARÂMETROS METROLÓGICOS */}
+            <div className="lg:col-span-7 flex flex-col gap-4">
+              <div className={`p-4 sm:p-5 rounded-2xl border relative overflow-hidden ${
+                isDark ? 'bg-slate-900/95 border-slate-800 shadow-xl' : 'bg-white border-slate-200 shadow-xs'
               }`}>
-                <input
-                  type="checkbox"
-                  checked={houveCalibracao}
-                  onChange={(e) => setHouveCalibracao(e.target.checked)}
-                  className={`w-4 h-4 rounded text-red-600 focus:ring-0 ${
-                    isDark ? 'border-slate-700 bg-slate-950' : 'border-slate-300 bg-white'
-                  }`}
-                />
-                <span>Houve Calibração dos Pneus nesta sessão</span>
-              </label>
+                <div className={`flex items-center justify-between pb-3 border-b mb-3 ${
+                  isDark ? 'border-slate-800' : 'border-slate-200'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                      isDark ? 'bg-blue-500/10 border border-blue-500/30 text-blue-400' : 'bg-blue-50 border border-blue-200 text-blue-600'
+                    }`}>
+                      <Calculator className="w-4 h-4" />
+                    </div>
+                    <h4 className={`font-mono font-bold text-xs uppercase ${
+                      isDark ? 'text-slate-200' : 'text-slate-800'
+                    }`}>
+                      Memória de Cálculo & Parâmetros Metrológicos
+                    </h4>
+                  </div>
+                  <span className={`text-[10px] font-mono ${
+                    isDark ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    Normatização CONTRAN nº 558/80
+                  </span>
+                </div>
 
-              <div className="flex items-center gap-2">
-                <span className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>Odômetro:</span>
-                <input
-                  type="number"
-                  value={odometroInput}
-                  onChange={(e) => setOdometroInput(e.target.value)}
-                  className={`w-28 border rounded-lg px-2 py-1 text-xs font-mono font-bold ${
-                    isDark ? 'bg-slate-950 border-slate-700 text-slate-100' : 'bg-slate-50 border-slate-300 text-slate-800'
-                  }`}
-                />
-                <span className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>km</span>
+                {/* Tabela de Parâmetros Metrológicos */}
+                <div className="space-y-2 text-xs font-mono">
+                  <div className={`flex items-center justify-between py-1.5 border-b ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200/80'
+                  }`}>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Profundidade Original de Fábrica (S_orig):</span>
+                    <span className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{metrologiaAtual.sOrig.toFixed(2)} mm</span>
+                  </div>
+
+                  <div className={`flex items-center justify-between py-1.5 border-b ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200/80'
+                  }`}>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Limite Legal Mandatório (CONTRAN 558/80):</span>
+                    <span className={`font-bold ${isDark ? 'text-red-400' : 'text-red-600'}`}>1.60 mm (TWI)</span>
+                  </div>
+
+                  <div className={`flex items-center justify-between py-1.5 border-b ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200/80'
+                  }`}>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Borracha Útil Total de Projeto (B_útil):</span>
+                    <span className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{metrologiaAtual.bUtilTotal.toFixed(2)} mm</span>
+                  </div>
+
+                  <div className={`flex items-center justify-between py-1.5 border-b ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200/80'
+                  }`}>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Desgaste Acumulado da Rodagem (Δ_desgaste):</span>
+                    <span className={`font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>
+                      {metrologiaAtual.deltaDesgaste.toFixed(2)} mm ({metrologiaAtual.percentualDesgasteConsumido.toFixed(1)}% consumido)
+                    </span>
+                  </div>
+
+                  <div className={`flex items-center justify-between py-1.5 border-b ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200/80'
+                  }`}>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Saldo de Borracha Restante até o Limite:</span>
+                    <span className={`font-bold ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{metrologiaAtual.saldoBorrachaRestante.toFixed(2)} mm</span>
+                  </div>
+
+                  <div className={`flex items-center justify-between py-1.5 border-b ${
+                    isDark ? 'border-slate-800/60' : 'border-slate-200/80'
+                  }`}>
+                    <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Percentual de Vida Útil Restante (% V_útil):</span>
+                    <span className={`font-black text-sm ${
+                      metrologiaAtual.percentualVidaUtil < 20 
+                        ? (isDark ? 'text-red-400' : 'text-red-600') 
+                        : metrologiaAtual.percentualVidaUtil < 40 
+                        ? (isDark ? 'text-amber-400' : 'text-amber-600') 
+                        : (isDark ? 'text-emerald-400' : 'text-emerald-600')
+                    }`}>
+                      {metrologiaAtual.percentualVidaUtil.toFixed(2)}%
+                    </span>
+                  </div>
+
+                  {/* Barra Gráfica de Vida Útil */}
+                  <div className="pt-1.5 pb-2">
+                    <div className={`w-full h-3 rounded-full border overflow-hidden flex ${
+                      isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-200 border-slate-300'
+                    }`}>
+                      <div 
+                        style={{ width: `${metrologiaAtual.percentualVidaUtil}%` }}
+                        className={`h-full transition-all duration-500 rounded-full ${
+                          metrologiaAtual.percentualVidaUtil < 20 
+                            ? 'bg-red-500' 
+                            : metrologiaAtual.percentualVidaUtil < 40 
+                            ? 'bg-amber-500' 
+                            : 'bg-emerald-500'
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Demonstrativo Formal da Equação Matemática */}
+                  <div className={`p-3 rounded-xl border text-[11px] ${
+                    isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
+                  }`}>
+                    <span className={`text-[10px] uppercase font-bold block mb-1 ${
+                      isDark ? 'text-slate-400' : 'text-slate-500'
+                    }`}>
+                      Demonstrativo Formal da Equação:
+                    </span>
+                    <code className={`block break-words font-mono font-bold ${
+                      isDark ? 'text-emerald-400' : 'text-emerald-700'
+                    }`}>
+                      {metrologiaAtual.demonstrativoEquacao}
+                    </code>
+                  </div>
+
+                  {/* Quilometragem Projetada para Troca */}
+                  {metrologiaAtual.kmProjetadoTwi && (
+                    <div className="flex items-center justify-between pt-1.5">
+                      <span className={isDark ? 'text-slate-400' : 'text-slate-600'}>Quilometragem Projetada para Atingimento do TWI:</span>
+                      <span className={`font-mono font-black ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+                        {metrologiaAtual.kmProjetadoTwi.toLocaleString('pt-BR')} km
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-
-            {/* Guia Didático TWI Integrado (Expansível) */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setShowTwiGuide(!showTwiGuide)}
-                className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer ${
-                  isDark 
-                    ? 'bg-slate-800/40 hover:bg-slate-800/80 border-slate-700/80 text-slate-300' 
-                    : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-amber-500" />
-                  <span>Guia Técnico Normativo: O que é TWI e Amparo Legal CONTRAN?</span>
-                </div>
-                {showTwiGuide ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-              </button>
-
-              {showTwiGuide && (
-                <div className="mt-2 animate-in fade-in duration-200">
-                  <TwiEducationalCard isDark={isDark} />
-                </div>
-              )}
             </div>
 
           </div>
@@ -904,46 +936,88 @@ const RodaCard: React.FC<RodaCardProps> = ({ slot, medicao, isSelected, onClick,
   return (
     <div
       onClick={onClick}
-      className={`group cursor-pointer transition-all duration-200 rounded-2xl p-2 sm:p-2.5 border shadow-sm ${
+      className={`group cursor-pointer transition-all duration-200 rounded-2xl p-3 sm:p-3.5 border shadow-sm w-full max-w-[280px] sm:max-w-[320px] ${
         isSelected
-          ? (isDark ? 'ring-2 ring-red-500 scale-105 bg-slate-800 border-red-500/80' : 'ring-2 ring-red-500 scale-105 bg-red-50/90 border-red-400 shadow-md')
-          : (isDark ? 'bg-slate-900/90 border-slate-700 hover:border-slate-500 hover:bg-slate-800/80' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50')
+          ? (isDark 
+              ? 'ring-2 ring-red-500 scale-[1.02] bg-slate-800/95 border-red-500 shadow-lg shadow-red-500/20' 
+              : 'ring-2 ring-red-500 scale-[1.02] bg-red-50/90 border-red-400 shadow-md shadow-red-500/10')
+          : (isDark 
+              ? 'bg-slate-900/90 border-slate-700/80 hover:border-slate-500 hover:bg-slate-800/90' 
+              : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 shadow-xs')
       }`}
     >
-      <div className="flex items-center gap-2">
-        {/* Pneu Visual com Anel Cromático */}
-        <div className={`w-8 h-12 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative shrink-0 ${
-          isCritico
-            ? (isDark ? 'bg-red-950 border-red-500 text-red-400 animate-pulse' : 'bg-red-100 border-red-600 text-red-700 animate-pulse')
-            : isAtencao
-            ? (isDark ? 'bg-amber-950 border-amber-500 text-amber-400' : 'bg-amber-100 border-amber-500 text-amber-700')
-            : (isDark ? 'bg-slate-950 border-emerald-500 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-700')
-        }`}>
-          <span className="font-mono font-black text-[10px]">{slot.posicao}</span>
-          <span className="text-[7.5px] font-mono font-bold">{medicao.profundidade_sulco_mm.toFixed(1)}</span>
+      {/* Topo do Card: Posição + Nome + Status */}
+      <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-200/60 dark:border-slate-800/60">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="w-6 h-6 rounded-md bg-red-600 text-white font-mono font-black text-[11px] flex items-center justify-center shrink-0 shadow-2xs">
+            {slot.posicao}
+          </span>
+          <div className="min-w-0">
+            <h5 className={`font-mono font-bold text-xs truncate ${isDark ? 'text-slate-100' : 'text-slate-900'}`} title={slot.label}>
+              {slot.label}
+            </h5>
+            <p className={`text-[9.5px] font-mono truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              {slot.descricao}
+            </p>
+          </div>
         </div>
 
-        {/* Informações da Roda */}
-        <div className="text-[10px] font-mono leading-tight min-w-0 flex-1">
-          <span className={`font-bold block truncate max-w-[85px] ${
-            isDark ? 'text-slate-200' : 'text-slate-800'
-          }`} title={slot.label}>
-            {slot.label}
-          </span>
-          <span className={`block text-[9px] ${
-            isDark ? 'text-slate-400' : 'text-slate-500'
+        <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${
+          isCritico 
+            ? (isDark ? 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse' : 'bg-red-50 text-red-700 border-red-200 animate-pulse')
+            : isAtencao
+            ? (isDark ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-amber-50 text-amber-700 border-amber-200')
+            : (isDark ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200')
+        }`}>
+          {isCritico ? 'CRÍTICO' : isAtencao ? 'ATENÇÃO' : 'CONFORME'}
+        </span>
+      </div>
+
+      {/* Meio: Pneu Visual + Métricas Numéricas */}
+      <div className="flex items-center justify-between gap-3">
+        {/* Pneu Gráfico com Profundidade */}
+        <div className="flex items-center gap-2.5">
+          <div className={`w-9 h-13 rounded-lg flex flex-col items-center justify-center border-2 transition-all relative shrink-0 shadow-inner ${
+            isCritico
+              ? (isDark ? 'bg-red-950 border-red-500 text-red-400 animate-pulse' : 'bg-red-100 border-red-600 text-red-700 animate-pulse')
+              : isAtencao
+              ? (isDark ? 'bg-amber-950 border-amber-500 text-amber-400' : 'bg-amber-100 border-amber-500 text-amber-700')
+              : (isDark ? 'bg-slate-950 border-emerald-500 text-emerald-400' : 'bg-emerald-50 border-emerald-500 text-emerald-700')
           }`}>
-            {medicao.pressao_psi} PSI
-          </span>
-          <span className={`font-bold text-[9px] ${
-            isCritico 
-              ? (isDark ? 'text-red-400' : 'text-red-600') 
-              : isAtencao 
-              ? (isDark ? 'text-amber-400' : 'text-amber-600') 
-              : (isDark ? 'text-emerald-400' : 'text-emerald-600')
+            <span className="font-mono font-black text-[11px]">{slot.posicao}</span>
+            <span className="text-[8px] font-mono font-bold mt-0.5">{medicao.profundidade_sulco_mm.toFixed(1)}</span>
+          </div>
+
+          <div className="space-y-0.5">
+            <div className="flex items-baseline gap-1">
+              <span className={`text-base font-black font-mono ${
+                isCritico ? (isDark ? 'text-red-400' : 'text-red-600') : isAtencao ? (isDark ? 'text-amber-400' : 'text-amber-600') : (isDark ? 'text-emerald-400' : 'text-emerald-600')
+              }`}>
+                {medicao.profundidade_sulco_mm.toFixed(1)}
+              </span>
+              <span className={`text-[10px] font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>mm sulco</span>
+            </div>
+            <div className={`text-[11px] font-mono ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+              <strong>{medicao.pressao_psi}</strong> <span className={`text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>PSI</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Vida Útil Percentual com Mini Barra */}
+        <div className="text-right flex flex-col items-end gap-1">
+          <span className={`font-black font-mono text-xs ${
+            isCritico ? (isDark ? 'text-red-400' : 'text-red-600') : isAtencao ? (isDark ? 'text-amber-400' : 'text-amber-600') : (isDark ? 'text-emerald-400' : 'text-emerald-600')
           }`}>
             {medicao.percentual_vida_util.toFixed(0)}% vida
           </span>
+          <div className={`w-16 h-2 rounded-full overflow-hidden border ${isDark ? 'bg-slate-950 border-slate-700' : 'bg-slate-200 border-slate-300'}`}>
+            <div 
+              style={{ width: `${Math.max(5, Math.min(100, medicao.percentual_vida_util))}%` }}
+              className={`h-full rounded-full transition-all duration-300 ${
+                isCritico ? 'bg-red-500' : isAtencao ? 'bg-amber-500' : 'bg-emerald-500'
+              }`}
+            />
+          </div>
         </div>
       </div>
     </div>
