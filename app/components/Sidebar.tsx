@@ -28,7 +28,8 @@ import {
   Truck,
   ArrowLeftRight,
   SlidersHorizontal,
-  QrCode
+  QrCode,
+  Disc
 } from 'lucide-react';
 import { SYSTEM_VERSION } from '@/config/version';
 import WhatsNewModal from './WhatsNewModal';
@@ -218,6 +219,7 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
   const navItems = [
     { id: 'dashboard', label: 'Dashboard / Visão Geral', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
     { id: 'viaturas', label: 'Viaturas & Frota', icon: <Truck className="w-5 h-5" />, path: '/viaturas' },
+    { id: 'pneus', label: 'Metrologia de Pneus', icon: <Disc className="w-5 h-5" />, path: '/frota/pneus' },
     { id: 'hidrantes', label: 'Hidrantes & Abrigos', icon: <Droplet className="w-5 h-5" />, path: '/hidrantes' },
     { id: 'sinalizacao', label: 'Sinalização NBR', icon: <AlertTriangle className="w-5 h-5" />, path: '/sinalizacao' },
     { id: 'iluminacao', label: 'Iluminação Emergência', icon: <Lightbulb className="w-5 h-5" />, path: '/iluminacao' },
