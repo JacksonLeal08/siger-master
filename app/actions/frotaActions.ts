@@ -868,9 +868,22 @@ export async function getChecklistByIdAction(
 // ==============================================================================
 // 7. METROLOGIA E RODAGEM DE PNEUS
 // ==============================================================================
-export { 
-  getCatalogoPneusAction, 
-  salvarInspecaoRodagemAction, 
-  listHistoricoInspecoesRodagemAction 
+import { 
+  getCatalogoPneusAction as getCatalogoPneusActionImpl, 
+  salvarInspecaoRodagemAction as salvarInspecaoRodagemActionImpl, 
+  listHistoricoInspecoesRodagemAction as listHistoricoInspecoesRodagemActionImpl 
 } from '@/app/actions/pneuActions';
+
+export async function getCatalogoPneusAction() {
+  return getCatalogoPneusActionImpl();
+}
+
+export async function salvarInspecaoRodagemAction(payload: any) {
+  return salvarInspecaoRodagemActionImpl(payload);
+}
+
+export async function listHistoricoInspecoesRodagemAction(contratoId?: string, viaturaId?: string) {
+  return listHistoricoInspecoesRodagemActionImpl(contratoId, viaturaId);
+}
+
 
