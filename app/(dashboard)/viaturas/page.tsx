@@ -948,7 +948,6 @@ export default function ViaturasPage() {
             );
           }}
           tecnicoPadrao={userProfile?.nome || 'Inspetor SPCI'}
-          theme="dark"
         />
       )}
 

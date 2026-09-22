@@ -412,7 +412,6 @@ export default function GestaoPneusPage() {
             triggerSuccessNotification('Inspeção Metrológica Concluída!', 'Medições de rodagem salvas com sucesso.');
           }}
           tecnicoPadrao={userProfile?.nome || 'Jackson Leal - Inspetor'}
-          theme="dark"
         />
       )}
 
