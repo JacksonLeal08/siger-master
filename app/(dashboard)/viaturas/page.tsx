@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSpci } from '@/app/context/SpciContext';
@@ -25,6 +26,7 @@ import {
 import { MaintenancePlanEngine } from '@/lib/maintenancePlanEngine';
 import { TwiEducationalCard } from '@/app/components/frota/TwiEducationalCard';
 import { TireMapInspection } from '@/app/components/frota/TireMapInspection';
+import { MapeamentoPneusModal } from '@/app/components/frota/MapeamentoPneusModal';
 import { ViaturaCard } from '@/app/components/frota/ViaturaCard';
 import { ViaturaModal } from '@/app/components/frota/ViaturaModal';
 import { AbastecimentoModal } from '@/app/components/frota/AbastecimentoModal';
@@ -76,6 +78,7 @@ const FrotaTrackingMap = dynamic(
 );
 
 export default function ViaturasPage() {
+  const router = useRouter();
   const { activeSite, userProfile, triggerSuccessNotification } = useSpci();
 
   // Contrato operacional efetivo
@@ -268,6 +271,16 @@ export default function ViaturasPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => router.push('/frota/pneus')}
+            className="px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Acessar Gestão e Laudos de Rodagem de Pneus"
+          >
+            <Disc className="w-4 h-4 text-emerald-600" />
+            Metrologia de Rodagem
+          </button>
+
           <button
             type="button"
             onClick={() => setShowTwiGuide(!showTwiGuide)}
@@ -833,28 +846,30 @@ export default function ViaturasPage() {
         }}
       />
 
-      {/* Modal: Mapeamento de Pneus & TWI */}
+      {/* Modal Executivo: Mapeamento Interativo de Pneus & Calibragem */}
       {isTireModalOpen && selectedViaturaForTire && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-3 sm:p-5 select-none">
-          <div className="w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 relative">
-            <button
-              type="button"
-              onClick={() => setIsTireModalOpen(false)}
-              className="absolute top-5 right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-none bg-transparent cursor-pointer"
-            >
-              ✕
-            </button>
-            <TireMapInspection
-              viatura={selectedViaturaForTire}
-              inspecoesAtuais={inspecoesPneusAtuais}
-              onInspecaoSalva={(nova) => {
-                setInspecoesPneusAtuais((prev) => [nova, ...prev]);
-                loadData();
-                triggerSuccessNotification('Medição de Pneu Gravada!', `Posição ${nova.posicao_pneu} registrada.`);
-              }}
-            />
-          </div>
-        </div>
+        <MapeamentoPneusModal
+          isOpen={isTireModalOpen}
+          viatura={selectedViaturaForTire}
+          contratoId={currentContratoId}
+          onClose={() => setIsTireModalOpen(false)}
+          onMinimize={() => {
+            handleMinimizeWindow(
+              'pneus',
+              `Pneus ${selectedViaturaForTire.prefixo_frota}`,
+              'modal_pneus'
+            );
+          }}
+          onSuccess={() => {
+            loadData();
+            triggerSuccessNotification(
+              'Inspeção de Pneus Gravada!',
+              `Medições metrológicas da viatura ${selectedViaturaForTire.prefixo_frota} salvas com sucesso.`
+            );
+          }}
+          tecnicoPadrao={userProfile?.nome || 'Inspetor SPCI'}
+          theme="dark"
+        />
       )}
 
       {/* Modal: Compartilhamento do Terminal Mobile via QR Code */}

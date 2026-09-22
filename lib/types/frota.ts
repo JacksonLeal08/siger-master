@@ -267,6 +267,69 @@ export interface InspecaoPneu {
   created_at?: string;
 }
 
+// ==============================================================================
+// METROLOGIA E GESTÃO DE RODAGEM VEICULAR (CONTRAN 558/80)
+// ==============================================================================
+
+export type PosicaoPneuAbreviada = 'DE' | 'DD' | 'TE' | 'TD' | 'ESTEPE';
+
+export interface CatalogoPneuReferencia {
+  id: string;
+  marca: string;
+  modelo: string;
+  medida: string;
+  profundidade_original_mm: number; // S_orig nominal de fábrica
+  pressao_recomendada_psi: number;
+  created_at?: string;
+}
+
+export interface ItemAfericaoPneu {
+  id?: string;
+  inspecao_id?: string;
+  posicao_pneu: PosicaoPneuAbreviada; // 'DE' | 'DD' | 'TE' | 'TD' | 'ESTEPE'
+  pneu_referencia_id?: string | null;
+  marca?: string;
+  modelo?: string;
+  medida?: string;
+  profundidade_original_mm: number; // S_orig
+  profundidade_sulco_mm: number;    // S_aferido
+  desgaste_acumulado_mm: number;    // Delta_desgaste
+  percentual_vida_util: number;     // % V_util
+  pressao_psi: number;
+  status_twi: StatusTwi;
+  foto_medicao_url?: string | null;
+  created_at?: string;
+}
+
+export interface InspecaoRodagemPneus {
+  id: string;
+  contrato_id: string;
+  viatura_id: string;
+  data_hora: string;
+  odometro_km: number;
+  status_geral_twi: StatusTwi;
+  houve_calibracao: boolean;
+  tecnico_nome: string;
+  observacoes_gerais?: string | null;
+  created_at?: string;
+  itens?: ItemAfericaoPneu[];
+  viatura?: Viatura;
+}
+
+export interface CalculoDesgasteMetrologico {
+  sOrig: number;
+  sAferido: number;
+  bUtilTotal: number;
+  deltaDesgaste: number;
+  percentualDesgasteConsumido: number;
+  saldoBorrachaRestante: number;
+  percentualVidaUtil: number;
+  statusTwi: StatusTwi;
+  demonstrativoEquacao: string;
+  taxaDesgasteMmPorKm?: number | null;
+  kmProjetadoTwi?: number | null;
+}
+
 export interface FrotaKpisSummary {
   totalViaturas: number;
   disponiveis: number;

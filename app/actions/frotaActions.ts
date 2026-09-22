@@ -865,3 +865,12 @@ export async function getChecklistByIdAction(
   }
 }
 
+// ==============================================================================
+// 7. METROLOGIA E RODAGEM DE PNEUS
+// ==============================================================================
+export { 
+  getCatalogoPneusAction, 
+  salvarInspecaoRodagemAction, 
+  listHistoricoInspecoesRodagemAction 
+} from '@/app/actions/pneuActions';
+
