@@ -272,6 +272,7 @@ export interface InspecaoPneu {
 // ==============================================================================
 
 export type PosicaoPneuAbreviada = 'DE' | 'DD' | 'TE' | 'TD' | 'ESTEPE';
+export type TipoTerrenoPneu = 'HT' | 'AT' | 'RT' | 'MT';
 
 export interface CatalogoPneuReferencia {
   id: string;
@@ -280,6 +281,7 @@ export interface CatalogoPneuReferencia {
   medida: string;
   profundidade_original_mm: number; // S_orig nominal de fábrica
   pressao_recomendada_psi: number;
+  tipo_terreno?: TipoTerrenoPneu;
   created_at?: string;
 }
 

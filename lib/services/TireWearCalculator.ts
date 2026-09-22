@@ -20,7 +20,8 @@ export const CATALOGO_PNEUS_HOMOLOGADOS_PADRAO: CatalogoPneuReferencia[] = [
     modelo: 'LTX FORCE',
     medida: '265/65 R17',
     profundidade_original_mm: 9.50,
-    pressao_recomendada_psi: 32.0
+    pressao_recomendada_psi: 32.0,
+    tipo_terreno: 'AT'
   },
   {
     id: 'pneu-pirelli-scorpion',
@@ -28,7 +29,8 @@ export const CATALOGO_PNEUS_HOMOLOGADOS_PADRAO: CatalogoPneuReferencia[] = [
     modelo: 'SCORPION ALL TERRAIN PLUS',
     medida: '265/65 R17',
     profundidade_original_mm: 10.00,
-    pressao_recomendada_psi: 32.0
+    pressao_recomendada_psi: 32.0,
+    tipo_terreno: 'AT'
   },
   {
     id: 'pneu-bridgestone-dueler',
@@ -36,7 +38,8 @@ export const CATALOGO_PNEUS_HOMOLOGADOS_PADRAO: CatalogoPneuReferencia[] = [
     modelo: 'DUELER A/T 693',
     medida: '265/65 R17',
     profundidade_original_mm: 9.00,
-    pressao_recomendada_psi: 30.0
+    pressao_recomendada_psi: 30.0,
+    tipo_terreno: 'AT'
   },
   {
     id: 'pneu-continental-vancontact',
@@ -44,7 +47,8 @@ export const CATALOGO_PNEUS_HOMOLOGADOS_PADRAO: CatalogoPneuReferencia[] = [
     modelo: 'VANCONTACT AP',
     medida: '225/75 R16C',
     profundidade_original_mm: 10.50,
-    pressao_recomendada_psi: 55.0
+    pressao_recomendada_psi: 55.0,
+    tipo_terreno: 'HT'
   },
   {
     id: 'pneu-goodyear-duratrac',
@@ -52,7 +56,17 @@ export const CATALOGO_PNEUS_HOMOLOGADOS_PADRAO: CatalogoPneuReferencia[] = [
     modelo: 'WRANGLER DURATRAC',
     medida: '265/70 R17',
     profundidade_original_mm: 12.00,
-    pressao_recomendada_psi: 35.0
+    pressao_recomendada_psi: 35.0,
+    tipo_terreno: 'RT'
+  },
+  {
+    id: 'pneu-bfgoodrich-km3',
+    marca: 'BFGOODRICH',
+    modelo: 'MUD-TERRAIN T/A KM3',
+    medida: '265/70 R17',
+    profundidade_original_mm: 13.50,
+    pressao_recomendada_psi: 35.0,
+    tipo_terreno: 'MT'
   }
 ];
 

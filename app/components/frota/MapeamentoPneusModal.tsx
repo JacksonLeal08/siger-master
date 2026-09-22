@@ -6,7 +6,8 @@ import {
   PosicaoPneuAbreviada, 
   CatalogoPneuReferencia, 
   ItemAfericaoPneu, 
-  StatusTwi 
+  StatusTwi,
+  TipoTerrenoPneu
 } from '@/lib/types/frota';
 import { 
   TireWearCalculator, 
@@ -20,6 +21,7 @@ import {
 } from '@/app/actions/pneuActions';
 import { soundNotificationService } from '@/lib/soundNotificationService';
 import { TwiEducationalCard } from './TwiEducationalCard';
+import { TireTypesGuideCard } from './TireTypesGuideCard';
 import { useTheme } from '@/app/context/ThemeContext';
 import { 
   Disc, 
@@ -128,7 +130,28 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   const [houveCalibracao, setHouveCalibracao] = useState<boolean>(true);
   const [observacoesGerais, setObservacoesGerais] = useState<string>('');
   const [showTwiGuide, setShowTwiGuide] = useState<boolean>(false);
+  const [showTireGuide, setShowTireGuide] = useState<boolean>(false);
+  const [highlightedTireType, setHighlightedTireType] = useState<TipoTerrenoPneu | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  // Microinteração com Scroll Suave e Destaque ao clicar na tag de terreno
+  const handleTagTerrenoClick = (tipoTerreno?: TipoTerrenoPneu) => {
+    if (!tipoTerreno) return;
+    setShowTireGuide(true);
+    setHighlightedTireType(tipoTerreno);
+
+    // Scroll suave até o card correspondente com destaque pulsante temporário
+    setTimeout(() => {
+      const el = document.getElementById(`tire-profile-${tipoTerreno}`) || document.getElementById('tire-types-guide-container');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 100);
+
+    setTimeout(() => {
+      setHighlightedTireType(null);
+    }, 1600);
+  };
 
   // Carregar catálogo oficial ao abrir
   useEffect(() => {
@@ -596,11 +619,40 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Catálogo Mestre */}
                   <div className="sm:col-span-3">
-                    <label className={`text-[10px] uppercase font-mono font-bold block mb-1 ${
-                      isDark ? 'text-slate-400' : 'text-slate-600'
-                    }`}>
-                      Pneu de Referência Homologado (Fábrica)
-                    </label>
+                    <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+                      <label className={`text-[10px] uppercase font-mono font-bold block ${
+                        isDark ? 'text-slate-400' : 'text-slate-600'
+                      }`}>
+                        Pneu de Referência Homologado (Fábrica)
+                      </label>
+
+                      {/* Pílula tátil do Perfil de Terreno com microinteração de navegação */}
+                      {refAtual && (
+                        <button
+                          type="button"
+                          onClick={() => handleTagTerrenoClick(refAtual.tipo_terreno || 'AT')}
+                          className={`text-[9.5px] font-mono font-bold px-2.5 py-0.5 rounded-full border cursor-pointer transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5 shadow-2xs ${
+                            (refAtual.tipo_terreno === 'HT')
+                              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/20'
+                              : (refAtual.tipo_terreno === 'RT')
+                              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20'
+                              : (refAtual.tipo_terreno === 'MT')
+                              ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 hover:bg-red-500/20'
+                              : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                          }`}
+                          title="Clique para abrir e destacar o Guia Didático de Terreno deste modelo"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full animate-ping bg-current opacity-75" />
+                          <span>
+                            {refAtual.tipo_terreno === 'HT' && '🏷️ H/T • ASFALTO'}
+                            {(refAtual.tipo_terreno === 'AT' || !refAtual.tipo_terreno) && '🏷️ A/T • USO MISTO'}
+                            {refAtual.tipo_terreno === 'RT' && '🏷️ R/T • TERRENO SEVERO'}
+                            {refAtual.tipo_terreno === 'MT' && '🏷️ M/T • LAMA/OFF-ROAD'}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+
                     <select
                       value={selectedCatalogoId}
                       onChange={(e) => handleSelectPneuReferencia(e.target.value)}
@@ -612,7 +664,7 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                     >
                       {catalogo.map((pneu) => (
                         <option key={pneu.id} value={pneu.id}>
-                          {pneu.marca} {pneu.modelo} • {pneu.medida} (S_orig: {pneu.profundidade_original_mm.toFixed(2)} mm • {pneu.pressao_recomendada_psi} PSI)
+                          {pneu.marca} {pneu.modelo} • {pneu.medida} [{pneu.tipo_terreno || 'AT'}] (S_orig: {pneu.profundidade_original_mm.toFixed(2)} mm • {pneu.pressao_recomendada_psi} PSI)
                         </option>
                       ))}
                     </select>
@@ -746,6 +798,14 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                   </div>
                 )}
               </div>
+
+              {/* Guia Técnico Didático: Tipos de Pneus para Caminhonetes & Viaturas (H/T, A/T, R/T, M/T) */}
+              <TireTypesGuideCard 
+                isDark={isDark}
+                highlightedType={highlightedTireType}
+                isOpenControlled={showTireGuide}
+                onToggleOpen={(open) => setShowTireGuide(open)}
+              />
             </div>
 
             {/* BLOCO DIREITA (7 COLUNAS): MEMÓRIA DE CÁLCULO E PARÂMETROS METROLÓGICOS */}
