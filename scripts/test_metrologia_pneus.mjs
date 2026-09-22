@@ -176,4 +176,21 @@ console.log('🧪 ==============================================================
   console.log('✅ Teste 7: Desobstrução espacial entre o Floating Dock (Centro) e FAB (Direita) aprovada.');
 }
 
+// -----------------------------------------------------------------------------
+// Teste 8: Validação de Metrologia de Pneu M/T Profundo (Chengshan Maspire M/T)
+// -----------------------------------------------------------------------------
+{
+  // Chengshan Maspire M/T LT265/65 R17 possui S_orig = 15.20 mm
+  // B_util = 15.20 - 1.60 = 13.60 mm
+  const bMaspire = calcularBorrachaUtil(15.20);
+  assert.strictEqual(bMaspire, 13.60, 'Borracha útil do Chengshan Maspire M/T deve ser 13.60mm');
+  
+  // Aferição com 8.00 mm de sulco restante
+  // Saldo = 8.00 - 1.60 = 6.40 mm
+  // % V_util = (6.40 / 13.60) * 100 = 47.0588... -> 47.06%
+  const vuMaspire = calcularPercentualVidaUtil(15.20, 8.00);
+  assert.strictEqual(vuMaspire, 47.06, 'Vida útil com 8mm deve ser 47.06%');
+  console.log('✅ Teste 8: Metrologia para Chengshan Maspire M/T (S_orig=15.20mm, B_util=13.60mm) aprovada.');
+}
+
 console.log('\n🎉 TODOS OS TESTES METROLÓGICOS FORAM EXECUTADOS COM 100% DE SUCESSO!\n');

@@ -67,6 +67,60 @@ export const CATALOGO_PNEUS_HOMOLOGADOS_PADRAO: CatalogoPneuReferencia[] = [
     profundidade_original_mm: 13.50,
     pressao_recomendada_psi: 35.0,
     tipo_terreno: 'MT'
+  },
+  {
+    id: 'pneu-chengshan-maspire-265-65-17',
+    marca: 'CHENGSHAN',
+    modelo: 'MASPIRE M/T',
+    medida: 'LT265/65 R17',
+    profundidade_original_mm: 15.20,
+    pressao_recomendada_psi: 40.0,
+    tipo_terreno: 'MT'
+  },
+  {
+    id: 'pneu-chengshan-maspire-265-70-16',
+    marca: 'CHENGSHAN',
+    modelo: 'MASPIRE M/T',
+    medida: 'LT265/70 R16',
+    profundidade_original_mm: 15.20,
+    pressao_recomendada_psi: 40.0,
+    tipo_terreno: 'MT'
+  },
+  {
+    id: 'pneu-chengshan-maspire-265-75-16',
+    marca: 'CHENGSHAN',
+    modelo: 'MASPIRE M/T',
+    medida: 'LT265/75 R16',
+    profundidade_original_mm: 16.30,
+    pressao_recomendada_psi: 40.0,
+    tipo_terreno: 'MT'
+  },
+  {
+    id: 'pneu-chengshan-maspire-245-75-16',
+    marca: 'CHENGSHAN',
+    modelo: 'MASPIRE M/T',
+    medida: 'LT245/75 R16',
+    profundidade_original_mm: 14.80,
+    pressao_recomendada_psi: 40.0,
+    tipo_terreno: 'MT'
+  },
+  {
+    id: 'pneu-chengshan-maspire-235-75-15',
+    marca: 'CHENGSHAN',
+    modelo: 'MASPIRE M/T',
+    medida: 'LT235/75 R15',
+    profundidade_original_mm: 14.50,
+    pressao_recomendada_psi: 35.0,
+    tipo_terreno: 'MT'
+  },
+  {
+    id: 'pneu-chengshan-maspire-31x10-50-15',
+    marca: 'CHENGSHAN',
+    modelo: 'MASPIRE M/T',
+    medida: '31X10.50 R15LT',
+    profundidade_original_mm: 15.50,
+    pressao_recomendada_psi: 35.0,
+    tipo_terreno: 'MT'
   }
 ];
 
