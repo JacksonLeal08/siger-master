@@ -32,23 +32,23 @@ import {
   Wrench,
   ClipboardCheck
 } from 'lucide-react';
-import { Viatura, TipoCombustivel, TipoVeiculo } from '@/lib/types/frota';
-import { listViaturasAction, registrarAbastecimentoAction, salvarChecklistVeicularAction } from '@/app/actions/frotaActions';
+import { Viatura, TipoCombustivel, TipoVeiculo, OrdemServicoFrota } from '@/lib/types/frota';
+import { 
+  listViaturasAction, 
+  registrarAbastecimentoAction, 
+  salvarChecklistVeicularAction,
+  listOrdensServicoAction
+} from '@/app/actions/frotaActions';
 import { FuelPricingService } from '@/lib/services/FuelPricingService';
 import { FleetLoadingScreen } from '@/app/components/frota/FleetLoadingScreen';
 import { terminalOfflineSync, QueuedAbastecimento } from '@/lib/services/terminalOfflineSync';
 import { TerminalActionHub } from '@/app/components/frota/TerminalActionHub';
 import { VeiculoChecklistForm } from '@/app/components/frota/VeiculoChecklistForm';
 import { VeiculoOrdemServicoForm } from '@/app/components/frota/VeiculoOrdemServicoForm';
+import { CategoryFilterGrid } from '@/app/components/frota/CategoryFilterGrid';
+import { compressImage } from '@/lib/imageCompressor';
 
-// Tipos de Categorias com Ícones para as Pílulas Horizontais
-const CATEGORIAS_PILULAS: { id: string; label: string; icon: string }[] = [
-  { id: 'TODOS', label: 'Todos', icon: '🚙' },
-  { id: 'AMBULANCIA', label: 'Ambulâncias', icon: '🚑' },
-  { id: 'CAMINHONETE', label: 'Caminhonetes 4x4', icon: '🛻' },
-  { id: 'CAMINHAO_INCENDIO', label: 'Combate / Resgate', icon: '🚒' },
-  { id: 'UTILITARIO', label: 'Apoio', icon: '🚐' },
-];
+
 
 const POSTOS_SUGERIDOS_REGIAO = [
   'Posto Ipiranga - Rota Sul',
@@ -128,22 +128,39 @@ function TerminalAbastecerContent() {
   // Sugestões de Postos em cache
   const [postosDisponiveis, setPostosDisponiveis] = useState<string[]>(POSTOS_SUGERIDOS_REGIAO);
   const [isManualSyncing, setIsManualSyncing] = useState(false);
+  const [syncFeedbackToast, setSyncFeedbackToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [viaturaOrdensServico, setViaturaOrdensServico] = useState<OrdemServicoFrota[]>([]);
 
-  // Forçar sincronização imediata
+  // Forçar sincronização imediata com feedback tátil e visual
   const handleForcarSincronizacao = async () => {
-    if (isManualSyncing || !navigator.onLine) return;
+    if (isManualSyncing) return;
+    if (!navigator.onLine) {
+      setSyncFeedbackToast({ message: 'Dispositivo sem sinal de internet no momento.', type: 'info' });
+      setTimeout(() => setSyncFeedbackToast(null), 3000);
+      return;
+    }
+
     setIsManualSyncing(true);
+    setSyncFeedbackToast({ message: 'Sincronizando registros pendentes com a central...', type: 'info' });
+
     try {
       const res = await terminalOfflineSync.syncPendingAbastecimentos();
       const q = await terminalOfflineSync.getPendingQueue();
       setPendingSyncCount(q.length);
       if (res.synced > 0) {
         carregarViaturas();
+        setSyncFeedbackToast({ message: `${res.synced} registro(s) descarregado(s) com sucesso!`, type: 'success' });
+      } else if (res.failed > 0) {
+        setSyncFeedbackToast({ message: `Atenção: ${res.failed} registro(s) não puderam ser enviados.`, type: 'error' });
+      } else {
+        setSyncFeedbackToast({ message: 'Fila de sincronização já está atualizada.', type: 'info' });
       }
-    } catch (e) {
+    } catch (e: any) {
       console.warn('Erro ao forçar sincronização:', e);
+      setSyncFeedbackToast({ message: 'Erro de comunicação ao sincronizar registros.', type: 'error' });
     } finally {
       setIsManualSyncing(false);
+      setTimeout(() => setSyncFeedbackToast(null), 4000);
     }
   };
 
@@ -298,7 +315,7 @@ function TerminalAbastecerContent() {
   }, [statusCalibracaoViatura, houveCalibracao, fotoCalibrador]);
 
   // Selecionar Viatura e avançar para o Hub Tático
-  const handleSelectViatura = (v: Viatura) => {
+  const handleSelectViatura = async (v: Viatura) => {
     setSelectedViatura(v);
     setTipoCombustivel(v.tipo_combustivel || 'DIESEL_S10');
     setOdometro(String((v.odometro_atual_km || 0) + 120));
@@ -307,29 +324,51 @@ function TerminalAbastecerContent() {
     setFotoCupom(null);
     setErroValidacao(null);
     setEtapa('HUB');
-  };
 
-  // Upload da foto do Cupom Fiscal
-  const handleFotoCupomChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setFotoCupom(reader.result as string);
-      reader.readAsDataURL(file);
+    // Carrega histórico recente de OS da viatura
+    try {
+      const res = await listOrdensServicoAction(contratoNome, v.id);
+      if (res.success && res.data) {
+        setViaturaOrdensServico(res.data);
+      }
+    } catch (err) {
+      console.warn('Erro ao carregar OS da viatura selecionada:', err);
     }
   };
 
-  // Upload da foto do Manômetro de Calibração
-  const handleFotoCalibradorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Upload e compressão inteligente da foto do Cupom Fiscal (Canvas 1280px / 0.72)
+  const handleFotoCupomChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setFotoCalibrador(reader.result as string);
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressImage(file, { maxWidth: 1280, maxHeight: 1280, quality: 0.72 });
+        setFotoCupom(compressed.base64);
+      } catch (err) {
+        console.warn('Falha na compressão do cupom, usando fallback:', err);
+        const reader = new FileReader();
+        reader.onload = () => setFotoCupom(reader.result as string);
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  // Submissão do Abastecimento
+  // Upload e compressão inteligente da foto do Manômetro de Calibração (Canvas 1280px / 0.72)
+  const handleFotoCalibradorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const compressed = await compressImage(file, { maxWidth: 1280, maxHeight: 1280, quality: 0.72 });
+        setFotoCalibrador(compressed.base64);
+      } catch (err) {
+        console.warn('Falha na compressão do manômetro, usando fallback:', err);
+        const reader = new FileReader();
+        reader.onload = () => setFotoCalibrador(reader.result as string);
+        reader.readAsDataURL(file);
+      }
+    }
+  };
+
+  // Submissão do Abastecimento com Arquitetura Online-First Resiliente
   const handleSubmitAbastecimento = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroValidacao(null);
@@ -373,6 +412,27 @@ function TerminalAbastecerContent() {
 
     setIsSubmitting(true);
 
+    // Garante compressão prévia se imagens ainda estiverem em tamanho bruto (> 450KB)
+    let cupomFinal = fotoCupom;
+    if (cupomFinal && cupomFinal.length > 500000) {
+      try {
+        const comp = await compressImage(cupomFinal, { maxWidth: 1280, maxHeight: 1280, quality: 0.72 });
+        cupomFinal = comp.base64;
+      } catch (e) {
+        console.warn('Compressão de segurança do cupom:', e);
+      }
+    }
+
+    let calibradorFinal = fotoCalibrador;
+    if (calibradorFinal && calibradorFinal.length > 500000) {
+      try {
+        const comp = await compressImage(calibradorFinal, { maxWidth: 1280, maxHeight: 1280, quality: 0.72 });
+        calibradorFinal = comp.base64;
+      } catch (e) {
+        console.warn('Compressão de segurança do calibrador:', e);
+      }
+    }
+
     const payload = {
       contrato_id: contratoNome,
       viatura_id: selectedViatura.id,
@@ -385,23 +445,22 @@ function TerminalAbastecerContent() {
       odometro_km: kmDigitado,
       condutor_nome: condutor.trim(),
       houve_calibracao_pneus: houveCalibracao,
-      foto_calibracao_url: fotoCalibrador,
-      foto_cupom_url: fotoCupom,
+      foto_calibracao_url: calibradorFinal,
+      foto_cupom_url: cupomFinal,
       latitude_posto: geoLoc?.lat,
       longitude_posto: geoLoc?.lng,
       tipoVeiculo: selectedViatura.tipo_veiculo,
     };
 
-    try {
-      if (navigator.onLine) {
-        // Envio online direto via Server Action
+    // 1. FLUXO PRIORITÁRIO ONLINE-FIRST
+    if (navigator.onLine) {
+      try {
         const res = await registrarAbastecimentoAction(payload, selectedViatura.tipo_veiculo);
 
         if (res.success) {
-          // Atualiza lista em cache dos postos
+          // Atualiza postos e odômetro da viatura
           await terminalOfflineSync.cachePostos([posto.trim()]);
 
-          // Atualiza a viatura no estado local
           setViaturas((prev) =>
             prev.map((v) =>
               v.id === selectedViatura.id
@@ -425,46 +484,41 @@ function TerminalAbastecerContent() {
           });
 
           setEtapa('SUCCESS');
+          setIsSubmitting(false);
+          return;
         } else {
-          // Falha de validação do servidor (exibe alerta na tela sem salvar como offline)
-          setErroValidacao(res.error || 'Falha ao registrar abastecimento.');
+          // Erro retornado pelas regras de negócio da central (NÃO joga para fila offline!)
+          setErroValidacao(res.error || 'Falha ao registrar abastecimento na central.');
           setIsSubmitting(false);
           return;
         }
-      } else {
-        // Modo Offline Real: Gravação transparente no IndexedDB
-        await terminalOfflineSync.enqueueAbastecimento(payload);
-        setPendingSyncCount((prev) => prev + 1);
-
-        setUltimoRegistroGravado({
-          placa: selectedViatura.placa,
-          prefixo: selectedViatura.prefixo_frota,
-          litros: litrosNum.toFixed(1),
-          valor: totalNum.toFixed(2),
-          isOffline: true,
-        });
-
-        setEtapa('SUCCESS');
+      } catch (err: any) {
+        // Se for erro de requisição que não seja falha física de rede, exibe alerta e não desvia
+        if (err?.message && !err.message.includes('Failed to fetch') && !err.message.includes('NetworkError') && !err.message.includes('timeout')) {
+          setErroValidacao(`Erro no servidor: ${err.message}`);
+          setIsSubmitting(false);
+          return;
+        }
+        console.warn('Falha estrita de comunicação de rede, enfileirando offline com foto compactada:', err);
       }
-    } catch (err: any) {
-      console.warn('Falha inesperada de comunicação de rede, enfileirando offline:', err);
-      // Se falhou por queda física de rede
-      try {
-        await terminalOfflineSync.enqueueAbastecimento(payload);
-        setPendingSyncCount((prev) => prev + 1);
+    }
 
-        setUltimoRegistroGravado({
-          placa: selectedViatura.placa,
-          prefixo: selectedViatura.prefixo_frota,
-          litros: litrosNum.toFixed(1),
-          valor: totalNum.toFixed(2),
-          isOffline: true,
-        });
+    // 2. FALLBACK OFFLINE REAL (Apenas se o aparelho estiver realmente desconectado)
+    try {
+      await terminalOfflineSync.enqueueAbastecimento(payload);
+      setPendingSyncCount((prev) => prev + 1);
 
-        setEtapa('SUCCESS');
-      } catch (offlineErr: any) {
-        setErroValidacao(offlineErr?.message || err?.message || 'Erro ao gravar registro no aparelho.');
-      }
+      setUltimoRegistroGravado({
+        placa: selectedViatura.placa,
+        prefixo: selectedViatura.prefixo_frota,
+        litros: litrosNum.toFixed(1),
+        valor: totalNum.toFixed(2),
+        isOffline: true,
+      });
+
+      setEtapa('SUCCESS');
+    } catch (offlineErr: any) {
+      setErroValidacao(offlineErr?.message || 'Erro ao gravar registro no aparelho.');
     } finally {
       setIsSubmitting(false);
     }
@@ -631,27 +685,13 @@ function TerminalAbastecerContent() {
               )}
             </div>
 
-            {/* Seletor de Categorias por Pílulas Horizontais */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar select-none">
-              {CATEGORIAS_PILULAS.map((cat) => {
-                const isActive = filtroCategoria === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setFiltroCategoria(cat.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all active:scale-95 ${
-                      isActive
-                        ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                        : 'bg-zinc-900 hover:bg-zinc-850 text-zinc-400 border border-zinc-800/80 hover:text-zinc-200'
-                    }`}
-                  >
-                    <span>{cat.icon}</span>
-                    <span>{cat.label}</span>
-                  </button>
-                );
-              })}
-            </div>
+            {/* Seletor de Categorias por Bento Grid Tátil */}
+            <CategoryFilterGrid
+              filtroAtual={filtroCategoria}
+              onSelectCategoria={setFiltroCategoria}
+              viaturas={viaturas}
+              theme={theme}
+            />
 
             {/* Contagem e Status */}
             <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 px-1">
@@ -769,6 +809,7 @@ function TerminalAbastecerContent() {
             <TerminalActionHub
               viatura={selectedViatura}
               contratoId={contratoNome}
+              ultimasOs={viaturaOrdensServico}
               theme={theme}
               onToggleTheme={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
               onSelectAction={(action) => {
@@ -1220,6 +1261,27 @@ function TerminalAbastecerContent() {
               </button>
             </div>
           </main>
+        )}
+
+        {/* Toast Notificação de Sincronização */}
+        {syncFeedbackToast && (
+          <div
+            className="fixed bottom-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-semibold backdrop-blur-md border animate-in fade-in slide-in-from-bottom-3 duration-300 max-w-[90%] pointer-events-none"
+            style={{
+              backgroundColor: syncFeedbackToast.type === 'success' 
+                ? 'rgba(16, 185, 129, 0.95)' 
+                : syncFeedbackToast.type === 'error' 
+                ? 'rgba(239, 68, 68, 0.95)' 
+                : 'rgba(39, 39, 42, 0.95)',
+              color: '#ffffff',
+              borderColor: syncFeedbackToast.type === 'success' ? '#059669' : syncFeedbackToast.type === 'error' ? '#dc2626' : '#52525b'
+            }}
+          >
+            {syncFeedbackToast.type === 'success' && <CheckCircle2 className="w-4 h-4 shrink-0 text-white" />}
+            {syncFeedbackToast.type === 'error' && <AlertTriangle className="w-4 h-4 shrink-0 text-white" />}
+            {syncFeedbackToast.type === 'info' && <RefreshCw className={`w-4 h-4 shrink-0 text-white ${isManualSyncing ? 'animate-spin' : ''}`} />}
+            <span className="truncate">{syncFeedbackToast.message}</span>
+          </div>
         )}
 
         {/* Rodapé Mobile App Shell */}

@@ -388,18 +388,42 @@ export async function saveInspecaoPneuAction(inspecao: Partial<InspecaoPneu>): P
 // 4. ORDENS DE SERVIÇO & OFICINAS
 // ==============================================================================
 
-export async function listOrdensServicoAction(contratoId?: string): Promise<{ success: boolean; data?: OrdemServicoFrota[]; error?: string }> {
+export async function listOrdensServicoAction(
+  contratoId?: string,
+  viaturaId?: string
+): Promise<{ success: boolean; data?: OrdemServicoFrota[]; error?: string }> {
   try {
     const supabase = getSupabaseAdminClient();
-    let query = supabase.from('ordens_servico_frota').select('*, viatura:viaturas(*), oficina:oficinas_prestadores(*)').order('data_abertura', { ascending: false });
+    let query = supabase
+      .from('ordens_servico_frota')
+      .select('*, viatura:viaturas(*), oficina:oficinas_prestadores(*)')
+      .order('data_abertura', { ascending: false });
 
     if (contratoId && contratoId !== 'TODOS' && contratoId !== 'GLOBAL') {
       query = query.eq('contrato_id', contratoId);
     }
 
+    if (viaturaId) {
+      query = query.eq('viatura_id', viaturaId);
+    }
+
     const { data, error } = await query;
     if (error) throw error;
-    return { success: true, data: (data || []) as OrdemServicoFrota[] };
+
+    // Normaliza campos para interoperabilidade
+    const normalized = (data || []).map((os: any) => ({
+      ...os,
+      tipo_manutencao: os.tipo_manutencao || os.natureza_manutencao || 'PREVENTIVA',
+      natureza_manutencao: os.natureza_manutencao || os.tipo_manutencao || 'PREVENTIVA',
+      origem_execucao: os.origem_execucao || (os.tipo_os === 'EXTERNA' ? 'EXTERNA_CREDENCIADA' : 'INTERNA_BRIGADA'),
+      tipo_os: os.tipo_os || (os.origem_execucao === 'EXTERNA_CREDENCIADA' ? 'EXTERNA' : 'INTERNA'),
+      descricao_motivo: os.descricao_motivo || os.descricao_servico || '',
+      descricao_servico: os.descricao_servico || os.descricao_motivo || '',
+      status_os: os.status_os || os.status || 'ABERTA',
+      status: os.status || os.status_os || 'ABERTA'
+    }));
+
+    return { success: true, data: normalized as OrdemServicoFrota[] };
   } catch (err: any) {
     console.error('[frotaActions] Erro ao listar ordens de serviço:', err);
     return { success: false, error: err?.message || 'Erro ao carregar ordens de serviço' };

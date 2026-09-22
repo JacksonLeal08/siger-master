@@ -142,6 +142,15 @@ export interface OrdemServicoFrota {
   created_at?: string;
   updated_at?: string;
 
+  // Campos de compatibilidade para Histórico Completo de Manutenções
+  tipo_manutencao?: 'PREVENTIVA' | 'CORRETIVA';
+  origem_execucao?: 'INTERNA_BRIGADA' | 'EXTERNA_CREDENCIADA';
+  descricao_motivo?: string;
+  servicos_executados?: string;
+  pecas_substituidas_json?: Array<{ peca: string; quantidade: number; valor_unitario?: number }>;
+  comprovantes_urls?: string[];
+  status_os?: 'ABERTA' | 'EM_EXECUCAO' | 'CONCLUIDA' | 'CANCELADA' | string;
+
   // Relações em tempo de execução
   viatura?: Viatura;
   oficina?: OficinaPrestador;

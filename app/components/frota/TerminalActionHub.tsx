@@ -26,12 +26,13 @@ interface TerminalActionHubProps {
   viatura: Viatura;
   contratoId: string;
   theme: 'light' | 'dark';
-  onToggleTheme: () => void;
+  onToggleTheme?: () => void;
   onSelectAction: (action: 'ABASTECER' | 'ORDEM_SERVICO' | 'CHECKLIST') => void;
   onChangeViatura: () => void;
   ultimoAbastecimento?: Abastecimento | null;
   osAberta?: OrdemServicoFrota | null;
   ultimoChecklist?: ChecklistVeicular | null;
+  ultimasOs?: OrdemServicoFrota[];
 }
 
 export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
@@ -43,7 +44,8 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
   onChangeViatura,
   ultimoAbastecimento,
   osAberta,
-  ultimoChecklist
+  ultimoChecklist,
+  ultimasOs
 }) => {
   const isDark = theme === 'dark';
 
@@ -115,20 +117,6 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Alternador de Tema Claro / Escuro */}
-          <button
-            type="button"
-            onClick={onToggleTheme}
-            title={isDark ? 'Mudar para Tema Claro (Executive Light)' : 'Mudar para Tema Escuro (Cockpit Dark)'}
-            className={`p-2.5 rounded-xl border flex items-center justify-center transition-all active:scale-95 cursor-pointer ${
-              isDark
-                ? 'bg-zinc-850 hover:bg-zinc-800 border-zinc-700 text-amber-400 shadow-xs'
-                : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800 shadow-xs'
-            }`}
-          >
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
         </div>
       </header>
 
@@ -367,6 +355,71 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
             </div>
           </div>
         </button>
+
+        {/* ------------------------------------------------------------- */}
+        {/* SEÇÃO 4: HISTÓRICO RÁPIDO DAS ÚLTIMAS MANUTENÇÕES */}
+        {/* ------------------------------------------------------------- */}
+        <div className={`p-4 rounded-3xl border transition-all ${
+          isDark ? 'bg-zinc-900/70 border-zinc-800' : 'bg-white border-slate-200 shadow-xs'
+        }`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className={`p-1.5 rounded-lg ${isDark ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>
+                <Wrench className="w-3.5 h-3.5" />
+              </div>
+              <h4 className={`text-xs font-black uppercase tracking-wider ${isDark ? 'text-zinc-200' : 'text-slate-800'}`}>
+                Últimas Manutenções da Viatura
+              </h4>
+            </div>
+            <span className={`text-[10px] font-mono ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
+              Histórico Recente
+            </span>
+          </div>
+
+          {ultimasOs && ultimasOs.length > 0 ? (
+            <div className="space-y-2">
+              {ultimasOs.slice(0, 3).map((os) => {
+                const isPrev = (os.tipo_manutencao || os.natureza_manutencao) === 'PREVENTIVA';
+                const dataFmt = new Date(os.data_abertura).toLocaleDateString('pt-BR');
+                return (
+                  <div
+                    key={os.id}
+                    className={`p-2.5 rounded-2xl border flex items-center justify-between text-xs transition-colors ${
+                      isDark ? 'bg-zinc-950/60 border-zinc-800/80' : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <div className="space-y-0.5 max-w-[70%]">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full border ${
+                          isPrev
+                            ? isDark ? 'bg-blue-950/80 text-blue-400 border-blue-800' : 'bg-blue-50 text-blue-700 border-blue-200'
+                            : isDark ? 'bg-rose-950/80 text-rose-400 border-rose-800' : 'bg-rose-50 text-rose-700 border-rose-200'
+                        }`}>
+                          {isPrev ? 'PREVENTIVA' : 'CORRETIVA'}
+                        </span>
+                        <span className={`font-mono font-bold text-[11px] ${isDark ? 'text-zinc-300' : 'text-slate-800'}`}>
+                          {os.numero_os}
+                        </span>
+                      </div>
+                      <p className={`text-[11px] truncate ${isDark ? 'text-zinc-400' : 'text-slate-600'}`}>
+                        {os.descricao_motivo || os.descricao_servico || 'Intervenção técnica realizada.'}
+                      </p>
+                    </div>
+
+                    <div className="text-right font-mono text-[10px] text-zinc-500 shrink-0">
+                      <div>{dataFmt}</div>
+                      <div className={`font-bold ${isDark ? 'text-zinc-400' : 'text-slate-700'}`}>{Number(os.odometro_km).toLocaleString('pt-BR')} km</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className={`text-xs italic text-center py-2 ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
+              Nenhum histórico de manutenção recente para esta viatura.
+            </p>
+          )}
+        </div>
       </main>
 
       {/* Rodapé Institucional */}
