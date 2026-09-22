@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Truck, Fuel, Wrench, Disc, X, Maximize2 } from 'lucide-react';
+import { Truck, Fuel, Wrench, Disc, X, Maximize2, BookOpen } from 'lucide-react';
 
 export interface MinimizedWindow {
   id: string;
   title: string;
-  type: 'viatura' | 'abastecimento' | 'ordem_servico' | 'pneus';
+  type: 'viatura' | 'abastecimento' | 'ordem_servico' | 'pneus' | 'ficha_tecnica_pneu';
 }
 
 export interface DockMinimizadosProps {
@@ -34,6 +34,8 @@ export const DockMinimizados: React.FC<DockMinimizadosProps> = ({
         return <Wrench className="w-3.5 h-3.5 text-blue-500 shrink-0" />;
       case 'pneus':
         return <Disc className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
+      case 'ficha_tecnica_pneu':
+        return <BookOpen className="w-3.5 h-3.5 text-blue-400 shrink-0" />;
       default:
         return <Truck className="w-3.5 h-3.5 text-slate-400 shrink-0" />;
     }
