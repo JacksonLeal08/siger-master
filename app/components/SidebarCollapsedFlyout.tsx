@@ -27,6 +27,8 @@ interface SidebarCollapsedFlyoutProps {
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onClose: () => void;
+  title?: string;
+  icon?: React.ReactNode;
 }
 
 export const SidebarCollapsedFlyout: React.FC<SidebarCollapsedFlyoutProps> = ({
@@ -37,6 +39,8 @@ export const SidebarCollapsedFlyout: React.FC<SidebarCollapsedFlyoutProps> = ({
   onMouseEnter,
   onMouseLeave,
   onClose,
+  title = 'Módulo Extintores',
+  icon,
 }) => {
   const [mounted, setMounted] = useState(false);
   const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
@@ -105,7 +109,7 @@ export const SidebarCollapsedFlyout: React.FC<SidebarCollapsedFlyoutProps> = ({
       onMouseLeave={onMouseLeave}
       role="menu"
       aria-orientation="vertical"
-      aria-label="Submenu Módulo Extintores"
+      aria-label={`Submenu ${title}`}
       style={{
         position: 'fixed',
         top: `${position.top}px`,
@@ -135,15 +139,15 @@ export const SidebarCollapsedFlyout: React.FC<SidebarCollapsedFlyoutProps> = ({
       <div className="px-3 py-2.5 border-b border-slate-100 dark:border-slate-800/80 mb-1 flex items-center justify-between bg-slate-50/70 dark:bg-slate-800/50 rounded-xl">
         <div className="flex items-center gap-2 min-w-0">
           <span className="p-1 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 shrink-0">
-            <Flame className="w-4 h-4" />
+            {icon || <Flame className="w-4 h-4" />}
           </span>
           <span className="text-[11px] font-black uppercase tracking-wider text-slate-900 dark:text-white truncate">
-            Módulo Extintores
+            {title}
           </span>
         </div>
         <span 
           className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-slate-700/80 text-slate-700 dark:text-slate-200 border border-slate-300/60 dark:border-slate-600/60 shrink-0"
-          title="Total de extintores do contrato"
+          title={`Total de ${title.toLowerCase()} do contrato`}
         >
           {totalCount}
         </span>

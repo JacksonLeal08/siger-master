@@ -29,13 +29,15 @@ import {
   ArrowLeftRight,
   SlidersHorizontal,
   QrCode,
-  Disc
+  Disc,
+  Fuel
 } from 'lucide-react';
 import { SYSTEM_VERSION } from '@/config/version';
 import WhatsNewModal from './WhatsNewModal';
 import { SidebarCollapsedFlyout } from './SidebarCollapsedFlyout';
 import { getSwapKpisAction } from '@/app/actions/assetSwapActions';
 import { getMaintenanceKpisAction } from '@/app/actions/maintenanceBatchActions';
+import { getFrotaKpisAction } from '@/app/actions/frotaActions';
 
 interface SidebarProps {
   onProfileClick?: () => void;
@@ -99,14 +101,55 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
     }, 180);
   };
 
-  // Fecha o flyout automaticamente ao mudar de rota
+  // Estado do Accordion do Módulo Mestre "Viaturas & Frota"
+  const isFrotaRoute = pathname.startsWith('/viaturas') || pathname.startsWith('/frota');
+  const [isFrotaOpen, setIsFrotaOpen] = useState(true);
+
+  // Flyout Flutuante para Viaturas no modo Recolhido
+  const [isFrotaFlyoutOpen, setIsFrotaFlyoutOpen] = useState(false);
+  const frotaTriggerRef = useRef<HTMLDivElement | null>(null);
+  const frotaFlyoutCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleFrotaMouseEnter = () => {
+    if (!isCollapsed) return;
+    if (frotaFlyoutCloseTimeoutRef.current) {
+      clearTimeout(frotaFlyoutCloseTimeoutRef.current);
+      frotaFlyoutCloseTimeoutRef.current = null;
+    }
+    setIsFrotaFlyoutOpen(true);
+  };
+
+  const handleFrotaMouseLeave = () => {
+    if (!isCollapsed) return;
+    frotaFlyoutCloseTimeoutRef.current = setTimeout(() => {
+      setIsFrotaFlyoutOpen(false);
+    }, 180);
+  };
+
+  const handleFrotaFlyoutMouseEnter = () => {
+    if (frotaFlyoutCloseTimeoutRef.current) {
+      clearTimeout(frotaFlyoutCloseTimeoutRef.current);
+      frotaFlyoutCloseTimeoutRef.current = null;
+    }
+  };
+
+  const handleFrotaFlyoutMouseLeave = () => {
+    frotaFlyoutCloseTimeoutRef.current = setTimeout(() => {
+      setIsFrotaFlyoutOpen(false);
+    }, 180);
+  };
+
+  // Fecha flyouts automaticamente ao mudar de rota
   useEffect(() => {
     setIsExtintoresFlyoutOpen(false);
+    setIsFrotaFlyoutOpen(false);
   }, [pathname]);
 
   // Indicadores sutilmente carregados em segundo plano para os badges
   const [swapsCount, setSwapsCount] = useState<number | null>(null);
   const [pendingBatchesCount, setPendingBatchesCount] = useState<number | null>(null);
+  const [viaturasCount, setViaturasCount] = useState<number | null>(null);
+  const [pneusCriticosCount, setPneusCriticosCount] = useState<number | null>(null);
 
   // Contrato ativo para isolamento de dados
   const effectiveSite = (!isGlobalScope && userProfile?.site) ? userProfile.site : (activeSite || 'TODOS');
@@ -119,14 +162,20 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
     }
   }, []);
 
-  // Mantém o accordion aberto se a rota ativa for uma sub-rota de extintores
+  // Mantém os accordions abertos se a rota ativa for uma de suas sub-rotas
   useEffect(() => {
     if (isExtintoresRoute) {
       setIsExtintoresOpen(true);
     }
   }, [isExtintoresRoute]);
 
-  // Carrega contagens de trocas e lotes para os badges dos sub-itens isolados por contrato
+  useEffect(() => {
+    if (isFrotaRoute) {
+      setIsFrotaOpen(true);
+    }
+  }, [isFrotaRoute]);
+
+  // Carrega contagens de trocas, lotes e viaturas para os badges dos sub-itens isolados por contrato
   useEffect(() => {
     let isMounted = true;
     getSwapKpisAction(effectiveSite).then(res => {
@@ -141,6 +190,13 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
       }
     }).catch(() => {});
 
+    getFrotaKpisAction(effectiveSite).then(res => {
+      if (isMounted && res.success && res.data) {
+        setViaturasCount(res.data.totalViaturas ?? 0);
+        setPneusCriticosCount(res.data.pneusCriticosTwi ?? 0);
+      }
+    }).catch(() => {});
+
     return () => { isMounted = false; };
   }, [effectiveSite]);
 
@@ -149,6 +205,7 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
     setIsCollapsed(nextState);
     if (!nextState) {
       setIsExtintoresFlyoutOpen(false);
+      setIsFrotaFlyoutOpen(false);
     }
     localStorage.setItem('spci_sidebar_collapsed', String(nextState));
     if (onCollapseChange) onCollapseChange(nextState);
@@ -215,18 +272,44 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
     }
   ];
 
-  // Itens da navegação padrão (satélites unificados fora do módulo Extintores)
+  // Sub-itens modulares do ecossistema Viaturas & Frota
+  const frotaSubItems = [
+    {
+      id: 'frota-viaturas',
+      label: 'Catálogo & Gestão de Frota',
+      shortLabel: 'Catálogo Viaturas',
+      icon: <Truck className="w-4 h-4 shrink-0" />,
+      path: '/viaturas',
+      isActive: pathname === '/viaturas'
+    },
+    {
+      id: 'frota-pneus',
+      label: 'Metrologia de Pneus',
+      shortLabel: 'Metrologia Pneus',
+      icon: <Disc className="w-4 h-4 shrink-0 text-red-400" />,
+      path: '/frota/pneus',
+      isActive: pathname.startsWith('/frota/pneus'),
+      alertBadge: pneusCriticosCount !== null && pneusCriticosCount > 0 ? pneusCriticosCount : undefined
+    },
+    {
+      id: 'frota-abastecer',
+      label: 'Registro de Abastecimento',
+      shortLabel: 'Abastecimento',
+      icon: <Fuel className="w-4 h-4 shrink-0 text-amber-500" />,
+      path: '/frota/abastecer',
+      isActive: pathname.startsWith('/frota/abastecer')
+    }
+  ];
+
+  // Itens da navegação padrão (satélites unificados fora dos módulos mestres Extintores e Viaturas)
   const navItems = [
     { id: 'dashboard', label: 'Dashboard / Visão Geral', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
-    { id: 'viaturas', label: 'Viaturas & Frota', icon: <Truck className="w-5 h-5" />, path: '/viaturas' },
-    { id: 'pneus', label: 'Metrologia de Pneus', icon: <Disc className="w-5 h-5" />, path: '/frota/pneus' },
     { id: 'hidrantes', label: 'Hidrantes & Abrigos', icon: <Droplet className="w-5 h-5" />, path: '/hidrantes' },
     { id: 'sinalizacao', label: 'Sinalização NBR', icon: <AlertTriangle className="w-5 h-5" />, path: '/sinalizacao' },
     { id: 'iluminacao', label: 'Iluminação Emergência', icon: <Lightbulb className="w-5 h-5" />, path: '/iluminacao' },
     { id: 'bombas', label: 'Casa de Bombas', icon: <Sliders className="w-5 h-5" />, path: '/bombas' },
     { id: 'ronda', label: 'Despacho & Ronda Campo', icon: <Smartphone className="w-5 h-5" />, path: '/ronda' },
     { id: 'mapa', label: 'Mapa Operacional', icon: <MapPin className="w-5 h-5" />, path: '/mapa' },
-    { id: 'alerts', label: 'Disparo de Alertas', icon: <Bell className="w-5 h-5" />, path: '/alerts' },
     { id: 'gestao-ativo', label: 'Gestão de Ativo', icon: <Boxes className="w-5 h-5" />, path: '/gestao-ativo' },
     ...(userProfile?.role === 'Desenvolvedor' ? [{ id: 'logs', label: 'Logs do Sistema', icon: <History className="w-5 h-5" />, path: '/logs' }] : []),
     ...(isAdmin ? [{ id: 'configuracoes', label: 'Configurações', icon: <Settings className="w-5 h-5" />, path: '/configuracoes' }] : [])
@@ -449,7 +532,114 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
           )}
         </div>
 
-        {/* 3. Demais módulos satélites */}
+        {/* 3. NÓ PRINCIPAL EXPANSÍVEL: VIATURAS & FROTA (Módulo Mestre Cockpit) */}
+        <div 
+          ref={frotaTriggerRef}
+          onMouseEnter={handleFrotaMouseEnter}
+          onMouseLeave={handleFrotaMouseLeave}
+          className="relative group/frota pt-0.5"
+        >
+          {/* Header do Módulo */}
+          <button
+            type="button"
+            onClick={() => {
+              if (isCollapsed) {
+                toggleCollapse();
+                setIsFrotaOpen(true);
+              } else {
+                setIsFrotaOpen(!isFrotaOpen);
+              }
+            }}
+            className={`w-full flex items-center justify-between py-2.5 text-xs font-semibold uppercase tracking-wider rounded-xl transition-all duration-200 text-left cursor-pointer border ${
+              isCollapsed ? 'justify-center px-0' : 'px-3.5'
+            } ${
+              isFrotaRoute
+                ? 'bg-slate-100 dark:bg-slate-800/80 border-red-500/40 text-slate-900 dark:text-white shadow-xs font-bold'
+                : 'border-transparent text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
+            }`}
+            title="Módulo Mestre de Viaturas & Frota"
+            aria-expanded={isFrotaOpen}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <span className={`inline-flex items-center transition-transform duration-200 ${
+                isFrotaRoute ? 'text-red-600 dark:text-red-500 scale-110' : 'text-red-600 dark:text-red-400 group-hover/frota:scale-110'
+              }`}>
+                <Truck className="w-5 h-5" />
+              </span>
+              {!isCollapsed && (
+                <span className="font-['Hanken_Grotesk'] font-bold truncate tracking-wider">
+                  Viaturas & Frota
+                </span>
+              )}
+            </div>
+
+            {!isCollapsed && (
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Badge Global de Viaturas */}
+                {viaturasCount !== null && (
+                  <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600">
+                    {viaturasCount}
+                  </span>
+                )}
+                {/* Chevron com Rotação Fluida */}
+                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                  isFrotaOpen ? 'rotate-180 text-red-500' : ''
+                }`} />
+              </div>
+            )}
+          </button>
+
+          {/* Submenu Retrátil (Accordion Tree) quando Expandida */}
+          {!isCollapsed && isFrotaOpen && (
+            <div className="ml-5 pl-2.5 border-l-2 border-slate-200 dark:border-slate-750/80 space-y-1 my-1.5 transition-all">
+              {frotaSubItems.map(subItem => (
+                <Link
+                  key={subItem.id}
+                  href={subItem.path}
+                  onClick={() => { if (onClose) onClose(); }}
+                  className={`flex items-center justify-between px-3 py-2 text-[11px] font-medium tracking-wide rounded-lg transition-all group/sub ${
+                    subItem.isActive
+                      ? 'bg-red-600/10 text-red-600 dark:text-red-400 font-bold border border-red-500/20'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className={`transition-colors ${
+                      subItem.isActive ? 'text-red-600 dark:text-red-400' : 'text-slate-400 dark:text-slate-500 group-hover/sub:text-red-500'
+                    }`}>
+                      {subItem.icon}
+                    </span>
+                    <span className="truncate">{subItem.label}</span>
+                  </div>
+
+                  {/* Badges de Status do Sub-item (Ex: Pneus Críticos TWI) */}
+                  {subItem.alertBadge !== undefined && subItem.alertBadge > 0 && (
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700/60 animate-pulse shrink-0" title={`${subItem.alertBadge} pneu(s) em estado crítico TWI`}>
+                      {subItem.alertBadge}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Submenu Popover Flutuante via React Portal quando a Barra Lateral estiver Recolhida */}
+          {isCollapsed && (
+            <SidebarCollapsedFlyout
+              isOpen={isFrotaFlyoutOpen}
+              triggerRef={frotaTriggerRef}
+              totalCount={viaturasCount ?? 0}
+              subItems={frotaSubItems}
+              title="Viaturas & Frota"
+              icon={<Truck className="w-4 h-4" />}
+              onMouseEnter={handleFrotaFlyoutMouseEnter}
+              onMouseLeave={handleFrotaFlyoutMouseLeave}
+              onClose={() => setIsFrotaFlyoutOpen(false)}
+            />
+          )}
+        </div>
+
+        {/* 4. Demais módulos satélites */}
         {navItems.filter(item => item.id !== 'dashboard').map(item => {
           const isActive = pathname.startsWith(item.path);
           return (

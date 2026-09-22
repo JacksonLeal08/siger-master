@@ -6,7 +6,7 @@ import { useSpci } from '@/app/context/SpciContext';
 import { 
   Bot, Send, X, Sparkles, Cpu, ShieldCheck, ChevronRight, ChevronDown, 
   HelpCircle, Layers, Flame, Droplets, QrCode, AlertTriangle, Bell, Trash2, AlertCircle,
-  MapPin, Navigation, Compass, Maximize2, Camera
+  MapPin, Navigation, Compass, Maximize2, Camera, Truck
 } from 'lucide-react';
 import WhatsNewModal from './WhatsNewModal';
 import { CURRENT_SYSTEM_VERSION } from '@/lib/version';
@@ -150,12 +150,12 @@ export default function SpciChatIa() {
       ]
     },
     {
-      category: 'DESPACHO & ALERTAS DE INCONFORMIDADE',
-      icon: AlertTriangle,
+      category: 'GESTÃO DE FROTA & METROLOGIA DE PNEUS',
+      icon: Truck,
       topics: [
         {
-          label: 'Como disparar alertas e relatórios de emergência?',
-          prompt: 'Como utilizar o módulo Disparo de Alertas e Notificações para equipamentos vencidos ou com vazamento?'
+          label: 'Como funciona a Metrologia de Pneus e CONTRAN 558/80?',
+          prompt: 'Como utilizar o módulo de Viaturas e Metrologia de Pneus com cálculo de sulco, calibração e diretrizes do CONTRAN 558/80?'
         }
       ]
     }
@@ -164,6 +164,10 @@ export default function SpciChatIa() {
   // Gerador de resposta inteligente local NBR e Sistema SPCI (à prova de falhas)
   const getSmartLocalNbrAnswer = (promptText: string): string => {
     const p = promptText.toLowerCase();
+
+    if (p.includes('pneu') || p.includes('contran') || p.includes('viatura') || p.includes('frota') || p.includes('twi') || p.includes('sulco')) {
+      return `🛞 **Metrologia de Rodagem & Resolução CONTRAN 558/80:**\n\nNo módulo **Viaturas & Frota > Metrologia de Pneus**:\n\n1. **Diagrama Panorâmico de Chassi:** Visualização esquemática em extensão total com as 5 rodas (DE, DD, TE, TD e Estepe) sem cortes de texto.\n2. **Sulco & TWI:** O CONTRAN 558/80 proíbe sulcos ≤ 1,6 mm (indicador TWI). O SPCI classifica automaticamente em Verde (≥3,0 mm - Conforme), Amarelo (1,7 a 2,9 mm - Atenção) e Vermelho (≤1,6 mm - Crítico/Proibido).\n3. **Projeção de Durabilidade:** A memória de cálculo projeta a taxa de desgaste por 1.000 km e a vida útil restante estimada.\n4. **Trava de Calibração:** Controle de aferição de pressão (PSI) e travamento preventivo a cada 15 dias.`;
+    }
 
     if (p.includes('exif') || p.includes('foto') || p.includes('câmera') || p.includes('camera') || p.includes('extra')) {
       return `📸 **Extração Automática de GPS por Fotos (EXIF):**\n\nAo tirar ou anexar uma foto de um extintor:\n\n1. **Detecção Instantânea:** O SPCI lê automaticamente os metadados EXIF gravados pelo sensor da câmera do smartphone no corpo do arquivo de imagem (JPEG/TIFF).\n2. **Coordenadas Precisas:** As tags de Latitude e Longitude são convertidas para graus decimais e salvas diretamente na ficha do ativo.\n3. **Sem Conflito:** Caso a foto não possua coordenadas (ex.: enviada com compressão pelo WhatsApp), o sistema aciona transparentemente o GPS da antena do celular ou mantém a posição anterior sem emitir erros.\n4. **Origem Rastreada:** O ativo recebe a tag 'FOTO_EXIF' indicando a auditoria de origem.`;
