@@ -22,8 +22,11 @@ import {
   FileText,
   Clock,
   Gauge,
-  Wrench
+  Wrench,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
+import { MaintenancePlanEngine } from '@/lib/maintenancePlanEngine';
 import { ViaturaHistoricoOSTab } from './ViaturaHistoricoOSTab';
 
 interface ViaturaModalProps {
@@ -58,6 +61,13 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   const [tipoVeiculo, setTipoVeiculo] = useState<TipoVeiculo>('CAMINHONETE');
   const [marca, setMarca] = useState('');
   const [modelo, setModelo] = useState('');
+  const [marcaModeloCrlv, setMarcaModeloCrlv] = useState('');
+  const [modeloPlanoChave, setModeloPlanoChave] = useState('');
+  const [crlvInfo, setCrlvInfo] = useState<{
+    planoEncontrado: boolean;
+    modeloPadrao?: string;
+    motorizacao?: string;
+  } | null>(null);
   const [anoFabricacao, setAnoFabricacao] = useState<number | ''>(new Date().getFullYear());
   const [tipoCombustivel, setTipoCombustivel] = useState<TipoCombustivel>('DIESEL_S10');
   const [odometro, setOdometro] = useState<string>('0');
@@ -86,6 +96,22 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setTipoVeiculo(viaturaToEdit.tipo_veiculo || 'CAMINHONETE');
       setMarca(viaturaToEdit.marca || '');
       setModelo(viaturaToEdit.modelo || '');
+      setMarcaModeloCrlv(viaturaToEdit.marca_modelo_crlv || '');
+      setModeloPlanoChave(viaturaToEdit.modelo_plano_chave || '');
+      if (viaturaToEdit.marca_modelo_crlv) {
+        const parsed = MaintenancePlanEngine.normalizeCrlvModel(viaturaToEdit.marca_modelo_crlv);
+        if (parsed.planoEncontrado) {
+          setCrlvInfo({
+            planoEncontrado: true,
+            modeloPadrao: parsed.modeloPadrao,
+            motorizacao: parsed.motorizacao
+          });
+        } else {
+          setCrlvInfo(null);
+        }
+      } else {
+        setCrlvInfo(null);
+      }
       setAnoFabricacao(viaturaToEdit.ano_fabricacao || new Date().getFullYear());
       setTipoCombustivel(viaturaToEdit.tipo_combustivel || 'DIESEL_S10');
       setOdometro(String(viaturaToEdit.odometro_atual_km || 0));
@@ -119,6 +145,9 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       setTipoVeiculo('CAMINHONETE');
       setMarca('');
       setModelo('');
+      setMarcaModeloCrlv('');
+      setModeloPlanoChave('');
+      setCrlvInfo(null);
       setAnoFabricacao(new Date().getFullYear());
       setTipoCombustivel('DIESEL_S10');
       setOdometro('0');
@@ -152,6 +181,25 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
     }
   };
 
+  // Manipulação de CRLV e Normalização de Plano do Fabricante
+  const handleCrlvChange = (val: string) => {
+    setMarcaModeloCrlv(val);
+    const parsed = MaintenancePlanEngine.normalizeCrlvModel(val);
+    if (parsed.planoEncontrado) {
+      setModeloPlanoChave(parsed.modeloChave);
+      setCrlvInfo({
+        planoEncontrado: true,
+        modeloPadrao: parsed.modeloPadrao,
+        motorizacao: parsed.motorizacao
+      });
+      if (!marca) setMarca(parsed.marca);
+      if (!modelo) setModelo(parsed.modeloPadrao);
+    } else {
+      setModeloPlanoChave('');
+      setCrlvInfo(null);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
@@ -176,6 +224,8 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
         tipo_veiculo: tipoVeiculo,
         marca: marca,
         modelo: modelo,
+        marca_modelo_crlv: marcaModeloCrlv || null,
+        modelo_plano_chave: modeloPlanoChave || null,
         ano_fabricacao: anoFabricacao ? Number(anoFabricacao) : null,
         tipo_combustivel: tipoCombustivel,
         odometro_atual_km: parseFloat(odometro) || 0,
@@ -415,6 +465,49 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
             <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
               2. Ficha Mecânica & Calibragem
             </h3>
+          </div>
+
+          {/* Campo Oficial do CRLV */}
+          <div className="mb-4 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/50 border border-slate-200/80 dark:border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                Marca / Modelo Oficial (Conforme Descrição do CRLV)
+              </label>
+              <span className="text-[10px] font-mono text-slate-400">Padrão DENATRAN / CRLV-e</span>
+            </div>
+            <input
+              type="text"
+              list="crlv-sugestoes"
+              value={marcaModeloCrlv}
+              onChange={(e) => handleCrlvChange(e.target.value.toUpperCase())}
+              placeholder="Ex: I/TOYOTA HILUX CD 4X4 ou M.BENZ/SPRINTER 416CDI AMB"
+              className="w-full text-xs font-mono font-bold uppercase px-3 py-2 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-xl focus:ring-2 focus:ring-red-600 focus:outline-hidden"
+            />
+            <datalist id="crlv-sugestoes">
+              <option value="I/TOYOTA HILUX CD 4X4" />
+              <option value="M.BENZ/SPRINTER 416CDI AMB" />
+              <option value="FORD/RANGER XLSCD4 22C" />
+              <option value="VW/AMAROK CD 4X4 COMF" />
+              <option value="FIAT/TORO ENDURANCE D" />
+              <option value="VOLVO/VM 330 AUTO BOMBA TANQUE" />
+            </datalist>
+
+            {crlvInfo && crlvInfo.planoEncontrado && (
+              <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 font-sans">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div>
+                    <p className="font-bold">Plano do Fabricante Acoplado:</p>
+                    <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
+                      {crlvInfo.modeloPadrao} • Motor: {crlvInfo.motorizacao} (Ciclos de 10k a 100k km)
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[9px] font-mono font-black uppercase px-2 py-0.5 rounded bg-emerald-600 text-white">
+                  SINCRONIZADO
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">

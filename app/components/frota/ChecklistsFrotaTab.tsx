@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ChecklistVeicular, ChecklistItemAvaliacao } from '@/lib/types/frota';
 import { listChecklistsAction, getChecklistByIdAction } from '@/app/actions/frotaActions';
 import { emitirLaudoChecklistPdf } from '@/lib/pdfLaudoChecklistGenerator';
+import { LaudoPericialVeicular } from './LaudoPericialVeicular';
 import { 
   ClipboardCheck, 
   Search, 
@@ -312,6 +313,14 @@ export const ChecklistsFrotaTab: React.FC<ChecklistsFrotaTabProps> = ({ contrato
                   <span className="text-[10px] font-mono text-slate-400 block">STATUS</span>
                   <span className="font-bold uppercase text-red-600 dark:text-red-400">{selectedChecklist.status_aprovacao}</span>
                 </div>
+              </div>
+
+              {/* Tabela do Laudo Pericial Hierarquizado pelos 8 Sistemas */}
+              <div className="space-y-2 pt-2">
+                <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                  Auditoria Técnica dos 8 Sistemas Mestre
+                </h4>
+                <LaudoPericialVeicular checklist={selectedChecklist} />
               </div>
 
               {/* Itens com Não Conformidade e Fotos */}

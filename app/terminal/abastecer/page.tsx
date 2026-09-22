@@ -29,9 +29,12 @@ import {
   Info,
   Sun,
   Moon,
+  Monitor,
   Wrench,
   ClipboardCheck
 } from 'lucide-react';
+import { useThemePreference } from '@/hooks/useThemePreference';
+import { ViaturaCardTerminal } from '@/app/components/frota/ViaturaCardTerminal';
 import { Viatura, TipoCombustivel, TipoVeiculo, OrdemServicoFrota } from '@/lib/types/frota';
 import { 
   listViaturasAction, 
@@ -82,7 +85,8 @@ function TerminalAbastecerContent() {
   // 6: FORM_CHECKLIST (Checklist Técnico Veicular com Dual-Photo Evidence)
   // 7: SUCCESS (Confirmação com Recibo Digital)
   const [etapa, setEtapa] = useState<EtapaTerminal>('LOADING');
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const { themePreference, resolvedTheme, setThemePreference } = useThemePreference('system');
+  const theme = resolvedTheme;
 
   // Estado de Conectividade e Fila
   const [isOnline, setIsOnline] = useState(true);
@@ -534,6 +538,7 @@ function TerminalAbastecerContent() {
         onComplete={() => setEtapa('CATALOG')}
         minDurationMs={2600}
         skipable={true}
+        theme={theme}
       />
     );
   }
@@ -610,20 +615,49 @@ function TerminalAbastecerContent() {
             </div>
           </div>
 
-          {/* Badge de Conectividade, Fila e Tema */}
+          {/* Badge de Conectividade, Fila e Seletor de Tema Tríplice */}
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
-              className={`p-1.5 rounded-xl border transition-all active:scale-95 ${
-                theme === 'dark'
-                  ? 'bg-zinc-900 hover:bg-zinc-800 text-amber-400 border-zinc-800'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
-              }`}
-              title={theme === 'dark' ? 'Mudar para Tema Claro' : 'Mudar para Tema Escuro'}
-            >
-              {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-            </button>
+            {/* Seletor de Tema Tríplice (Claro, Escuro e Sistema) */}
+            <div className={`flex items-center p-0.5 rounded-xl border ${
+              theme === 'dark' ? 'bg-zinc-900 border-zinc-800' : 'bg-slate-100 border-slate-300 shadow-2xs'
+            }`}>
+              <button
+                type="button"
+                onClick={() => setThemePreference('light')}
+                className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                  themePreference === 'light'
+                    ? 'bg-white text-amber-600 shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300'
+                }`}
+                title="Modo Claro"
+              >
+                <Sun className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setThemePreference('dark')}
+                className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                  themePreference === 'dark'
+                    ? 'bg-zinc-800 text-zinc-100 shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300'
+                }`}
+                title="Modo Escuro"
+              >
+                <Moon className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setThemePreference('system')}
+                className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                  themePreference === 'system'
+                    ? theme === 'dark' ? 'bg-zinc-800 text-cyan-400 shadow-xs font-bold' : 'bg-white text-cyan-600 shadow-xs font-bold'
+                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300'
+                }`}
+                title="Automático (Preferência do Sistema)"
+              >
+                <Monitor className="w-3.5 h-3.5" />
+              </button>
+            </div>
 
             {pendingSyncCount > 0 && (
               <button
@@ -717,85 +751,14 @@ function TerminalAbastecerContent() {
               </div>
             ) : (
               <div className="space-y-3">
-                {viaturasFiltradas.map((v) => {
-                  const statusPneu = FuelPricingService.validarCalibracaoPneus(
-                    v.data_ultima_calibracao,
-                    15
-                  );
-
-                  return (
-                    <div
-                      key={v.id}
-                      onClick={() => handleSelectViatura(v)}
-                      className="group p-4 rounded-2xl bg-zinc-900/70 hover:bg-zinc-900 border border-zinc-800/90 hover:border-zinc-700 shadow-lg transition-all duration-200 cursor-pointer active:scale-[0.99] flex flex-col gap-3 relative overflow-hidden"
-                    >
-                      {/* Faixa decorativa lateral */}
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-600/80 group-hover:bg-red-500 transition-colors" />
-
-                      <div className="flex items-start justify-between gap-3">
-                        {/* Informações da Viatura */}
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-black font-mono tracking-tight text-white group-hover:text-red-400 transition-colors">
-                              {v.prefixo_frota}
-                            </span>
-                            <span className="text-[9px] px-2 py-0.5 rounded-md font-mono bg-zinc-800 text-zinc-300 uppercase font-bold border border-zinc-700/60">
-                              {v.tipo_veiculo}
-                            </span>
-                          </div>
-                          <p className="text-xs text-zinc-400 font-medium line-clamp-1">
-                            {v.marca} {v.modelo}
-                          </p>
-                          <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono">
-                            <Gauge className="w-3.5 h-3.5 text-zinc-500" />
-                            <span>{(v.odometro_atual_km || 0).toLocaleString('pt-BR')} km</span>
-                          </div>
-                        </div>
-
-                        {/* Placa Padrão Mercosul Estampada */}
-                        <div className="w-28 bg-white border-2 border-zinc-900 rounded-md overflow-hidden shadow-sm shrink-0 select-none">
-                          {/* Tarja Azul Superior */}
-                          <div className="bg-[#003399] px-1 py-0.5 flex items-center justify-between text-white">
-                            <span className="text-[7px] font-black tracking-widest leading-none">
-                              BRASIL
-                            </span>
-                            {/* Bandeira estilizada */}
-                            <div className="w-2.5 h-1.5 bg-emerald-600 rounded-[1px] relative flex items-center justify-center">
-                              <div className="w-1.5 h-1 bg-yellow-400 transform rotate-45" />
-                            </div>
-                          </div>
-                          {/* Placa em Preto */}
-                          <div className="text-center py-1 bg-white">
-                            <span className="text-xs font-black font-mono tracking-widest text-zinc-900">
-                              {v.placa}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Rodapé do Card com Status de Calibração */}
-                      <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between text-xs">
-                        {statusPneu.bloqueioObrigatorio ? (
-                          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-400">
-                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                            <span>⚠️ Calibração Vencida ({statusPneu.diasDesdeCalibracao}d)</span>
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400">
-                            <Disc className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>
-                              Calibração OK ({Math.max(0, 15 - statusPneu.diasDesdeCalibracao)}d restantes)
-                            </span>
-                          </div>
-                        )}
-
-                        <span className="text-xs font-bold text-red-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
-                          Acessar Hub <ChevronRight className="w-3.5 h-3.5" />
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {viaturasFiltradas.map((v) => (
+                  <ViaturaCardTerminal
+                    key={v.id}
+                    viatura={v}
+                    theme={theme}
+                    onSelect={handleSelectViatura}
+                  />
+                ))}
               </div>
             )}
           </main>
@@ -811,7 +774,7 @@ function TerminalAbastecerContent() {
               contratoId={contratoNome}
               ultimasOs={viaturaOrdensServico}
               theme={theme}
-              onToggleTheme={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+              onToggleTheme={() => setThemePreference(theme === 'dark' ? 'light' : 'dark')}
               onSelectAction={(action) => {
                 if (action === 'ABASTECER') setEtapa('FORM_ABASTECER');
                 else if (action === 'ORDEM_SERVICO') setEtapa('FORM_OS');

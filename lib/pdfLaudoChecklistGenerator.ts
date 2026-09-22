@@ -28,6 +28,60 @@ export function emitirLaudoChecklistPdf(checklist: ChecklistVeicular): void {
     i => i.parecer === 'NAO_CONFORME'
   ) || [];
 
+  // Agrupamento hierárquico por sistemas mestres
+  const sistemasOrdem = ['FREIOS', 'SUSPENSAO', 'MOTOR_CAMBIO', 'ELETRICA', 'ILUMINACAO', 'PNEUS', 'EQUIPAMENTOS', 'IMPLEMENTOS_ESPECIFICOS'];
+  const sistemasNomes: Record<string, string> = {
+    FREIOS: '🛑 1. SISTEMA DE FREIOS & CIRCUITO HIDRÁULICO',
+    SUSPENSAO: '🔩 2. SISTEMA DE SUSPENSÃO & DIREÇÃO',
+    MOTOR_CAMBIO: '⚙️ 3. MOTOR, TRANSMISSÃO & ARREFECIMENTO',
+    ELETRICA: '⚡ 4. SISTEMA ELÉTRICO & ELETRÔNICO',
+    ILUMINACAO: '💡 5. ILUMINAÇÃO & SINALIZAÇÃO DE EMERGÊNCIA',
+    PNEUS: '🛞 6. PNEUS, RODAS & ÍNDICE TWI',
+    EQUIPAMENTOS: '🦺 7. EQUIPAMENTOS DE BORDO & SEGURANÇA',
+    IMPLEMENTOS_ESPECIFICOS: '🚒 8. IMPLEMENTOS ESPECÍFICOS DE EMERGÊNCIA'
+  };
+
+  const gruposMap: Record<string, any[]> = {};
+  (checklist.itens || []).forEach(item => {
+    const s = item.sistema_grupo || 'EQUIPAMENTOS';
+    if (!gruposMap[s]) gruposMap[s] = [];
+    gruposMap[s].push(item);
+  });
+
+  const tabelaLinhasHtml = Object.keys(gruposMap).length === 0
+    ? '<tr><td colspan="3" style="text-align:center; padding: 12px; color: #64748b;">Nenhum item discriminado neste laudo.</td></tr>'
+    : Object.keys(gruposMap)
+        .sort((a, b) => (sistemasOrdem.indexOf(a) >= 0 ? sistemasOrdem.indexOf(a) : 99) - (sistemasOrdem.indexOf(b) >= 0 ? sistemasOrdem.indexOf(b) : 99))
+        .map(grupo => {
+          const itens = gruposMap[grupo] || [];
+          const nomeGrupo = sistemasNomes[grupo] || grupo;
+          const headerRow = `
+            <tr class="master-system-row">
+              <td colspan="3">${nomeGrupo} (${itens.length} itens auditados)</td>
+            </tr>
+          `;
+          const itemRows = itens.map((item, idx) => `
+            <tr class="${item.parecer === 'NAO_CONFORME' ? 'row-nc' : ''}">
+              <td style="padding-left: 20px; font-weight: ${item.parecer === 'NAO_CONFORME' ? '700' : '500'};">
+                ${idx + 1}. ${item.item_nome}
+                ${item.observacao_anomalia && item.parecer === 'NAO_CONFORME' ? `<br><small style="color: #991b1b; font-style: italic;">Relato: ${item.observacao_anomalia}</small>` : ''}
+              </td>
+              <td style="text-align: center;">
+                <span class="${
+                  item.parecer === 'CONFORME' ? 'parecer-c' :
+                  item.parecer === 'NAO_CONFORME' ? 'parecer-nc' : 'parecer-na'
+                }">
+                  ${item.parecer}
+                </span>
+              </td>
+              <td style="text-align: center;">
+                ${item.gravidade_anomalia ? `<strong>${item.gravidade_anomalia}</strong>` : '-'}
+              </td>
+            </tr>
+          `).join('');
+          return headerRow + itemRows;
+        }).join('');
+
   const htmlContent = `
 <!DOCTYPE html>
 <html lang="pt-BR" translate="no">
@@ -148,8 +202,23 @@ export function emitirLaudoChecklistPdf(checklist: ChecklistVeicular): void {
       font-size: 8.5px;
     }
     .checklist-table td {
-      padding: 4px 6px;
+      padding: 5px 6px;
       border-bottom: 1px solid #e2e8f0;
+    }
+    .master-system-row td {
+      background: #e2e8f0 !important;
+      color: #0f172a !important;
+      font-weight: 800 !important;
+      font-size: 9px !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 6px 8px !important;
+      border-top: 2px solid #94a3b8 !important;
+      border-bottom: 1px solid #cbd5e1 !important;
+    }
+    .row-nc td {
+      background: #fef2f2 !important;
+      color: #991b1b;
     }
     .checklist-table tr:nth-child(even) {
       background: #f8fafc;
@@ -315,30 +384,13 @@ export function emitirLaudoChecklistPdf(checklist: ChecklistVeicular): void {
   <table class="checklist-table">
     <thead>
       <tr>
-        <th style="width: 25%;">Sistema Auditado</th>
-        <th style="width: 50%;">Item / Componente Verificado</th>
-        <th style="width: 15%; text-align: center;">Parecer</th>
-        <th style="width: 10%; text-align: center;">Gravidade</th>
+        <th style="width: 65%;">Item / Componente Verificado</th>
+        <th style="width: 20%; text-align: center;">Parecer</th>
+        <th style="width: 15%; text-align: center;">Gravidade</th>
       </tr>
     </thead>
     <tbody>
-      ${checklist.itens?.map(item => `
-        <tr>
-          <td><strong>${item.sistema_grupo}</strong></td>
-          <td>${item.item_nome}</td>
-          <td style="text-align: center;">
-            <span class="${
-              item.parecer === 'CONFORME' ? 'parecer-c' :
-              item.parecer === 'NAO_CONFORME' ? 'parecer-nc' : 'parecer-na'
-            }">
-              ${item.parecer}
-            </span>
-          </td>
-          <td style="text-align: center;">
-            ${item.gravidade_anomalia ? `<strong>${item.gravidade_anomalia}</strong>` : '-'}
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="4">Nenhum item discriminado.</td></tr>'}
+      ${tabelaLinhasHtml}
     </tbody>
   </table>
 

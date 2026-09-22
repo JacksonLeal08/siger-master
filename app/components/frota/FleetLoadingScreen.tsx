@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from 'lucide-react';
+import { engineAudioEngine } from '@/src/utils/engineAudioEngine';
 
 export interface FleetLoadingScreenProps {
   contratoNome?: string;
@@ -22,6 +23,7 @@ export interface FleetLoadingScreenProps {
   autoStart?: boolean;
   minDurationMs?: number;
   skipable?: boolean;
+  theme?: 'light' | 'dark';
 }
 
 interface StepMessage {
@@ -40,7 +42,7 @@ const ETAPAS_IGNICAO: StepMessage[] = [
     mensagem: 'Inicializando barramento CAN e telemetria de bordo...',
     subtexto: 'Varredura de atuadores, módulo ECM e sensores de injeção',
     icone: Cpu,
-    statusColor: 'text-amber-400 border-amber-500/40 bg-amber-500/10',
+    statusColor: 'text-amber-500 border-amber-500/40 bg-amber-500/10',
   },
   {
     pctRange: [25, 49],
@@ -48,7 +50,7 @@ const ETAPAS_IGNICAO: StepMessage[] = [
     mensagem: 'Sincronizando frota ativa e viaturas de emergência...',
     subtexto: 'Verificação de licenças, seguros e prefixos operacionais',
     icone: Radio,
-    statusColor: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10',
+    statusColor: 'text-cyan-500 border-cyan-500/40 bg-cyan-500/10',
   },
   {
     pctRange: [50, 74],
@@ -56,7 +58,7 @@ const ETAPAS_IGNICAO: StepMessage[] = [
     mensagem: 'Buscando postos homologados e preços em tempo real...',
     subtexto: 'Cálculo de variação econômica e ranking regional de Diesel S10',
     icone: Fuel,
-    statusColor: 'text-blue-400 border-blue-500/40 bg-blue-500/10',
+    statusColor: 'text-blue-500 border-blue-500/40 bg-blue-500/10',
   },
   {
     pctRange: [75, 94],
@@ -64,7 +66,7 @@ const ETAPAS_IGNICAO: StepMessage[] = [
     mensagem: 'Auditando ciclos de calibração de pneus e índice TWI...',
     subtexto: 'Conferência da janela de 15 dias e sulcos mínimos legais NBR/CONTRAN',
     icone: Disc,
-    statusColor: 'text-rose-400 border-rose-500/40 bg-rose-500/10',
+    statusColor: 'text-rose-500 border-rose-500/40 bg-rose-500/10',
   },
   {
     pctRange: [95, 100],
@@ -72,7 +74,7 @@ const ETAPAS_IGNICAO: StepMessage[] = [
     mensagem: 'Terminal operacional de abastecimento liberado com sucesso!',
     subtexto: 'Sessão segura autorizada para condutores e socorristas',
     icone: ShieldCheck,
-    statusColor: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
+    statusColor: 'text-emerald-500 border-emerald-500/40 bg-emerald-500/10',
   },
 ];
 
@@ -82,43 +84,24 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
   autoStart = true,
   minDurationMs = 2800,
   skipable = true,
+  theme = 'dark',
 }) => {
+  const isDark = theme === 'dark';
   const [progress, setProgress] = useState(0);
-  const [isAudioMuted, setIsAudioMuted] = useState(false);
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(() => engineAudioEngine.isMuted());
   const [isCompleted, setIsCompleted] = useState(false);
-  const audioCtxRef = useRef<AudioContext | null>(null);
 
-  const playBeep = (freq: number, type: OscillatorType = 'sine', duration = 0.08) => {
-    if (isAudioMuted || typeof window === 'undefined') return;
-    try {
-      if (!audioCtxRef.current) {
-        const AudioCtx =
-          window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        audioCtxRef.current = new AudioCtx();
-      }
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-      gain.gain.setValueAtTime(0.04, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch {
-      // Audio fallback
-    }
+  const toggleMute = () => {
+    const nextMute = !isAudioMuted;
+    setIsAudioMuted(nextMute);
+    engineAudioEngine.setMuted(nextMute);
   };
 
   useEffect(() => {
     if (!autoStart) return;
+
+    // Inicia o motor sonoro de aceleração
+    engineAudioEngine.start();
 
     let startTimestamp: number | null = null;
     let animationFrameId: number;
@@ -128,6 +111,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
       const elapsed = timestamp - startTimestamp;
       const linearPct = Math.min(elapsed / minDurationMs, 1);
 
+      // Curva suave de aceleração veicular (ease-in-out)
       const easedPct =
         linearPct < 0.5
           ? 2 * linearPct * linearPct
@@ -136,16 +120,16 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
       const currentVal = Math.floor(easedPct * 100);
       setProgress(currentVal);
 
-      if (currentVal === 25 || currentVal === 50 || currentVal === 75) {
-        playBeep(440, 'triangle', 0.05);
-      }
+      // Atualiza o motor sonoro Web Audio API modulando a rotação de RPM
+      engineAudioEngine.updateProgress(currentVal);
 
       if (linearPct < 1) {
         animationFrameId = requestAnimationFrame(step);
       } else {
         setProgress(100);
         setIsCompleted(true);
-        playBeep(880, 'sine', 0.18);
+        // Desaceleração suave ao atingir 100%
+        engineAudioEngine.stop(0.35);
         setTimeout(() => {
           onComplete?.();
         }, 600);
@@ -153,7 +137,10 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
     };
 
     animationFrameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animationFrameId);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      engineAudioEngine.stop(0.1);
+    };
   }, [autoStart, minDurationMs, onComplete]);
 
   const currentStep = useMemo(() => {
@@ -181,18 +168,33 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
   const handleSkip = () => {
     setProgress(100);
     setIsCompleted(true);
-    playBeep(880, 'sine', 0.15);
+    engineAudioEngine.stop(0.2);
     setTimeout(() => onComplete?.(), 200);
   };
 
   const IconeEtapa = currentStep.icone;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col justify-between bg-zinc-950 text-zinc-100 font-sans select-none overflow-hidden pb-safe pt-safe">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-950/30 via-zinc-950 to-black pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+    <div className={`fixed inset-0 z-[9999] flex flex-col justify-between font-sans select-none overflow-hidden pb-safe pt-safe transition-colors duration-300 ${
+      isDark ? 'bg-zinc-950 text-zinc-100' : 'bg-slate-100 text-slate-900'
+    }`}>
+      {/* Background Bitemático */}
+      {isDark ? (
+        <>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-950/30 via-zinc-950 to-black pointer-events-none" />
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200 via-slate-100 to-slate-200 pointer-events-none" />
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
+        </>
+      )}
 
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-zinc-900/80 bg-zinc-950/60 backdrop-blur-md">
+      {/* Header do Cluster */}
+      <header className={`relative z-10 flex items-center justify-between px-6 py-4 border-b backdrop-blur-md transition-colors ${
+        isDark ? 'border-zinc-900/80 bg-zinc-950/60' : 'border-slate-200 bg-white/80'
+      }`}>
         <div className="flex items-center gap-3">
           <div className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
           <div>
@@ -200,31 +202,46 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
               <span className="text-[11px] font-black tracking-widest uppercase text-red-500">
                 SPCI // FLEET CLUSTER
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-md font-mono font-bold bg-zinc-900 border border-zinc-800 text-zinc-300">
+              <span className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-bold border ${
+                isDark ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-slate-100 border-slate-300 text-slate-700'
+              }`}>
                 SITE: {contratoNome}
               </span>
             </div>
-            <p className="text-[10px] text-zinc-500 tracking-wider">
+            <p className={`text-[10px] tracking-wider ${isDark ? 'text-zinc-500' : 'text-slate-500'}`}>
               TERMINAL ELETRÔNICO DE CAMPO V2.11
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Botão de Som Realista do Motor */}
           <button
             type="button"
-            onClick={() => setIsAudioMuted(!isAudioMuted)}
-            className="p-2 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
-            title={isAudioMuted ? 'Ativar Áudio de Telemetria' : 'Silenciar'}
+            onClick={toggleMute}
+            className={`p-2 rounded-xl border transition-all cursor-pointer ${
+              isDark 
+                ? 'bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-400 hover:text-zinc-200' 
+                : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-600 hover:text-slate-900 shadow-xs'
+            }`}
+            title={isAudioMuted ? 'Ativar Som Realista do Motor (Web Audio API)' : 'Silenciar Motor'}
           >
-            {isAudioMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+            {isAudioMuted ? (
+              <VolumeX className="w-4 h-4 text-slate-400" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-emerald-500 animate-pulse" />
+            )}
           </button>
 
           {skipable && !isCompleted && (
             <button
               type="button"
               onClick={handleSkip}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-xs font-semibold text-zinc-400 hover:text-white transition-all active:scale-95"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all active:scale-95 cursor-pointer ${
+                isDark
+                  ? 'bg-zinc-900/80 hover:bg-zinc-800 border-zinc-800 text-zinc-400 hover:text-white'
+                  : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-950 shadow-xs'
+              }`}
             >
               <span>Pular</span>
               <FastForward className="w-3.5 h-3.5" />
@@ -233,8 +250,10 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
         </div>
       </header>
 
+      {/* Mostrador Central (Velocímetro / Can Gauge) */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4">
         <div className="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center">
+          {/* Ticks Perimetrais */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {ticks.map(({ angle, isMajor, index }) => (
               <div
@@ -246,7 +265,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
                   className={`rounded-full transition-colors duration-300 ${
                     progress >= (index / 24) * 100
                       ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
-                      : 'bg-zinc-800'
+                      : isDark ? 'bg-zinc-800' : 'bg-slate-300'
                   } ${isMajor ? 'h-3.5 w-1' : 'h-2 w-0.5'}`}
                 />
               </div>
@@ -269,12 +288,13 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
               </filter>
             </defs>
 
+            {/* Trilha do Mostrador */}
             <circle
               cx="120"
               cy="120"
               r={radius}
               fill="none"
-              stroke="#27272a"
+              stroke={isDark ? '#27272a' : '#cbd5e1'}
               strokeWidth={strokeWidth}
               strokeDasharray={`${arcLength} ${circumference}`}
               strokeDashoffset="0"
@@ -282,6 +302,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
               className="origin-center transform rotate-[150deg]"
             />
 
+            {/* Arco Ativo com Brilho em Gradiente */}
             <circle
               cx="120"
               cy="120"
@@ -297,66 +318,81 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
             />
           </svg>
 
+          {/* Dados Centrais */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">
-              TELEMETRIA CAN
+            <span className={`text-[11px] font-mono tracking-widest uppercase ${
+              isDark ? 'text-zinc-500' : 'text-slate-400'
+            }`}>
+              RPM / TELEMETRIA
             </span>
 
             <div className="flex items-baseline justify-center">
-              <span className="text-6xl sm:text-7xl font-black font-mono tracking-tighter text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+              <span className={`text-6xl sm:text-7xl font-black font-mono tracking-tighter drop-shadow-md ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>
                 {progress}
               </span>
               <span className="text-2xl font-black text-red-500 font-mono ml-1">%</span>
             </div>
 
             <div className="flex items-center gap-1 mt-1">
-              <span className="text-[10px] font-mono text-zinc-400">0</span>
-              <div className="w-20 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 p-0.5">
+              <span className={`text-[10px] font-mono ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>0</span>
+              <div className={`w-20 h-1.5 rounded-full overflow-hidden border p-0.5 ${
+                isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-slate-200 border-slate-300'
+              }`}>
                 <div
                   className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 rounded-full transition-all duration-75"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <span className="text-[10px] font-mono text-zinc-400">MAX</span>
+              <span className={`text-[10px] font-mono ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>MAX</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-5 sm:gap-7 mt-4 px-5 py-2.5 rounded-2xl bg-zinc-900/60 border border-zinc-800/80 backdrop-blur-md">
+        {/* Caixas de Telemetria de Bordo */}
+        <div className={`flex items-center gap-5 sm:gap-7 mt-4 px-5 py-2.5 rounded-2xl border backdrop-blur-md shadow-lg ${
+          isDark ? 'bg-zinc-900/60 border-zinc-800/80 text-zinc-100' : 'bg-white border-slate-300 text-slate-900 shadow-slate-200/60'
+        }`}>
           <div className="flex flex-col items-center gap-1" title="Injeção Eletrônica / ECM">
-            <Cpu className={`w-4 h-4 transition-all duration-300 ${progress < 30 ? 'text-zinc-700' : 'text-amber-500 animate-pulse drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]'}`} />
-            <span className="text-[9px] font-mono text-zinc-600 font-bold">ECM</span>
+            <Cpu className={`w-4 h-4 transition-all duration-300 ${progress < 30 ? 'text-zinc-400' : 'text-amber-500 animate-pulse drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]'}`} />
+            <span className="text-[9px] font-mono font-bold opacity-75">ECM</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Tensão de Carga 14.2V">
             <BatteryCharging className={`w-4 h-4 transition-all duration-300 ${progress < 50 ? 'text-red-500' : 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]'}`} />
-            <span className="text-[9px] font-mono text-zinc-600 font-bold">14.2V</span>
+            <span className="text-[9px] font-mono font-bold opacity-75">14.2V</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Sistema TPMS / TWI">
-            <Disc className={`w-4 h-4 transition-all duration-300 ${progress < 80 ? 'text-zinc-700' : 'text-emerald-500 animate-bounce drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]'}`} />
-            <span className="text-[9px] font-mono text-zinc-600 font-bold">TPMS</span>
+            <Disc className={`w-4 h-4 transition-all duration-300 ${progress < 80 ? 'text-zinc-400' : 'text-emerald-500 animate-bounce drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]'}`} />
+            <span className="text-[9px] font-mono font-bold opacity-75">TPMS</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Telemetria de Posicionamento">
-            <Satellite className={`w-4 h-4 transition-all duration-300 ${progress < 70 ? 'text-zinc-700' : 'text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
-            <span className="text-[9px] font-mono text-zinc-600 font-bold">GPS</span>
+            <Satellite className={`w-4 h-4 transition-all duration-300 ${progress < 70 ? 'text-zinc-400' : 'text-cyan-500 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
+            <span className="text-[9px] font-mono font-bold opacity-75">GPS</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Estado Operacional">
             {isCompleted ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 animate-pulse" />
             ) : (
-              <AlertTriangle className="w-4 h-4 text-zinc-700" />
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
             )}
-            <span className="text-[9px] font-mono text-zinc-600 font-bold">READY</span>
+            <span className="text-[9px] font-mono font-bold opacity-75">READY</span>
           </div>
         </div>
       </main>
 
-      <footer className="relative z-10 px-6 py-6 border-t border-zinc-900/80 bg-zinc-950/80 backdrop-blur-xl">
+      {/* Rodapé com Card Informativo de Status */}
+      <footer className={`relative z-10 px-6 py-6 border-t backdrop-blur-xl transition-colors ${
+        isDark ? 'border-zinc-900/80 bg-zinc-950/80' : 'border-slate-200 bg-white/90'
+      }`}>
         <div className="max-w-md mx-auto space-y-3">
-          <div className="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 shadow-xl transition-all duration-300">
+          <div className={`p-4 rounded-2xl border shadow-xl transition-all duration-300 ${
+            isDark ? 'bg-zinc-900/90 border-zinc-800 text-zinc-100' : 'bg-white border-slate-200 text-slate-900 shadow-slate-200/50'
+          }`}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <span
@@ -365,26 +401,32 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
                   <IconeEtapa className="w-3 h-3" />
                   {currentStep.tag}
                 </span>
-                <span className="text-[10px] font-mono text-zinc-500">
+                <span className={`text-[10px] font-mono ${isDark ? 'text-zinc-500' : 'text-slate-400'}`}>
                   PASSO {ETAPAS_IGNICAO.findIndex((e) => e.tag === currentStep.tag) + 1} DE 5
                 </span>
               </div>
-              <span className="text-xs font-mono font-bold text-zinc-400">
+              <span className={`text-xs font-mono font-bold ${isDark ? 'text-zinc-400' : 'text-slate-600'}`}>
                 {progress}%
               </span>
             </div>
 
-            <p className="text-sm font-semibold text-zinc-100 tracking-tight leading-snug">
+            <p className={`text-sm font-semibold tracking-tight leading-snug ${
+              isDark ? 'text-zinc-100' : 'text-slate-900'
+            }`}>
               {currentStep.mensagem}
               <span className="inline-block w-1.5 h-3.5 ml-1 bg-red-500 animate-pulse" />
             </p>
 
-            <p className="text-xs text-zinc-500 mt-1 font-mono leading-relaxed truncate">
+            <p className={`text-xs mt-1 font-mono leading-relaxed truncate ${
+              isDark ? 'text-zinc-500' : 'text-slate-500'
+            }`}>
               {currentStep.subtexto}
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-zinc-600 font-mono px-1">
+          <div className={`flex items-center justify-between text-[11px] font-mono px-1 ${
+            isDark ? 'text-zinc-600' : 'text-slate-500'
+          }`}>
             <span>&copy; SPCI FROTA MASTER 2026</span>
             <span>STATUS: {isCompleted ? 'ONLINE' : 'BOOTING...'}</span>
           </div>

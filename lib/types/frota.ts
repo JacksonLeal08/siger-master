@@ -65,6 +65,8 @@ export interface Viatura {
   tipo_veiculo: TipoVeiculo;
   marca: string;
   modelo: string;
+  marca_modelo_crlv?: string | null;
+  modelo_plano_chave?: string | null;
   ano_fabricacao?: number | null;
   tipo_combustivel: TipoCombustivel;
   odometro_atual_km: number;
