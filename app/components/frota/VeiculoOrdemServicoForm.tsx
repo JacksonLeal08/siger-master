@@ -107,6 +107,7 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
         descricao_servico: `[Abertura Mobile via Terminal] Solicitante: ${solicitanteNome.trim() || 'Motorista Operacional'}\nRelato: ${descricao.trim()}`,
         status: 'ABERTA',
         oficina_id: tipoOs === 'EXTERNA' ? oficinaId : null,
+        comprovantes_urls: fotoEvidencia ? [fotoEvidencia] : [],
         data_abertura: new Date().toISOString()
       };
 

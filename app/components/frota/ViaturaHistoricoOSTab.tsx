@@ -25,11 +25,15 @@ import {
 interface ViaturaHistoricoOSTabProps {
   viatura: Viatura;
   contratoId: string;
+  onEditOs?: (os: OrdemServicoFrota) => void;
+  onNewOs?: () => void;
 }
 
 export const ViaturaHistoricoOSTab: React.FC<ViaturaHistoricoOSTabProps> = ({
   viatura,
-  contratoId
+  contratoId,
+  onEditOs,
+  onNewOs
 }) => {
   const [ordens, setOrdens] = useState<OrdemServicoFrota[]>([]);
   const [loading, setLoading] = useState(true);
@@ -150,7 +154,7 @@ export const ViaturaHistoricoOSTab: React.FC<ViaturaHistoricoOSTabProps> = ({
           />
         </div>
 
-        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end flex-wrap">
           <span className="text-[10px] font-mono text-slate-400 uppercase mr-1">Tipo:</span>
           {(['TODOS', 'PREVENTIVA', 'CORRETIVA'] as const).map(tipo => (
             <button
@@ -166,6 +170,17 @@ export const ViaturaHistoricoOSTab: React.FC<ViaturaHistoricoOSTabProps> = ({
               {tipo === 'TODOS' ? 'Todas' : tipo}
             </button>
           ))}
+
+          {onNewOs && (
+            <button
+              type="button"
+              onClick={onNewOs}
+              className="ml-2 px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1 transition-all shadow-xs cursor-pointer active:scale-95"
+            >
+              <Wrench className="w-3 h-3" />
+              <span>+ Nova O.S.</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -277,6 +292,17 @@ export const ViaturaHistoricoOSTab: React.FC<ViaturaHistoricoOSTabProps> = ({
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {onEditOs && (
+                      <button
+                        type="button"
+                        onClick={() => onEditOs(os)}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-all cursor-pointer shadow-2xs active:scale-95"
+                      >
+                        <Wrench className="w-3 h-3" />
+                        <span>Gerenciar</span>
+                      </button>
+                    )}
+
                     {os.romaneio_pdf_url && (
                       <a
                         href={os.romaneio_pdf_url}

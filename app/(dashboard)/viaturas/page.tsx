@@ -19,7 +19,8 @@ import {
   getFrotaKpisAction, 
   listInspecoesPneusAction,
   listAbastecimentosAction,
-  listOficinasAction
+  listOficinasAction,
+  listOrdensServicoAction
 } from '@/app/actions/frotaActions';
 import { MaintenancePlanEngine } from '@/lib/maintenancePlanEngine';
 import { TwiEducationalCard } from '@/app/components/frota/TwiEducationalCard';
@@ -31,6 +32,7 @@ import { OrdemServicoModal } from '@/app/components/frota/OrdemServicoModal';
 import { OficinaModal } from '@/app/components/frota/OficinaModal';
 import { TerminalMobileShareModal } from '@/app/components/frota/TerminalMobileShareModal';
 import { ChecklistsFrotaTab } from '@/app/components/frota/ChecklistsFrotaTab';
+import { OrdensServicoFrotaTab } from '@/app/components/frota/OrdensServicoFrotaTab';
 import { FrotaDockBar, MinimizedWindow } from '@/app/components/frota/FrotaDockBar';
 import { 
   Truck, 
@@ -85,13 +87,14 @@ export default function ViaturasPage() {
   }, [activeSite, userProfile]);
 
   // Aba Ativa Principal
-  const [activeTab, setActiveTab] = useState<'painel' | 'mapa' | 'abastecimentos' | 'oficinas' | 'checklists'>('painel');
+  const [activeTab, setActiveTab] = useState<'painel' | 'mapa' | 'abastecimentos' | 'ordens_servico' | 'oficinas' | 'checklists'>('painel');
 
   // Estados de Dados
   const [viaturas, setViaturas] = useState<Viatura[]>([]);
   const [kpis, setKpis] = useState<FrotaKpisSummary | null>(null);
   const [abastecimentos, setAbastecimentos] = useState<Abastecimento[]>([]);
   const [oficinas, setOficinas] = useState<OficinaPrestador[]>([]);
+  const [ordensServico, setOrdensServico] = useState<OrdemServicoFrota[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filtros
@@ -109,6 +112,7 @@ export default function ViaturasPage() {
 
   const [isOsModalOpen, setIsOsModalOpen] = useState(false);
   const [selectedViaturaForOs, setSelectedViaturaForOs] = useState<Viatura | null>(null);
+  const [selectedOsForEdit, setSelectedOsForEdit] = useState<OrdemServicoFrota | null>(null);
 
   const [isOficinaModalOpen, setIsOficinaModalOpen] = useState(false);
   const [selectedOficinaForEdit, setSelectedOficinaForEdit] = useState<OficinaPrestador | null>(null);
@@ -127,17 +131,19 @@ export default function ViaturasPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [vRes, kRes, aRes, oRes] = await Promise.all([
+      const [vRes, kRes, aRes, oRes, osRes] = await Promise.all([
         listViaturasAction(currentContratoId),
         getFrotaKpisAction(currentContratoId),
         listAbastecimentosAction(undefined, currentContratoId),
-        listOficinasAction(currentContratoId)
+        listOficinasAction(currentContratoId),
+        listOrdensServicoAction(currentContratoId)
       ]);
 
       if (vRes.success && vRes.data) setViaturas(vRes.data);
       if (kRes.success && kRes.data) setKpis(kRes.data);
       if (aRes.success && aRes.data) setAbastecimentos(aRes.data);
       if (oRes.success && oRes.data) setOficinas(oRes.data);
+      if (osRes.success && osRes.data) setOrdensServico(osRes.data);
     } catch (err) {
       console.error('Erro ao carregar dados da frota:', err);
     } finally {
@@ -332,6 +338,18 @@ export default function ViaturasPage() {
         >
           <Fuel className="w-4 h-4 text-amber-500" />
           Abastecimentos & Postos ({abastecimentos.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('ordens_servico')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'ordens_servico'
+              ? 'bg-red-600 text-white shadow-md'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Wrench className="w-4 h-4 text-orange-500" />
+          Ordens de Serviço ({ordensServico.length})
         </button>
 
         <button
@@ -603,6 +621,27 @@ export default function ViaturasPage() {
         </div>
       )}
 
+      {/* ABA: ORDENS DE SERVIÇO & RATEIO DE CUSTOS */}
+      {activeTab === 'ordens_servico' && (
+        <OrdensServicoFrotaTab
+          ordensServico={ordensServico}
+          viaturas={viaturas}
+          oficinas={oficinas}
+          onOpenNovaOs={() => {
+            setSelectedOsForEdit(null);
+            setSelectedViaturaForOs(null);
+            setIsOsModalOpen(true);
+          }}
+          onEditOs={(os) => {
+            setSelectedOsForEdit(os);
+            const v = viaturas.find(x => x.id === os.viatura_id) || null;
+            setSelectedViaturaForOs(v);
+            setIsOsModalOpen(true);
+          }}
+          onRefresh={loadData}
+        />
+      )}
+
       {/* ABA 4: OFICINAS CREDENCIADAS */}
       {activeTab === 'oficinas' && (
         <div className="space-y-4">
@@ -731,6 +770,17 @@ export default function ViaturasPage() {
           loadData();
           triggerSuccessNotification('Viatura Salva!', `Prefixo ${saved.prefixo_frota} atualizado com sucesso.`);
         }}
+        onEditOs={(os) => {
+          setSelectedOsForEdit(os);
+          const v = viaturas.find(x => x.id === os.viatura_id) || selectedViaturaForEdit;
+          setSelectedViaturaForOs(v);
+          setIsOsModalOpen(true);
+        }}
+        onNewOs={(v) => {
+          setSelectedOsForEdit(null);
+          setSelectedViaturaForOs(v);
+          setIsOsModalOpen(true);
+        }}
       />
 
       {/* Modal: Abastecimento Padronizado com ModalBaseCorporativo */}
@@ -751,21 +801,25 @@ export default function ViaturasPage() {
       )}
 
       {/* Modal: Ordem de Serviço */}
-      {selectedViaturaForOs && (
-        <OrdemServicoModal
-          isOpen={isOsModalOpen}
-          viatura={selectedViaturaForOs}
-          contratoId={currentContratoId}
-          onClose={() => setIsOsModalOpen(false)}
-          onMinimize={() => {
-            handleMinimizeWindow('ordem_servico', `OS ${selectedViaturaForOs.prefixo_frota}`, 'modal_os');
-          }}
-          onSuccess={() => {
-            loadData();
-            triggerSuccessNotification('Ordem de Serviço Salva!', 'Encaminhamento e histórico operacional atualizados.');
-          }}
-        />
-      )}
+      <OrdemServicoModal
+        isOpen={isOsModalOpen}
+        viatura={selectedViaturaForOs}
+        viaturas={viaturas}
+        contratoId={currentContratoId}
+        osToEdit={selectedOsForEdit}
+        onClose={() => {
+          setIsOsModalOpen(false);
+          setSelectedOsForEdit(null);
+          setSelectedViaturaForOs(null);
+        }}
+        onMinimize={() => {
+          handleMinimizeWindow('ordem_servico', `OS ${selectedViaturaForOs?.prefixo_frota || selectedOsForEdit?.numero_os || 'Frota'}`, 'modal_os');
+        }}
+        onSuccess={() => {
+          loadData();
+          triggerSuccessNotification('Ordem de Serviço Salva!', 'Encaminhamento e rateio de custos registrados.');
+        }}
+      />
 
       {/* Modal: Oficina Credenciada */}
       <OficinaModal

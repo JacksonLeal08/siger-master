@@ -411,17 +411,29 @@ export async function listOrdensServicoAction(
     if (error) throw error;
 
     // Normaliza campos para interoperabilidade
-    const normalized = (data || []).map((os: any) => ({
-      ...os,
-      tipo_manutencao: os.tipo_manutencao || os.natureza_manutencao || 'PREVENTIVA',
-      natureza_manutencao: os.natureza_manutencao || os.tipo_manutencao || 'PREVENTIVA',
-      origem_execucao: os.origem_execucao || (os.tipo_os === 'EXTERNA' ? 'EXTERNA_CREDENCIADA' : 'INTERNA_BRIGADA'),
-      tipo_os: os.tipo_os || (os.origem_execucao === 'EXTERNA_CREDENCIADA' ? 'EXTERNA' : 'INTERNA'),
-      descricao_motivo: os.descricao_motivo || os.descricao_servico || '',
-      descricao_servico: os.descricao_servico || os.descricao_motivo || '',
-      status_os: os.status_os || os.status || 'ABERTA',
-      status: os.status || os.status_os || 'ABERTA'
-    }));
+    const normalized = (data || []).map((os: any) => {
+      const cPecas = Number(os.custo_pecas || 0);
+      const cMao = Number(os.custo_mao_de_obra || 0);
+      const cPneus = Number(os.custo_pneus || 0);
+      const cTotal = Number(os.custo_total || (cPecas + cMao + cPneus));
+      return {
+        ...os,
+        tipo_manutencao: os.tipo_manutencao || os.natureza_manutencao || 'PREVENTIVA',
+        natureza_manutencao: os.natureza_manutencao || os.tipo_manutencao || 'PREVENTIVA',
+        origem_execucao: os.origem_execucao || (os.tipo_os === 'EXTERNA' ? 'EXTERNA_CREDENCIADA' : 'INTERNA_BRIGADA'),
+        tipo_os: os.tipo_os || (os.origem_execucao === 'EXTERNA_CREDENCIADA' ? 'EXTERNA' : 'INTERNA'),
+        descricao_motivo: os.descricao_motivo || os.descricao_servico || '',
+        descricao_servico: os.descricao_servico || os.descricao_motivo || '',
+        status_os: os.status_os || os.status || 'ABERTA',
+        status: os.status || os.status_os || 'ABERTA',
+        custo_pecas: cPecas,
+        custo_mao_de_obra: cMao,
+        custo_pneus: cPneus,
+        custo_total: cTotal,
+        orcamentos_json: Array.isArray(os.orcamentos_json) ? os.orcamentos_json : [],
+        notas_fiscais_json: Array.isArray(os.notas_fiscais_json) ? os.notas_fiscais_json : []
+      };
+    });
 
     return { success: true, data: normalized as OrdemServicoFrota[] };
   } catch (err: any) {
@@ -433,26 +445,47 @@ export async function listOrdensServicoAction(
 export async function saveOrdemServicoAction(os: Partial<OrdemServicoFrota>): Promise<{ success: boolean; data?: OrdemServicoFrota; error?: string }> {
   try {
     const supabase = getSupabaseAdminClient();
+    
+    // Normaliza status
+    const statusFinal = os.status_os || os.status || 'ABERTA';
+    const custoPecas = Number(os.custo_pecas || 0);
+    const custoMaoDeObra = Number(os.custo_mao_de_obra || 0);
+    const custoPneus = Number(os.custo_pneus || 0);
+    const custoTotal = Number(os.custo_total || (custoPecas + custoMaoDeObra + custoPneus));
+
     const payload = {
       ...os,
       numero_os: os.numero_os || `OS-${Date.now().toString().slice(-6)}`,
-      contrato_id: os.contrato_id || 'ONÇA PUMA'
+      contrato_id: os.contrato_id || 'ONÇA PUMA',
+      status: statusFinal,
+      status_os: statusFinal,
+      custo_pecas: custoPecas,
+      custo_mao_de_obra: custoMaoDeObra,
+      custo_pneus: custoPneus,
+      custo_total: custoTotal,
+      orcamentos_json: os.orcamentos_json || [],
+      notas_fiscais_json: os.notas_fiscais_json || [],
+      data_conclusao: (statusFinal === 'CONCLUIDA' && !os.data_conclusao) ? new Date().toISOString() : os.data_conclusao
     };
 
     const { data, error } = await supabase
       .from('ordens_servico_frota')
       .upsert(payload)
-      .select('*')
+      .select('*, viatura:viaturas(*), oficina:oficinas_prestadores(*)')
       .single();
 
     if (error) throw error;
 
     // Atualiza status da viatura se em oficina externa ou manutenção
-    if (os.viatura_id && os.status === 'EM_ANDAMENTO') {
-      const novoStatus = os.tipo_os === 'EXTERNA' ? 'EM_OFICINA_EXTERNA' : 'EM_MANUTENCAO_INTERNA';
-      await supabase.from('viaturas').update({ status_operacional: novoStatus }).eq('id', os.viatura_id);
-    } else if (os.viatura_id && os.status === 'CONCLUIDA') {
-      await supabase.from('viaturas').update({ status_operacional: 'DISPONIVEL' }).eq('id', os.viatura_id);
+    if (os.viatura_id) {
+      if (statusFinal === 'EM_EXECUCAO' || statusFinal === 'EM_ANDAMENTO') {
+        const novoStatus = os.tipo_os === 'EXTERNA' || os.origem_execucao === 'EXTERNA_CREDENCIADA' 
+          ? 'EM_OFICINA_EXTERNA' 
+          : 'EM_MANUTENCAO_INTERNA';
+        await supabase.from('viaturas').update({ status_operacional: novoStatus }).eq('id', os.viatura_id);
+      } else if (statusFinal === 'CONCLUIDA') {
+        await supabase.from('viaturas').update({ status_operacional: 'DISPONIVEL' }).eq('id', os.viatura_id);
+      }
     }
 
     return { success: true, data: data as OrdemServicoFrota };

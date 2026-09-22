@@ -38,6 +38,9 @@ export type StatusTwi =
 
 export type StatusOrdemServico = 
   | 'ABERTA' 
+  | 'EM_ORCAMENTO' 
+  | 'APROVADA' 
+  | 'EM_EXECUCAO' 
   | 'EM_ANDAMENTO' 
   | 'AGUARDANDO_PECAS' 
   | 'CONCLUIDA' 
@@ -120,6 +123,26 @@ export interface ItemChecklistOs {
   observacao?: string;
 }
 
+export interface NotaFiscalAnexo {
+  id: string;
+  tipo: 'SERVICO' | 'PECA' | 'PNEU' | 'GERAL';
+  numero_nf: string;
+  valor: number;
+  url: string;
+  nome_arquivo: string;
+  data_upload?: string;
+}
+
+export interface DocumentoAnexo {
+  id: string;
+  tipo: 'ORCAMENTO' | 'LAUDO' | 'OUTRO';
+  titulo: string;
+  valor_estimado?: number;
+  url: string;
+  nome_arquivo: string;
+  data_upload?: string;
+}
+
 export interface OrdemServicoFrota {
   id: string;
   contrato_id: string;
@@ -132,6 +155,7 @@ export interface OrdemServicoFrota {
   descricao_servico: string;
   custo_pecas: number;
   custo_mao_de_obra: number;
+  custo_pneus?: number;
   custo_total?: number;
   status: StatusOrdemServico;
   itens_checklist: ItemChecklistOs[];
@@ -139,17 +163,21 @@ export interface OrdemServicoFrota {
   responsavel_abertura?: string | null;
   data_abertura: string;
   data_conclusao?: string | null;
+  data_aprovacao?: string | null;
+  responsavel_aprovacao?: string | null;
   created_at?: string;
   updated_at?: string;
 
-  // Campos de compatibilidade para Histórico Completo de Manutenções
+  // Campos de compatibilidade para Histórico Completo de Manutenções & Rateio
   tipo_manutencao?: 'PREVENTIVA' | 'CORRETIVA';
   origem_execucao?: 'INTERNA_BRIGADA' | 'EXTERNA_CREDENCIADA';
   descricao_motivo?: string;
   servicos_executados?: string;
   pecas_substituidas_json?: Array<{ peca: string; quantidade: number; valor_unitario?: number }>;
   comprovantes_urls?: string[];
-  status_os?: 'ABERTA' | 'EM_EXECUCAO' | 'CONCLUIDA' | 'CANCELADA' | string;
+  orcamentos_json?: DocumentoAnexo[];
+  notas_fiscais_json?: NotaFiscalAnexo[];
+  status_os?: 'ABERTA' | 'EM_ORCAMENTO' | 'APROVADA' | 'EM_EXECUCAO' | 'CONCLUIDA' | 'CANCELADA' | string;
 
   // Relações em tempo de execução
   viatura?: Viatura;

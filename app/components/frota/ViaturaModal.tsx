@@ -5,7 +5,8 @@ import {
   Viatura, 
   TipoVeiculo, 
   TipoCombustivel, 
-  StatusOperacionalViatura 
+  StatusOperacionalViatura,
+  OrdemServicoFrota
 } from '@/lib/types/frota';
 import { saveViaturaAction } from '@/app/actions/frotaActions';
 import { soundNotificationService } from '@/lib/soundNotificationService';
@@ -32,6 +33,8 @@ interface ViaturaModalProps {
   onClose: () => void;
   onMinimize?: () => void;
   onSuccess: (saved: Viatura) => void;
+  onEditOs?: (os: OrdemServicoFrota) => void;
+  onNewOs?: (viatura: Viatura) => void;
 }
 
 export const ViaturaModal: React.FC<ViaturaModalProps> = ({
@@ -39,7 +42,9 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   viaturaToEdit,
   contratoId,
   onClose,
-  onSuccess
+  onSuccess,
+  onEditOs,
+  onNewOs
 }) => {
   const [modalSubTab, setModalSubTab] = useState<'DADOS' | 'HISTORICO_OS'>('DADOS');
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -275,7 +280,12 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       )}
 
       {modalSubTab === 'HISTORICO_OS' && viaturaToEdit ? (
-        <ViaturaHistoricoOSTab viatura={viaturaToEdit} contratoId={contratoId} />
+        <ViaturaHistoricoOSTab 
+          viatura={viaturaToEdit} 
+          contratoId={contratoId}
+          onEditOs={onEditOs}
+          onNewOs={onNewOs ? () => onNewOs(viaturaToEdit) : undefined}
+        />
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5 font-sans">
           {errorMsg && (
