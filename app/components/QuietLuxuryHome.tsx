@@ -59,16 +59,16 @@ export default function QuietLuxuryHome() {
           {/* Logo & Brand Mark */}
           <div className="flex items-center gap-4">
             <Image 
-              src="/logo-omg.png" 
-              alt="Logo Grupo OMG" 
-              width={140}
-              height={40}
+              src="/assets/branding/logo-jimmp-info.png" 
+              alt="Logo JIMMP Info" 
+              width={160}
+              height={44}
               priority
-              className="h-10 w-auto object-contain filter drop-shadow-sm transition-transform hover:scale-105" 
+              className="h-10 w-auto object-contain filter drop-shadow-sm transition-transform hover:scale-105 hover:drop-shadow-[0_0_12px_rgba(104,211,70,0.55)]" 
             />
             <div className="border-l border-slate-200 dark:border-slate-800 pl-4 py-1 hidden sm:block">
-              <span className="text-[9px] font-black text-red-600 dark:text-red-500 tracking-[0.25em] block uppercase leading-none">PLATAFORMA</span>
-              <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SPCI MASTER</span>
+              <span className="text-[9px] font-black text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA</span>
+              <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
             </div>
           </div>
 
@@ -476,15 +476,15 @@ export default function QuietLuxuryHome() {
           Pronto para Elevar a Segurança da sua Planta?
         </h2>
         <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-sans max-w-xl mx-auto leading-relaxed">
-          Acesse o Cockpit SPCI Master com suas credenciais corporativas e gerencie todo o parque de combate a incêndio com alto padrão de governança.
+          Acesse o Cockpit SIGER Master com suas credenciais corporativas e gerencie todo o parque de emergência, combate e frota com alto padrão de governança.
         </p>
         <div>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-3 px-10 py-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-xl transition-all duration-300 active:scale-95 border-none"
+            className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#282A2F] to-[#1E2024] hover:from-[#3C3F45] hover:to-[#282A2F] text-white border border-[#68D346]/40 hover:border-[#68D346] font-black text-xs uppercase tracking-widest rounded-xl shadow-[0_0_15px_rgba(104,211,70,0.2)] hover:shadow-[0_0_25px_rgba(104,211,70,0.4)] transition-all duration-300 active:scale-95"
           >
-            <span>ENTRAR NO SISTEMA SPCI</span>
-            <ArrowRight className="w-4 h-4" />
+            <span className="text-[#68D346]">ENTRAR NO COCKPIT SIGER</span>
+            <ArrowRight className="w-4 h-4 text-[#68D346]" />
           </Link>
         </div>
       </section>
@@ -494,8 +494,8 @@ export default function QuietLuxuryHome() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
           <div className="space-y-3 md:col-span-2">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-black tracking-widest text-red-600 dark:text-red-500 uppercase">SISTEMA SPCI</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">Master v2.0</span>
+              <span className="font-mono text-xs font-black tracking-widest text-[#68D346] uppercase">SIGER MASTER</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#68D346] border border-[#68D346]/30 font-mono">v2.5 • JIMMP Info</span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">
               Plataforma de inteligência e governança operacional para Sistemas de Proteção Contra Incêndio, assegurando conformidade com normas técnicas e prontidão operacional contínua.

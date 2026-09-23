@@ -325,23 +325,23 @@ export default function PortalTecnicoPage() {
         />
 
         <div className="relative z-10 max-w-lg mx-auto px-4 py-3 sm:py-3.5 flex items-center justify-between gap-2">
-          {/* Título / Marca Institucional com Logo Transparente e Sem Bordas */}
+          {/* Título / Marca Institucional com Logo JIMMP Info */}
           <div className="flex items-center gap-2.5 select-none min-w-0">
             <img 
-              src="/logo-omg-clean.png" 
-              alt="Grupo OMG SPCI Master" 
-              className="max-h-9 w-auto object-contain shrink-0 bg-transparent border-0 ring-0 shadow-none filter drop-shadow-sm" 
+              src="/assets/branding/logo-jimmp-info.png" 
+              alt="JIMMP Info - SIGER Master" 
+              className="max-h-9 w-auto object-contain shrink-0 bg-transparent border-0 ring-0 shadow-none filter drop-shadow-[0_0_10px_rgba(104,211,70,0.4)]" 
             />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-xs sm:text-sm font-black uppercase tracking-widest font-sans truncate text-white">
-                  SPCI BOMBEIROS
+                  SIGER BOMBEIROS
                 </h1>
-                <span className="hidden xs:inline-block text-[8px] font-mono px-1.5 py-0.5 rounded bg-red-900/60 border border-red-400/30 text-red-100 font-bold">
+                <span className="hidden xs:inline-block text-[8px] font-mono px-1.5 py-0.5 rounded bg-[#1E2024] border border-[#68D346]/40 text-[#68D346] font-bold">
                   BRIGADA
                 </span>
               </div>
-              <p className="text-[8px] text-red-100 font-mono tracking-wider truncate">
+              <p className="text-[8px] text-slate-300 font-mono tracking-wider truncate">
                 GESTOR DE CONFORMIDADE & RONDA
               </p>
             </div>

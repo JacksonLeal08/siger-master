@@ -4,31 +4,31 @@ import QuietLuxuryHome from './components/QuietLuxuryHome';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'SISTEMA SPCI Master | Gestão de Combate a Incêndio',
+    absolute: 'SIGER Master | Gestão Integrada de Emergência & Resgate • JIMMP Info',
   },
-  description: 'Plataforma para rastreabilidade de ativos SPCI, emissão de laudos NBR 12962 em tempo real e gestão de combate a incêndio offline-first.',
+  description: 'Plataforma integrada para rastreabilidade de ativos SPCI, telemetria de frotas operacionais e emissão de laudos técnicos em tempo real.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'SISTEMA SPCI Master | Gestão e Governança de Combate a Incêndio',
-    description: 'Centralização de laudos técnicos NBR 12962, vistorias em tempo real e rastreabilidade offline-first de ativos de segurança contra incêndio.',
+    title: 'SIGER Master | Gestão Integrada de Emergência, Resgate e Frotas • JIMMP Info',
+    description: 'Centralização de laudos técnicos NBR, telemetria operacional de frotas e governança contínua.',
     url: SITE_URL,
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: '/assets/branding/logo-jimmp-info.png',
         width: 1200,
         height: 630,
-        alt: 'SISTEMA SPCI Master - Governança e Engenharia Contra Incêndio',
+        alt: 'SIGER Master - JIMMP Info',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SISTEMA SPCI Master | Gestão e Governança de Combate a Incêndio',
-    description: 'Centralização de laudos técnicos NBR 12962, vistorias em tempo real e rastreabilidade offline-first.',
-    images: ['/og-image.png'],
+    title: 'SIGER Master | Gestão Integrada de Emergência & Resgate • JIMMP Info',
+    description: 'Centralização de laudos técnicos NBR, telemetria operacional de frotas e governança contínua.',
+    images: ['/assets/branding/logo-jimmp-info.png'],
   },
 };
 

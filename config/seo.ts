@@ -1,5 +1,5 @@
 /**
- * Configurações Centrais de SEO e Metadados do SISTEMA SPCI Master
+ * Configurações Centrais de SEO e Metadados do SIGER Master (JIMMP Info)
  * Garante URL dinâmica baseada em ambiente e centralização de tags.
  */
 
@@ -8,12 +8,16 @@ export const SITE_URL =
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://spci-master.vercel.app');
 
 export const SEO_CONFIG = {
-  siteName: 'SISTEMA SPCI',
-  defaultTitle: 'SISTEMA SPCI - Gestão de Ativos, Prevenção e Combate a Incêndio',
-  titleTemplate: '%s | SISTEMA SPCI',
-  defaultDescription: 'Plataforma para rastreabilidade de ativos SPCI, emissão de laudos NBR 12962 em tempo real e gestão de combate a incêndio offline-first.',
+  siteName: 'SIGER Master',
+  defaultTitle: 'SIGER Master - Gestão Integrada de Emergência, Resgate e Frotas | JIMMP Info',
+  titleTemplate: '%s | SIGER Master',
+  defaultDescription: 'Plataforma integrada para rastreabilidade de ativos, telemetria de viaturas, laudos técnicos NBR e gestão operacional offline-first.',
   keywords: [
+    'SIGER Master',
+    'JIMMP Info',
     'SPCI',
+    'Gestão de Frotas',
+    'Telemetria Operacional',
     'Prevenção de Incêndio',
     'NBR 12962',
     'NBR 13434',
@@ -27,6 +31,6 @@ export const SEO_CONFIG = {
     'Engenharia de Segurança'
   ],
   category: 'technology',
-  ogImage: '/og-image.png',
+  ogImage: '/assets/branding/logo-jimmp-info.png',
   locale: 'pt_BR',
 };

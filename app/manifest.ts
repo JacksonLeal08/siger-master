@@ -2,19 +2,19 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'SPCI Master - Grupo OMG',
-    short_name: 'SPCI Master',
-    description: 'Sistema de Segurança e Conformidade contra Incêndio para Inspeções em Campo',
+    name: 'SIGER Master - JIMMP Info',
+    short_name: 'SIGER Master',
+    description: 'Sistema Integrado de Gestão de Emergência, Resgate e Frotas Operacionais',
     start_url: '/',
     display: 'standalone',
-    background_color: '#333333', // Cinza Corporativo Dark
-    theme_color: '#dc2626',      // Vermelho Ômega Grupo OMG
+    background_color: '#1E2024', // Grafite Cyber Metálico
+    theme_color: '#1E2024',      // Titânio Escuro
     orientation: 'portrait',
     icons: [
       {
-        src: '/icons/omega-icon.svg',
-        sizes: '100x100',
-        type: 'image/svg+xml',
+        src: '/assets/branding/icon-jimmp.png',
+        sizes: '192x192',
+        type: 'image/png',
         purpose: 'any',
       },
       {
@@ -38,9 +38,9 @@ export default function manifest(): MetadataRoute.Manifest {
         url: '/consulta/EXT-001',
       },
       {
-        name: 'Dashboard SPCI',
+        name: 'Cockpit SIGER',
         short_name: 'Cockpit',
-        description: 'Painel Geral de Ativos',
+        description: 'Painel Geral de Ativos e Frota',
         url: '/dashboard',
       },
     ],

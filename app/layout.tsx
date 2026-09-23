@@ -64,16 +64,16 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/icons/omega-icon.svg', type: 'image/svg+xml' },
+      { url: '/assets/branding/icon-jimmp.png', type: 'image/png' },
       { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
     ],
     shortcut: '/favicon.svg',
-    apple: '/icons/icon-192.png',
+    apple: '/assets/branding/icon-jimmp.png',
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'SPCI Master',
+    title: 'SIGER Master',
   },
   openGraph: {
     title: SEO_CONFIG.defaultTitle,

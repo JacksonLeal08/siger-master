@@ -1,12 +1,11 @@
-const CACHE_NAME = 'spci-pwa-cache-v10';
+const CACHE_NAME = 'siger-pwa-cache-v12';
 const ASSETS_TO_CACHE = [
   '/',
   '/favicon.svg',
-  '/icons/omega-icon.svg',
+  '/assets/branding/logo-jimmp-info.png',
+  '/assets/branding/icon-jimmp.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
-  '/logo-omg.png',
-  '/logo-omg-clean.png',
   '/login-bg.png',
 ];
 
@@ -14,7 +13,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Cache inicial v10 carregado.');
+      console.log('[Service Worker SIGER Master] Cache v12 carregado.');
       return cache.addAll(ASSETS_TO_CACHE);
     }).catch(err => console.warn('[Service Worker] Erro no cache install:', err))
   );
