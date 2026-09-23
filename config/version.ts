@@ -44,7 +44,7 @@ export const SYSTEM_CHANGELOG: ChangelogRelease[] = [
       '🤖 Painel Lateral (Drawer Right) Agente de IA 24h inspirado no sistema Elite Coach com suporte DeepSeek-V3 + Gemini.',
       '📚 Tópicos de Usabilidade do Sistema integrados para resposta instantânea da IA (NBR 12962, 12693, 13434, 13714, 15808, 15809).',
       '🔔 Sistema de Alertas e Notificações de Novidades da Versão (v2.7.0) com aviso automático na tela.',
-      '🎯 Ajuste fino de posicionamento flutuante (FAB) do botão Inspe IA prevenindo qualquer sobreposição visual.',
+      '🎯 Ajuste fino de posicionamento flutuante (FAB) do botão SIGER IA prevenindo qualquer sobreposição visual.',
       '☀️ Refatoração 100% Tema Claro Corporativo nos modais de Inspeção, Checklist e Assistente IA.'
     ]
   }

@@ -445,7 +445,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
           <div className={`flex items-center justify-between text-[11px] font-mono px-1 ${
             isDark ? 'text-zinc-600' : 'text-slate-500'
           }`}>
-            <span>&copy; SPCI FROTA MASTER 2026</span>
+            <span>&copy; SIGER FROTA MASTER 2026</span>
             <span>STATUS: {isCompleted ? 'ONLINE' : 'BOOTING...'}</span>
           </div>
         </div>

@@ -36,7 +36,7 @@ export const CURRENT_SYSTEM_VERSION: SystemVersionInfo = {
     {
       category: 'UI/UX',
       title: 'Bento Card com Foto do Ativo, Chassi e Capacidade',
-      description: 'Exibição da imagem cadastrada do equipamento com modal de ampliação (Zoom Lightbox), agrupamento do número do Chassi junto do Patrimônio/Tag SPCI e inclusão do campo Capacidade Extintora junto ao Selo Inmetro.'
+      description: 'Exibição da imagem cadastrada do equipamento com modal de ampliação (Zoom Lightbox), agrupamento do número do Chassi junto do Patrimônio/Tag SIGER e inclusão do campo Capacidade Extintora junto ao Selo Inmetro.'
     },
     {
       category: 'UI/UX',

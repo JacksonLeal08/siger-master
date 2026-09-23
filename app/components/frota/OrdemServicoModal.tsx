@@ -588,7 +588,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
                     className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold outline-none cursor-pointer"
                   >
                     <option value="EXTERNA">Oficina Externa Credenciada</option>
-                    <option value="INTERNA">Oficina Interna da Base SPCI</option>
+                    <option value="INTERNA">Oficina Interna da Base SIGER</option>
                   </select>
                 </div>
 
@@ -650,7 +650,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
                   </label>
                   <input
                     type="text"
-                    value="Base / Oficina Mecânica Interna da Brigada SPCI"
+                    value="Base / Oficina Mecânica Interna da Brigada SIGER"
                     disabled
                     className="w-full bg-slate-100 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs font-bold text-slate-500"
                   />

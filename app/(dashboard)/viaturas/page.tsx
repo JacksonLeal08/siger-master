@@ -255,8 +255,8 @@ export default function ViaturasPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-3xl shadow-xs">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] bg-red-600/10 text-red-600 border border-red-600/20 px-2.5 py-0.5 rounded-full font-mono font-black uppercase tracking-wider">
-              SPCI FROTA V2.0
+            <span className="text-[10px] bg-[#1C4E26]/30 text-[#B7F365] border border-[#68D346]/40 px-2.5 py-0.5 rounded-full font-mono font-black uppercase tracking-wider shadow-[0_0_8px_rgba(104,211,70,0.2)]">
+              SIGER FROTA V2.0
             </span>
             <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-mono font-bold">
               Site: {currentContratoId}

@@ -237,12 +237,12 @@ ${historyText || '- Nenhum evento crítico registrado.'}
 ### IV. RECOMENDAÇÕES E REAPROVAÇÃO
 - Manter rotina de inspeção visual mensal cadastrada via QR Code no SIGER Master.
 - Efetuar a pronta correção de qualquer apontamento não conforme registrado na linha do tempo.
-- Homologação emitida em ${new Date().toLocaleDateString('pt-BR')} pelo Sistema Inspe IA.`;
+- Homologação emitida em ${new Date().toLocaleDateString('pt-BR')} pelo Sistema SIGER IA.`;
 
     try {
       const promptText = `Gere um rascunho de "Parecer Técnico de Engenharia de Incêndio" formal e detalhado para o seguinte ativo:
       ID: ${assetId}
-      Tipo: ${asset.category || 'Equipamento SPCI'}
+      Tipo: ${asset.category || 'Equipamento SIGER'}
       Modelo: ${(asset as any).model || 'Padrão'}
       Local: ${asset.location} ${asset.subLocation ? ' - ' + asset.subLocation : ''}
       Status: ${localStatus}
@@ -260,7 +260,7 @@ ${historyText || '- Nenhum evento crítico registrado.'}
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: promptText,
-          systemInstruction: "Você é o Inspe IA SPCI, especialista em engenharia de segurança contra incêndios no Brasil. Responda em português de forma formal."
+          systemInstruction: "Você é o SIGER IA, especialista em engenharia de segurança, emergência e conformidade normativa no Brasil. Responda em português de forma formal."
         })
       });
 

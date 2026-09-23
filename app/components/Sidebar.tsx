@@ -702,7 +702,7 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
         })}
       </nav>
 
-      {/* Botão 3D Tactile Cyber-Red Inspe IA (Assistente Virtual 24h) */}
+      {/* Botão 3D Tactile Cyber-Red SIGER IA (Assistente Virtual 24h) */}
       <div className={`my-2.5 px-1 ${isCollapsed ? 'flex justify-center' : ''}`}>
         <div className="relative group w-full">
           <button
@@ -711,8 +711,8 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
             className={`w-full relative flex items-center bg-gradient-to-r from-red-700 via-rose-700 to-slate-900 hover:from-red-600 hover:to-rose-800 text-white rounded-2xl shadow-lg shadow-rose-950/40 hover:shadow-xl hover:shadow-rose-950/60 active:translate-y-0.5 border border-rose-500/30 hover:border-rose-400/50 transition-all duration-200 cursor-pointer overflow-hidden font-sans ${
               isCollapsed ? 'p-2.5 justify-center h-12 w-12' : 'p-3 gap-3'
             }`}
-            title="Abrir Assistente Virtual Inspe IA SPCI 24h"
-            aria-label="Abrir Assistente Virtual Inspe IA 24h"
+            title="Abrir Assistente Virtual SIGER IA 24h"
+            aria-label="Abrir Assistente Virtual SIGER IA 24h"
           >
             {/* Brilho diagonal de reflexo de vidro */}
             <div className="absolute -top-10 -left-10 w-20 h-32 bg-white/10 rotate-45 transform pointer-events-none group-hover:translate-x-48 transition-transform duration-700 ease-in-out" aria-hidden="true" />
@@ -733,7 +733,7 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
               <div className="flex flex-col text-left min-w-0 flex-1 leading-tight">
                 <div className="flex items-center justify-between gap-1">
                   <span className="font-['Hanken_Grotesk'] font-black text-xs uppercase tracking-wider text-white truncate">
-                    INSPE IA SPCI
+                    SIGER IA
                   </span>
                   <span className="text-[8px] font-black uppercase tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-1.5 py-0.5 rounded-full shrink-0 font-mono flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5" /> 24H
@@ -749,33 +749,12 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
             {isCollapsed && (
               <div className="opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3.5 py-2 bg-slate-900 text-white rounded-xl shadow-2xl text-[11px] font-bold uppercase tracking-wider whitespace-nowrap z-50 border border-red-500/40 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-                <span>INSPE IA SPCI (AGENTE 24H)</span>
+                <span>SIGER IA (AGENTE 24H)</span>
               </div>
             )}
           </button>
         </div>
       </div>
-
-      {/* Indicador de banco conectado e versão */}
-      {!isCollapsed && (
-        <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-center text-xs space-y-1 mb-2 select-none shrink-0">
-          <div className="flex items-center justify-between">
-            <p className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 font-['Hanken_Grotesk'] text-[11px]">
-              <span aria-hidden="true">🟢</span> Banco SPCI Ativo
-            </p>
-            <button 
-              onClick={() => setShowWhatsNew(true)}
-              className="text-[9px] font-bold bg-red-100 dark:bg-red-600/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-600/40 px-1.5 py-0.5 rounded-md hover:scale-105 transition-transform cursor-pointer"
-              title="Clique para ver as novidades da versão"
-            >
-              {SYSTEM_VERSION}
-            </button>
-          </div>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono leading-none truncate text-left pt-0.5">
-            {currentUser ? `User: ${currentUser.email?.split('@')[0]}` : 'Offline-first'}
-          </p>
-        </div>
-      )}
 
       {/* Modal de Novidades da Versão */}
       <WhatsNewModal isOpen={showWhatsNew} onClose={() => setShowWhatsNew(false)} />

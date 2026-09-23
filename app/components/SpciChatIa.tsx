@@ -213,7 +213,7 @@ export default function SpciChatIa() {
       return `📱 **Vistoria via QR Code no Celular:**\n\n1. Abra o menu **QR Code de Inspeção** no cabeçalho do sistema.\n2. Aponte a câmera do seu smartphone para o QR Code colado no extintor ou hidrante.\n3. O sistema abre diretamente a ficha do equipamento com os itens do checklist ABNT para preenchimento com 1 clique!`;
     }
 
-    return `🤖 **Inspe IA (Assistente SIGER NBR):**\n\nEntendido! Para a pergunta "${promptText}", aqui está a orientação técnica baseada no padrão ABNT da sua planta:\n\n• **Conformidade Atual:** ${compliancePercentage}% (${totalAssets} ativos monitorados, ${totalVencidos} pendências).\n• **Extintores (NBR 12962):** Lacre íntegro, ponteiro do manômetro no verde e validade anual em dia.\n• **Sinalização (NBR 13434):** Placas fotoluminescentes instaladas acima dos equipamentos e desobstruídas.\n\nComo posso ajudar detalhando algum quesito específico para a sua vistoria hoje?`;
+    return `🤖 **SIGER IA (Assistente Técnico NBR):**\n\nEntendido! Para a pergunta "${promptText}", aqui está a orientação técnica baseada no padrão ABNT da sua planta:\n\n• **Conformidade Atual:** ${compliancePercentage}% (${totalAssets} ativos monitorados, ${totalVencidos} pendências).\n• **Extintores (NBR 12962):** Lacre íntegro, ponteiro do manômetro no verde e validade anual em dia.\n• **Sinalização (NBR 13434):** Placas fotoluminescentes instaladas acima dos equipamentos e desobstruídas.\n\nComo posso ajudar detalhando algum quesito específico para a sua vistoria hoje?`;
   };
 
   const handleSendPrompt = async (promptToSend?: string) => {
@@ -232,10 +232,10 @@ export default function SpciChatIa() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          prompt: `Responda de forma sucinta como o Inspe IA SPCI.
-          Planta SPCI atual: ${totalAssets} ativos monitorados, ${totalVencidos} vencidos, ${totalAtencao} em atenção. Índice Geral Conformidade: ${compliancePercentage}%.
+          prompt: `Responda de forma sucinta como o SIGER IA.
+          Planta SIGER atual: ${totalAssets} ativos monitorados, ${totalVencidos} vencidos, ${totalAtencao} em atenção. Índice Geral Conformidade: ${compliancePercentage}%.
           Mensagem do operador: ${textToQuery}`,
-          systemInstruction: "Você é o assistente virtual Inspe IA SPCI operando via motor DeepSeek-V3. Responda em português brasileiro, de forma breve, altamente precisa e técnica, baseando-se estritamente em engenharia de segurança contra incêndios (NBR 12693, NBR 12962, NBR 13434, NBR 13714, NBR 10897, NBR 15808, NBR 15809) e nas funcionalidades do sistema SIGER Master (Mapa Operacional com geolocalização de ativos, rotas via Google Maps e Waze, modo imersivo tela cheia, captura de fotos com câmera do dispositivo e extração automática de GPS a partir dos metadados EXIF da imagem). Mantenha as respostas objetivas e formatadas em Markdown quando necessário."
+          systemInstruction: "Você é o assistente virtual SIGER IA operando via motor DeepSeek-V3. Responda em português brasileiro, de forma breve, altamente precisa e técnica, baseando-se estritamente em engenharia de segurança contra incêndios (NBR 12693, NBR 12962, NBR 13434, NBR 13714, NBR 10897, NBR 15808, NBR 15809) e nas funcionalidades do sistema SIGER Master (Mapa Operacional com geolocalização de ativos, rotas via Google Maps e Waze, modo imersivo tela cheia, captura de fotos com câmera do dispositivo e extração automática de GPS a partir dos metadados EXIF da imagem). Mantenha as respostas objetivas e formatadas em Markdown quando necessário."
         })
       });
 
@@ -252,10 +252,10 @@ export default function SpciChatIa() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            prompt: `Responda de forma sucinta como o Inspe IA SPCI.
-            Planta SPCI atual: ${totalAssets} ativos monitorados, ${totalVencidos} vencidos, ${totalAtencao} em atenção. Índice Geral Conformidade: ${compliancePercentage}%.
+            prompt: `Responda de forma sucinta como o SIGER IA.
+            Planta SIGER atual: ${totalAssets} ativos monitorados, ${totalVencidos} vencidos, ${totalAtencao} em atenção. Índice Geral Conformidade: ${compliancePercentage}%.
             Mensagem do operador: ${textToQuery}`,
-            systemInstruction: "Você é o assistente virtual Inspe IA SPCI. Responda em português brasileiro, de forma breve, muito precisa, baseando-se estritamente em engenharia de segurança contra incêndios e nas funcionalidades do sistema SIGER Master (Mapa Operacional, rotas Waze/Google Maps, fotos com extração de GPS EXIF e modo tela cheia)."
+            systemInstruction: "Você é o assistente virtual SIGER IA. Responda em português brasileiro, de forma breve, muito precisa, baseando-se estritamente em engenharia de segurança contra incêndios e nas funcionalidades do sistema SIGER Master (Mapa Operacional, rotas Waze/Google Maps, fotos com extração de GPS EXIF e modo tela cheia)."
           })
         });
 

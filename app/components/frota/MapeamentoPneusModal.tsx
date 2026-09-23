@@ -80,7 +80,7 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   onClose,
   onMinimize,
   onSuccess,
-  tecnicoPadrao = 'Inspetor de Frota SPCI',
+  tecnicoPadrao = 'Inspetor de Frota SIGER',
   theme: themeProp
 }) => {
   const { theme: contextTheme, toggleTheme } = useTheme();

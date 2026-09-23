@@ -1531,7 +1531,7 @@ function InspecaoOuCadastroContent() {
                     className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase tracking-widest transition-all active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer shadow-lg rounded-xl"
                   >
                     {loading ? <RefreshCw className="animate-spin" size={14} /> : null}
-                    SALVAR NO BANCO SPCI
+                    SALVAR NO BANCO SIGER
                   </button>
                 </div>
 

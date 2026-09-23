@@ -1,4 +1,4 @@
-const CACHE_NAME = 'siger-pwa-cache-v13';
+const CACHE_NAME = 'siger-pwa-cache-v14';
 const ASSETS_TO_CACHE = [
   '/',
   '/favicon.svg',
@@ -13,7 +13,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker SIGER Master] Cache v13 carregado.');
+      console.log('[Service Worker SIGER Master] Cache v14 carregado.');
       return cache.addAll(ASSETS_TO_CACHE);
     }).catch(err => console.warn('[Service Worker] Erro no cache install:', err))
   );

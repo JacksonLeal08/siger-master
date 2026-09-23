@@ -377,7 +377,7 @@ export const OrdensServicoFrotaTab: React.FC<OrdensServicoFrotaTabProps> = ({
                   <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-bold">
                     <Truck className="w-3.5 h-3.5 text-red-600 shrink-0" />
                     <span>
-                      {viat ? `${viat.prefixo_frota} • ${viat.modelo}` : 'Viatura SPCI'}
+                      {viat ? `${viat.prefixo_frota} • ${viat.modelo}` : 'Viatura SIGER'}
                     </span>
                     {viat?.placa && (
                       <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono font-bold text-slate-600 dark:text-slate-400">
@@ -401,7 +401,7 @@ export const OrdensServicoFrotaTab: React.FC<OrdensServicoFrotaTabProps> = ({
                       <Building2 className="w-3 h-3 text-slate-400" />
                       {os.tipo_os === 'EXTERNA' 
                         ? (ofc ? ofc.razao_social : 'Oficina Externa Credenciada')
-                        : 'Oficina Interna da Brigada SPCI'
+                        : 'Oficina Interna da Brigada SIGER'
                       }
                     </span>
 

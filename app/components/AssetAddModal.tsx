@@ -1087,7 +1087,7 @@ export default function AssetAddModal({ isOpen, onClose }: AssetAddModalProps) {
                 disabled={uploadingImage}
                 className="px-6 py-3 text-[10px] sm:text-xs font-black uppercase tracking-wider text-white bg-[#007F3E] hover:bg-[#006631] rounded-xl cursor-pointer shadow-sm transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {uploadingImage ? 'Enviando Foto...' : 'Salvar no Banco SPCI'}
+                {uploadingImage ? 'Enviando Foto...' : 'Salvar no Banco SIGER'}
               </button>
             </div>
           </form>

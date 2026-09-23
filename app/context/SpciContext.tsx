@@ -484,7 +484,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openSwapModal = useCallback(() => setIsSwapModalOpen(true), []);
   const closeSwapModal = useCallback(() => setIsSwapModalOpen(false), []);
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'user' | 'assistant'; text: string }>>([
-    { sender: 'assistant', text: 'Olá Operador! Sou o assistente Inspe IA SPCI. Como posso apoiar você em suas inspeções de NBR de hoje, ou ao redactar alertas de inconformidades?' }
+    { sender: 'assistant', text: 'Olá Operador! Sou o assistente SIGER IA. Como posso apoiar você em suas inspeções de NBR de hoje, ou ao redactar alertas de inconformidades?' }
   ]);
   const [userPrompt, setUserPrompt] = useState('');
   const [aiGenerating, setAiGenerating] = useState(false);

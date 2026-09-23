@@ -38,7 +38,7 @@ export const TireMapInspection: React.FC<TireMapInspectionProps> = ({
   viatura,
   inspecoesAtuais,
   onInspecaoSalva,
-  inspetorPadrao = 'Inspetor Frota SPCI'
+  inspetorPadrao = 'Inspetor Frota SIGER'
 }) => {
   const [selectedSlot, setSelectedSlot] = useState<TireSlotConfig | null>(null);
   const [sulcoInput, setSulcoInput] = useState<string>('4.5');

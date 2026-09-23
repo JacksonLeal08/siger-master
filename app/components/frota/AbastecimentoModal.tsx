@@ -53,7 +53,7 @@ export const AbastecimentoModal: React.FC<AbastecimentoModalProps> = ({
   const [novoOdometro, setNovoOdometro] = useState<string>(
     viatura.odometro_atual_km ? String(viatura.odometro_atual_km + 450) : '450'
   );
-  const [condutor, setCondutor] = useState(condutorPadrao || 'Motorista Operacional SPCI');
+  const [condutor, setCondutor] = useState(condutorPadrao || 'Motorista Operacional SIGER');
 
   // Estados de Telemetria e Trava de Calibração
   const [ultimoPrecoRegistrado, setUltimoPrecoRegistrado] = useState<number | null>(null);
@@ -227,7 +227,7 @@ export const AbastecimentoModal: React.FC<AbastecimentoModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       modalId="modal-frota-abastecimento"
-      badgeSistema="TELEMETRIA SPCI & FROTA"
+      badgeSistema="TELEMETRIA SIGER & FROTA"
       badgeContrato={contratoId || viatura.contrato_id || 'ONÇA PUMA'}
       titulo={`ABASTECIMENTO • ${viatura.prefixo_frota} (${viatura.placa})`}
       subtitulo="Rastreamento de preços médios, conformidade de consumo e trava de segurança quinzenal de pneus"
