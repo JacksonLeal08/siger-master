@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * SoundNotificationService - Motor de Áudio Industrial para Alertas do SPCI Master
+ * SoundNotificationService - Motor de Áudio Industrial para Alertas do SIGER Master
  * Utiliza Web Audio API sintetizada nativa no navegador (sem dependência de arquivos de áudio externos).
  */
 

@@ -209,7 +209,7 @@ export default function AssetMovementHistoryModal({
                       <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-1.5">
                           <User size={12} className="text-slate-500" />
-                          <span>{item.usuario_nome || 'Operador SPCI'}</span>
+                          <span>{item.usuario_nome || 'Operador SIGER'}</span>
                         </div>
 
                         {item.foto_evidencia_url && (

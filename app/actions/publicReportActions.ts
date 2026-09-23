@@ -101,7 +101,7 @@ export async function reportPublicAnomalyAction(payload: PublicAnomalyPayload) {
     return {
       success: true,
       ticketId,
-      message: `Chamado ${ticketId} registrado com sucesso no sistema SPCI.`
+      message: `Chamado ${ticketId} registrado com sucesso no SISTEMA SIGER.`
     };
   } catch (error: any) {
     console.error('[reportPublicAnomalyAction] Erro ao registrar anomalia:', error);

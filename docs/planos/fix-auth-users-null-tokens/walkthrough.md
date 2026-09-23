@@ -1,6 +1,6 @@
 # Relatório de Entrega: Correção de Schema no Login (Supabase Auth)
 
-Esta entrega resolve a anomalia do erro "Database error querying schema" (ou "Esquema de consulta por erro de banco de dados") no login de novos colaboradores do SPCI.
+Esta entrega resolve a anomalia do erro "Database error querying schema" (ou "Esquema de consulta por erro de banco de dados") no login de novos colaboradores do SIGER.
 
 ## Alterações Realizadas
 
@@ -179,4 +179,4 @@ $$;
 ## Verificação dos Ajustes
 
 1. A build de produção do Next.js foi compilada sem erros locally, provando a consistência dos tipos.
-2. A atualização nas migrações garante rastreabilidade do histórico de infraestrutura do SPCI.
+2. A atualização nas migrações garante rastreabilidade do histórico de infraestrutura do SIGER.

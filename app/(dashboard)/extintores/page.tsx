@@ -997,7 +997,7 @@ export default function ExtintoresPage() {
 
     setValidatedRows([]);
     setShowBulkImport(false);
-    triggerSuccessNotification('Importação Concluída!', `${validRows.length} extintores foram salvos e integrados ao sistema SPCI.`);
+    triggerSuccessNotification('Importação Concluída!', `${validRows.length} extintores foram salvos e integrados ao SISTEMA SIGER.`);
   };
 
   const errorCount = validatedRows.reduce((acc, row) => acc + row.errors.length, 0);
@@ -2008,7 +2008,7 @@ export default function ExtintoresPage() {
               <div className="absolute -right-10 -bottom-10 opacity-5 text-9xl select-none pointer-events-none" aria-hidden="true">🧯</div>
               <div>
                 <h2 className="font-bold text-xl text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <span>🧯</span> Inventário de Extintores SPCI
+                  <span>🧯</span> Inventário de Extintores SIGER
                 </h2>
                 <p className="text-slate-500 text-xs mt-1 font-sans leading-relaxed">
                   Visão consolidada do controle de conformidades, validades de recarga e teste hidrostático da planta corporativa.

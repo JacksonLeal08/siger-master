@@ -280,7 +280,7 @@ export const Header = ({ onScanClick, onProfileClick, onMenuClick, onGestaoAtivo
             <div className="hidden sm:block text-left leading-tight">
               <span className="sr-only">Conectado como:</span>
               <p className="text-[10px] font-bold text-slate-800 uppercase tracking-wide truncate max-w-[120px]">
-                {userProfile?.name || currentUser.displayName || 'Técnico SPCI'}
+                {userProfile?.name || currentUser.displayName || 'Técnico SIGER'}
               </p>
               <p className="text-[8px] font-mono text-red-600 uppercase tracking-wider font-bold">
                 {userProfile?.role === 'Desenvolvedor'

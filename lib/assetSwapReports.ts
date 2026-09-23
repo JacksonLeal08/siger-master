@@ -297,7 +297,7 @@ export function generateSwapReportPDF(troca: SubstituicaoAtivoRecord) {
     <body>
       <div class="header">
         <div>
-          <div class="brand-title">SPCI MASTER • SISTEMA DE GESTÃO CONTRA INCÊNDIO</div>
+          <div class="brand-title">SIGER Master • SISTEMA DE GESTÃO CONTRA INCÊNDIO</div>
           <div class="brand-sub">LAUDO TÉCNICO DE TROCA & SUBSTITUIÇÃO DE EXTINTORES • GRUPO OMG</div>
         </div>
         <div style="text-align: right;">
@@ -433,12 +433,12 @@ export function generateSwapReportPDF(troca: SubstituicaoAtivoRecord) {
         </div>
         <div class="sign-box">
           <div class="sign-role">Gestão SST / Segurança Patrimonial</div>
-          <div class="sign-sub">Grupo OMG • SPCI Master</div>
+          <div class="sign-sub">Grupo OMG • SIGER Master</div>
         </div>
       </div>
 
       <div class="footer">
-        <span>Sistema SPCI Master • Rastreabilidade Perpétua de Equipamentos de Emergência</span>
+        <span>Sistema SIGER Master • Rastreabilidade Perpétua de Equipamentos de Emergência</span>
         <span>Autenticação: ${troca.id}</span>
       </div>
     </body>
@@ -455,7 +455,7 @@ export function generateSwapReportPDF(troca: SubstituicaoAtivoRecord) {
  */
 export function exportSwapsToXLSX(trocas: SubstituicaoAtivoRecord[]) {
   const sheetData: any[][] = [
-    ['SISTEMA SPCI MASTER - RELATÓRIO GERENCIAL DE TROCAS & SUBSTITUIÇÕES DE EXTINTORES'],
+    ['SISTEMA SIGER Master - RELATÓRIO GERENCIAL DE TROCAS & SUBSTITUIÇÕES DE EXTINTORES'],
     [`Data de Geração:`, new Date().toLocaleDateString('pt-BR'), '', `Total de Substituições:`, trocas.length],
     [],
     [

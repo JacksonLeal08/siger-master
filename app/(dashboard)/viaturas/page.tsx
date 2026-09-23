@@ -948,7 +948,7 @@ export default function ViaturasPage() {
               `Medições metrológicas da viatura ${selectedViaturaForTire.prefixo_frota} salvas com sucesso.`
             );
           }}
-          tecnicoPadrao={userProfile?.nome || 'Inspetor SPCI'}
+          tecnicoPadrao={userProfile?.nome || 'Inspetor SIGER'}
         />
       )}
 

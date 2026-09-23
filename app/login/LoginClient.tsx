@@ -19,7 +19,7 @@ const statusMessages = [
   'Iniciando handshake seguro com servidor...',
   'Sincronizando cache local IndexedDB...',
   'Carregando credenciais corporativas...',
-  'Acesso concedido. Bem-vindo ao SPCI!'
+  'Acesso concedido. Bem-vindo ao SIGER!'
 ];
 
 export default function LoginClient() {
@@ -261,7 +261,7 @@ export default function LoginClient() {
             </div>
 
             <div className="space-y-1 text-left">
-              <h1 className="text-xl font-bold uppercase text-slate-900 dark:text-slate-100 tracking-wider">Acessar Cockpit SPCI</h1>
+              <h1 className="text-xl font-bold uppercase text-slate-900 dark:text-slate-100 tracking-wider">Acessar Cockpit SIGER</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 font-sans">Entre com suas credenciais corporativas SPCI.</p>
             </div>
 

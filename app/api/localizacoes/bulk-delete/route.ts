@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         p_ids: ids,
         p_contrato_id: contrato_id || null,
         p_usuario_id: usuario_id || null,
-        p_usuario_nome: usuario_nome || 'Operador SPCI'
+        p_usuario_nome: usuario_nome || 'Operador SIGER'
       });
 
       if (!rpcErr && rpcData) {
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
         acao: 'EXCLUSAO_MASSA_LOCAIS',
         tabela: 'localizacoes_operacionais',
         usuario_id: usuario_id || null,
-        usuario_nome: usuario_nome || 'Operador SPCI',
+        usuario_nome: usuario_nome || 'Operador SIGER',
         detalhes: JSON.stringify({
           quantidade_excluida: ids.length,
           ids_excluidos: ids,

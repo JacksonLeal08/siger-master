@@ -12,7 +12,7 @@ import { LogOut } from 'lucide-react';
 import { extractIdOrHashFromUrl } from '@/lib/utils';
 
 
-// Componentes modulares e desacoplados do SPCI
+// Componentes modulares e desacoplados do SIGER
 import AssetInspectionModal from '../components/AssetInspectionModal';
 import AssetAddModal from '../components/AssetAddModal';
 import AssetHistoryModal from '../components/AssetHistoryModal';
@@ -105,7 +105,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setTimeout(() => {
           triggerSuccessNotification(
             'E-mail Confirmado! 🟢',
-            'Sua conta foi ativada com sucesso. Seja bem-vindo ao Cockpit SPCI Master!'
+            'Sua conta foi ativada com sucesso. Seja bem-vindo ao Cockpit SIGER Master!'
           );
         }, 500);
         window.history.replaceState(null, '', window.location.pathname);
@@ -376,8 +376,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </h2>
             <p className="text-xs text-slate-600 leading-relaxed font-sans">
               {userProfile.status === 'pending'
-                ? `Olá, ${userProfile.name}! Seu cadastro foi mapeado no SPCI, mas requer liberação manual de um administrador para operar. Contate o administrador jackson602@gmail.com para ativar seu login.`
-                : `Olá, ${userProfile.name}! Seu perfil de acesso foi suspenso temporariamente pela administração do SPCI.`}
+                ? `Olá, ${userProfile.name}! Seu cadastro foi mapeado no SIGER, mas requer liberação manual de um administrador para operar. Contate o administrador jackson602@gmail.com para ativar seu login.`
+                : `Olá, ${userProfile.name}! Seu perfil de acesso foi suspenso temporariamente pela administração do SIGER.`}
             </p>
           </div>
 
@@ -481,7 +481,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <AssetSwapModal
         isOpen={isSwapModalOpen}
         onClose={closeSwapModal}
-        currentUserName={userProfile?.name || currentUser?.displayName || 'Operador SPCI'}
+        currentUserName={userProfile?.name || currentUser?.displayName || 'Operador SIGER'}
         currentUserEmail={userProfile?.email || currentUser?.email || undefined}
       />
 
@@ -548,7 +548,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <h3 className="font-bold text-sm text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                     <span>⚙️</span> Configurações de Perfil
                   </h3>
-                  <p className="text-slate-500 text-[10px] mt-0.5 font-sans">Identificação de vistorias e logotipo SPCI</p>
+                  <p className="text-slate-500 text-[10px] mt-0.5 font-sans">Identificação de vistorias e logotipo SIGER</p>
                 </div>
                 <button
                   onClick={() => setShowProfileModal(false)}
@@ -613,7 +613,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className="block text-[9px] font-bold uppercase text-slate-500">Logos Recomendadas</span>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { name: '🔥 SPCI Corp', url: 'https://images.unsplash.com/photo-1516216621161-8a5021e11e2f?w=100&auto=format&fit=crop&q=80' },
+                      { name: '🔥 SIGER Corp', url: 'https://images.unsplash.com/photo-1516216621161-8a5021e11e2f?w=100&auto=format&fit=crop&q=80' },
                       { name: '🏢 Seguridade', url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=100&auto=format&fit=crop&q=80' },
                       { name: '🌳 EcoPrevenir', url: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=100&auto=format&fit=crop&q=80' }
                     ].map(preset => (
@@ -770,7 +770,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
 
               <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
-                Encerrar Sessão no SPCI?
+                Encerrar Sessão no SIGER?
               </h3>
 
               <p className="text-[10px] text-slate-600 dark:text-slate-400 font-sans leading-normal mt-2.5 px-2">

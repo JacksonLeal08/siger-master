@@ -65,11 +65,11 @@ export const EtiquetaPreviewTermica: React.FC<EtiquetaPreviewTermicaProps> = ({
             <div className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-red-600 print:bg-black" />
               <span className="text-[7px] font-sans font-black tracking-tight text-slate-900">
-                SPCI // OMG
+                SIGER // OMG
               </span>
             </div>
           ) : (
-            <span className="text-[6.5px] font-sans text-slate-500 font-bold">SPCI MASTER</span>
+            <span className="text-[6.5px] font-sans text-slate-500 font-bold">SIGER Master</span>
           )}
           <span className="text-[6.5px] font-bold uppercase tracking-wider text-slate-700">
             {asset.category}

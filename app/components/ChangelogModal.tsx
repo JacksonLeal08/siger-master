@@ -38,7 +38,7 @@ export default function ChangelogModal({ isOpen, onClose }: ChangelogModalProps)
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase text-red-600 tracking-widest">
-                  NOVIDADES DO SISTEMA SPCI
+                  NOVIDADES DO SISTEMA SIGER
                 </span>
                 <h2 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
                   Versão Oficial {SYSTEM_VERSION}
@@ -108,7 +108,7 @@ export default function ChangelogModal({ isOpen, onClose }: ChangelogModalProps)
               onClick={onClose}
               className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer active:scale-95"
             >
-              Entendido / Continuar no SPCI →
+              Entendido / Continuar no SIGER →
             </button>
           </div>
 

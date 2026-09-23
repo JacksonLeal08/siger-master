@@ -111,7 +111,7 @@ const MODAL_ID = 'modal-asset-swap-wizard';
 export default function WizardTrocaModalMobile({
   isOpen,
   onClose,
-  currentUserName = 'Operador SPCI',
+  currentUserName = 'Operador SIGER',
   currentUserEmail,
   preSelectedAssetId,
   onSuccess
@@ -506,7 +506,7 @@ export default function WizardTrocaModalMobile({
         descricao_motivo: descricao.trim() || undefined,
         foto_antes_url: fotoAntes || undefined,
         foto_depois_url: fotoDepois || undefined,
-        tecnico_responsavel_nome: currentUserName || userProfile?.name || currentUser?.displayName || 'Operador SPCI',
+        tecnico_responsavel_nome: currentUserName || userProfile?.name || currentUser?.displayName || 'Operador SIGER',
         tecnico_responsavel_email: currentUserEmail || userProfile?.email || currentUser?.email || undefined,
       });
 

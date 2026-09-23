@@ -279,7 +279,7 @@ export default function QuickAssetFab() {
           whileTap={{ scale: 0.92 }}
           type="button"
           className="w-14 h-14 bg-gradient-to-tr from-red-700 via-rose-600 to-red-500 hover:from-red-600 hover:to-rose-500 text-white rounded-full shadow-[0_8px_25px_rgba(220,38,38,0.5)] border-2 border-white/20 flex items-center justify-center cursor-pointer relative z-50 group"
-          aria-label="Acesso Rápido SPCI"
+          aria-label="Acesso Rápido SIGER"
           title="Ações Rápidas: Nova Inspeção ou Novo Ativo"
         >
           <motion.div

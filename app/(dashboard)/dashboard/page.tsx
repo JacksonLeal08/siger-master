@@ -187,7 +187,7 @@ export default function DashboardPage() {
               Unidade Industrial 01
             </span>
             <h2 className="font-['Hanken_Grotesk'] font-extrabold text-3xl md:text-4xl text-white tracking-tight mt-3">
-              Ronda & Monitoramento SPCI
+              Ronda & Monitoramento SIGER
             </h2>
             <p className="text-slate-300 text-sm mt-1 max-w-xl">
               Inspeções registradas e em conformidade periódica com as normas técnicas.
@@ -372,7 +372,7 @@ export default function DashboardPage() {
         </div>
       </motion.div>
 
-      {/* ═══ MÓDULO EXECUTIVO & OPERACIONAL DE EXTINTORES SPCI ═══ */}
+      {/* ═══ MÓDULO EXECUTIVO & OPERACIONAL DE Extintores SIGER ═══ */}
       <ExtintoresManagementDashboard />
 
       {/* Estatísticas por Setor e Logs Recentes */}

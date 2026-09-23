@@ -1,7 +1,7 @@
 # Plano de Implementação: Indicadores de Inspeções, Edição em Massa e Fluxo de Logout Premium
 
 ## Overview
-Este plano detalha o desenvolvimento técnico de três grandes frentes de melhoria no SPCI:
+Este plano detalha o desenvolvimento técnico de três grandes frentes de melhoria no SIGER:
 1. Painel de **Inspeções no Período** posicionado no inventário de Extintores.
 2. Ferramenta de **Edição em Massa** via importação/exportação de planilhas.
 3. Novo **Fluxo de Logout Premium** com botão na Sidebar, modal de confirmação desfocado e página interativa com estilo industrial e redirecionamento de 3s.

@@ -239,7 +239,7 @@ A implementação PWA já está pré-configurada no projeto via `app/manifest.ts
   * Isolar chamadas de API do Supabase e rotas `/api/` para bypass do cache do Service Worker, permitindo que a fila de sincronização `SyncQueue` (gerenciada via IndexedDB e `useSync`) envie as vistorias pendentes sem interferência do proxy de rede.
 * **Banner de Instalação Customizado (A2HS):**
   * Detectar o evento `beforeinstallprompt` no Portal Técnico Móvel e na aplicação Web.
-  * Renderizar um banner elegante, discreto e moderno estimulando o usuário a "Instalar Aplicativo SPCI" para acesso direto da tela inicial, melhorando a performance e experiência de uso em campo.
+  * Renderizar um banner elegante, discreto e moderno estimulando o usuário a "Instalar AplicAtivo SIGER" para acesso direto da tela inicial, melhorando a performance e experiência de uso em campo.
 
 ---
 

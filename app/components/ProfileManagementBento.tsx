@@ -341,7 +341,7 @@ export default function ProfileManagementBento({
 
             <div className="space-y-2 text-slate-700 dark:text-zinc-300">
               <span className="text-[10px] font-black uppercase tracking-wider font-mono text-slate-500 dark:text-zinc-400 block">
-                Permissões no Cockpit SPCI:
+                Permissões no Cockpit SIGER:
               </span>
               <ul className="space-y-1.5 text-xs">
                 <li className="flex items-center gap-2">

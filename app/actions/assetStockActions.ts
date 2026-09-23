@@ -749,7 +749,7 @@ export async function bulkMoveAssetStatusAction(payload: BulkMovePayload) {
         status_novo: targetStatus,
         motivo_movimentacao: motivo || 'Movimentação em lote via painel de estoque',
         observacao: observacao || null,
-        usuario_nome: usuarioNome || 'Operador SPCI',
+        usuario_nome: usuarioNome || 'Operador SIGER',
         usuario_email: usuarioEmail || null,
         created_at: nowIso
       }));
@@ -768,7 +768,7 @@ export async function bulkMoveAssetStatusAction(payload: BulkMovePayload) {
           tipo_evento: 'MOVIMENTACAO_LOTE',
           status_origem: asset.status_estoque || 'Desconhecido',
           status_destino: targetStatus,
-          usuario_responsavel_nome: usuarioNome || 'Operador SPCI',
+          usuario_responsavel_nome: usuarioNome || 'Operador SIGER',
           usuario_responsavel_email: usuarioEmail || null,
           descricao_evento: motivo || `Movimentação em lote para ${targetStatus}`,
           detalhes_alteracao: {
@@ -854,7 +854,7 @@ export async function deleteAssetPermanentlyAction(
         tipo_evento: 'EXCLUSAO_DEFINITIVA',
         status_origem: 'EXCLUIDO',
         status_destino: 'REMOVIDO',
-        usuario_responsavel_nome: usuarioNome || 'Operador SPCI',
+        usuario_responsavel_nome: usuarioNome || 'Operador SIGER',
         usuario_responsavel_email: usuarioEmail || null,
         descricao_evento: `Ativo ${cleanId} (${category}) excluído definitivamente do sistema.`,
         created_at: new Date().toISOString()

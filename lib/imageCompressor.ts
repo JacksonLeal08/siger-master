@@ -1,5 +1,5 @@
 /**
- * SPCI Master - Engine de Compressão Inteligente de Imagens (Client-Side)
+ * SIGER Master - Engine de Compressão Inteligente de Imagens (Client-Side)
  * Otimizado para Mobile e Web conforme padrões 'mobile-design' e 'web-design-master'.
  * Reduz fotos de 5-15MB para ~180-350KB preservando nitidez de lacres, manômetros e QR Codes.
  */

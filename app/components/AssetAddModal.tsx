@@ -655,7 +655,7 @@ export default function AssetAddModal({ isOpen, onClose }: AssetAddModalProps) {
               CADASTRO DE EQUIPAMENTOS
             </span>
             <h2 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider mt-1 flex items-center gap-1.5">
-              ✍️ Cadastrar Novo Ativo no Sistema SPCI
+              ✍️ Cadastrar Novo Ativo no SISTEMA SIGER
             </h2>
           </div>
           <div className="flex items-center gap-1.5">

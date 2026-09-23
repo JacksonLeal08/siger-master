@@ -1,5 +1,5 @@
 /**
- * Utilitários Geoespaciais do Ecossistema SPCI Master
+ * Utilitários Geoespaciais do Ecossistema SIGER Master
  * Cálculo de distância geodésica (Haversine), filtros de oscilação GPS e formatação.
  */
 

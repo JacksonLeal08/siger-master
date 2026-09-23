@@ -46,7 +46,7 @@ export default function RetornoManutencaoPage() {
     userProfile?.name ||
     currentUser?.displayName ||
     (currentUser?.email ? currentUser.email.split('@')[0] : '') ||
-    'Inspetor SPCI';
+    'Inspetor SIGER';
   const loggedUserEmail = userProfile?.email || currentUser?.email || undefined;
 
   // Determinar o contrato ativo para isolamento de dados

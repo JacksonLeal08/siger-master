@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (normalizedRole !== 'DESENVOLVEDOR' && normalizedRole !== 'DEVELOPER') {
       return NextResponse.json(
         { 
-          error: 'Acesso negado. Ação restrita com exclusividade a Desenvolvedores do sistema SPCI Master.' 
+          error: 'Acesso negado. Ação restrita com exclusividade a Desenvolvedores do sistema SIGER Master.' 
         },
         { status: 403 }
       );

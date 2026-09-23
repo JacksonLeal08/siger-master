@@ -48,7 +48,7 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleCopyDiagnosis = () => {
-    const errorDetails = `[SPCI ERROR DIAGNOSTICS]
+    const errorDetails = `[SIGER ERROR DIAGNOSTICS]
 Timestamp: ${new Date().toISOString()}
 Error: ${this.state.error?.name}: ${this.state.error?.message}
 Stack: ${this.state.error?.stack || 'N/A'}

@@ -97,7 +97,7 @@ export default function BulkMovementModal({
           fornecedor_cnpj: fornecedorCnpj.trim() || undefined,
           previsao_retorno: previsaoRetorno || undefined,
           observacoes: observacao.trim() || undefined,
-          usuario_envio_nome: currentUserName || 'Operador SPCI',
+          usuario_envio_nome: currentUserName || 'Operador SIGER',
           usuario_envio_email: currentUserEmail,
           itens: selectedItems.map((item) => ({
             asset_id: item.id,
@@ -135,7 +135,7 @@ export default function BulkMovementModal({
             ? 'Recolhimento para triagem interna e formação de lote'
             : 'Reclassificação para prontidão de uso operacional',
         observacao: observacao.trim() || undefined,
-        usuarioNome: currentUserName || 'Operador SPCI',
+        usuarioNome: currentUserName || 'Operador SIGER',
         usuarioEmail: currentUserEmail
       });
 

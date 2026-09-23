@@ -204,7 +204,7 @@ export default function AtivoPublicClient({ initialAsset, searchedId }: Props) {
 
     setIsSubmittingReport(true);
     try {
-      // 1. Dispara Server Action para o banco do SPCI Master
+      // 1. Dispara Server Action para o banco do SIGER Master
       const result = await reportPublicAnomalyAction({
         assetId: asset?.id || searchedId,
         anomalias: selectedAnomalias,
@@ -221,7 +221,7 @@ export default function AtivoPublicClient({ initialAsset, searchedId }: Props) {
         })
         .join('\n');
 
-      const msgWhatsApp = `*🚨 REPORTE DE ANOMALIA EM ATIVO SPCI*
+      const msgWhatsApp = `*🚨 REPORTE DE ANOMALIA EM Ativo SIGER*
 ----------------------------------------
 *Ativo:* ${asset?.idAtivo || asset?.patrimonio || searchedId}
 *Categoria:* ${asset?.category?.toUpperCase() || 'SPCI'}
@@ -236,7 +236,7 @@ ${descricaoExtra ? `*Observações:* ${descricaoExtra}\n` : ''}*Comunicante:* ${
 *Contato:* ${contatoComunicante || 'Via Portal Público'}
 *Protocolo:* ${result.ticketId || 'PUB-' + Date.now().toString().slice(-4)}
 ----------------------------------------
-_Mensagem gerada automaticamente via Portal Público SPCI Master._`;
+_Mensagem gerada automaticamente via Portal Público SIGER Master._`;
 
       const whatsappUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_CECOM}&text=${encodeURIComponent(msgWhatsApp)}`;
 
@@ -270,7 +270,7 @@ _Mensagem gerada automaticamente via Portal Público SPCI Master._`;
             </div>
             <div>
               <span className="font-['Hanken_Grotesk'] text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white block">
-                SPCI MASTER
+                SIGER Master
               </span>
               <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
                 Portal Público
@@ -331,7 +331,7 @@ _Mensagem gerada automaticamente via Portal Público SPCI Master._`;
           </div>
           <div>
             <span className="font-['Hanken_Grotesk'] text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white block">
-              SPCI MASTER
+              SIGER Master
             </span>
             <span className="text-[9px] text-slate-500 dark:text-slate-400 uppercase tracking-widest block">
               Portal Público de Conformidade

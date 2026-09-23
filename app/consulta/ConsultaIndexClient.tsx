@@ -29,7 +29,7 @@ export default function ConsultaIndexClient() {
             Portal Público de Conformidade NBR
           </div>
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white font-['Hanken_Grotesk']">
-            Consulta Pública de Ativos SPCI
+            Consulta Pública de Ativos SIGER
           </h1>
           <p className="text-xs text-slate-400 font-sans max-w-md mx-auto leading-relaxed">
             Consulte a ficha técnica, selo Inmetro, data de recarga e integridade hidrostática de qualquer equipamento de combate a incêndio.

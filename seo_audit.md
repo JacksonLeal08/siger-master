@@ -1,4 +1,4 @@
-# 📋 Relatório de Auditoria Técnica de SEO & GEO — SISTEMA SPCI Master
+# 📋 Relatório de Auditoria Técnica de SEO & GEO — SISTEMA SIGER Master
 > **Data:** 13/09/2026 | **Especialista:** `seo-specialist` | **Versão do Sistema:** 4.3.0  
 > **Status Geral:** 🟡 Atenção Requerida (Alguns pontos críticos de rastreamento e dados estruturados)
 
@@ -6,7 +6,7 @@
 
 ## 🎯 Resumo Executivo
 
-Esta auditoria analisou minuciosamente as configurações de **SEO Tradicional (Google/Bing)**, **GEO (Otimização para IAs como ChatGPT, Perplexity e Gemini)** e a **Acessibilidade Semântica** do **SISTEMA SPCI Master**.
+Esta auditoria analisou minuciosamente as configurações de **SEO Tradicional (Google/Bing)**, **GEO (Otimização para IAs como ChatGPT, Perplexity e Gemini)** e a **Acessibilidade Semântica** do **SISTEMA SIGER Master**.
 
 Embora o projeto já possua uma base sólida com Next.js App Router, fontes otimizadas e PWA, foram identificados **11 apontamentos**, dos quais **2 são Críticos**, **4 são de Alta Prioridade**, **3 de Média Prioridade** e **2 são Sugestões de Melhoria**.
 
@@ -67,7 +67,7 @@ Embora o projeto já possua uma base sólida com Next.js App Router, fontes otim
 * **Arquivo:** [`app/login/LoginClient.tsx`](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/login/LoginClient.tsx)
 * **O que acontece hoje:** O formulário de login utiliza ícones e textos em `div`/`span`, mas não possui nenhuma tag de cabeçalho `<h1>`.
 * **Por que isso é um problema:** A ausência de `<h1>` quebra os critérios essenciais de acessibilidade (WCAG) e é apontada como falha pelos robôs de SEO (Lighthouse / Google Search Essentials), que esperam que toda página tenha um título principal claro.
-* **Como resolver:** Adicionar uma tag `<h1>` visualmente elegante no topo do card (ex: `<h1 className="...">Acesso ao Cockpit SPCI</h1>`).
+* **Como resolver:** Adicionar uma tag `<h1>` visualmente elegante no topo do card (ex: `<h1 className="...">Acesso ao Cockpit SIGER</h1>`).
 
 ---
 
@@ -81,10 +81,10 @@ Embora o projeto já possua uma base sólida com Next.js App Router, fontes otim
 
 ### 🟡 7. [MÉDIO] Título da Home Duplicando o Nome da Marca (`titleTemplate`)
 * **Arquivo:** [`app/layout.tsx`](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/layout.tsx#L41) e [`app/page.tsx`](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/page.tsx#L6)
-* **O que acontece hoje:** O layout define a máscara `titleTemplate: '%s | SISTEMA SPCI'`. Na Home, a página define `title: 'SISTEMA SPCI Master | Gestão e Governança de Combate a Incêndio'`.
-* **Resultado Gerado:** `SISTEMA SPCI Master | Gestão e Governança de Combate a Incêndio | SISTEMA SPCI` (78 caracteres).
+* **O que acontece hoje:** O layout define a máscara `titleTemplate: '%s | SISTEMA SIGER'`. Na Home, a página define `title: 'SISTEMA SIGER Master | Gestão e Governança de Combate a Incêndio'`.
+* **Resultado Gerado:** `SISTEMA SIGER Master | Gestão e Governança de Combate a Incêndio | SISTEMA SIGER` (78 caracteres).
 * **Por que isso é um problema:** O título fica com a marca repetida duas vezes e ultrapassa o limite visual de 60 caracteres do Google, sendo cortado com reticências (`...`) nos resultados de pesquisa.
-* **Como resolver:** Na Home (`app/page.tsx`), declarar o título com `title: { absolute: 'SISTEMA SPCI Master | Gestão de Combate a Incêndio' }`, impedindo que o template adicione o sufixo duplicado.
+* **Como resolver:** Na Home (`app/page.tsx`), declarar o título com `title: { absolute: 'SISTEMA SIGER Master | Gestão de Combate a Incêndio' }`, impedindo que o template adicione o sufixo duplicado.
 
 ---
 
@@ -107,7 +107,7 @@ Embora o projeto já possua uma base sólida com Next.js App Router, fontes otim
 ### 🟢 10. [BAIXO / GEO] Oportunidade para Motores de Busca com IA (ChatGPT / Perplexity)
 * **Local:** [`app/components/QuietLuxuryHome.tsx`](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/components/QuietLuxuryHome.tsx)
 * **Oportunidade:** IAs generativas buscam respostas prontas e tabelas com números para citar como fontes de autoridade.
-* **Sugestão de Recurso:** Incluir na Home um bloco de "Tabela de Prazos Normativos" visível (ex: Inspeção Nível 1 = Mensal, Recarga Nível 2 = Anual, Teste Hidrostático Nível 3 = 5 anos conforme NBR 12962). Isso faz com que ferramentas como Perplexity e SearchGPT citem o SISTEMA SPCI Master como fonte de referência técnica.
+* **Sugestão de Recurso:** Incluir na Home um bloco de "Tabela de Prazos Normativos" visível (ex: Inspeção Nível 1 = Mensal, Recarga Nível 2 = Anual, Teste Hidrostático Nível 3 = 5 anos conforme NBR 12962). Isso faz com que ferramentas como Perplexity e SearchGPT citem o SISTEMA SIGER Master como fonte de referência técnica.
 
 ---
 

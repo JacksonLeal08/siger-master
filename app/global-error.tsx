@@ -13,11 +13,11 @@ export default function GlobalError({
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    console.error('[SPCI Global Root Error]', error);
+    console.error('[SIGER Global Root Error]', error);
   }, [error]);
 
   const handleCopy = () => {
-    const text = `[SPCI CRITICAL ROOT ERROR]
+    const text = `[SIGER CRITICAL ROOT ERROR]
 Timestamp: ${new Date().toISOString()}
 Message: ${error.message}
 Digest: ${error.digest || 'N/A'}
@@ -40,7 +40,7 @@ Stack: ${error.stack || 'N/A'}`;
           </div>
 
           <span className="text-[10px] font-mono tracking-widest text-red-400 uppercase font-bold">
-            SISTEMA SPCI // FALHA GLOBAL DE INICIALIZAÇÃO
+            SISTEMA SIGER // FALHA GLOBAL DE INICIALIZAÇÃO
           </span>
 
           <h1 className="text-xl sm:text-2xl font-black text-white mt-1 uppercase">

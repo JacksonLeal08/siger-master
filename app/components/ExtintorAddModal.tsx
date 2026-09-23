@@ -844,7 +844,7 @@ export default function ExtintorAddModal({ isOpen, onClose }: ExtintorAddModalPr
     if (isOpen) {
       registerWindow(MODAL_ID, {
         title: 'Novo Extintor',
-        subtitle: 'Cadastro Técnico SPCI',
+        subtitle: 'Cadastro Técnico SIGER',
         iconName: 'flame',
         badgeStatus: formPatrimonio ? `#${formPatrimonio}` : 'Cadastro',
         onClose,
@@ -1702,7 +1702,7 @@ export default function ExtintorAddModal({ isOpen, onClose }: ExtintorAddModalPr
                   ATÍVO REGISTRADO COM SUCESSO!
                 </h3>
                 <p className="text-[11px] text-slate-500 font-sans mt-1">
-                  O extintor foi validado de acordo com a NBR 12962 e integrado ao SPCI.
+                  O extintor foi validado de acordo com a NBR 12962 e integrado ao SIGER.
                 </p>
 
                 {/* Details card */}

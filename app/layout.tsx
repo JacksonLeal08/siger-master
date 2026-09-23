@@ -87,7 +87,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'SISTEMA SPCI Master - Governança e Segurança Contra Incêndio',
+        alt: 'SISTEMA SIGER Master - Governança e Segurança Contra Incêndio',
       },
     ],
   },

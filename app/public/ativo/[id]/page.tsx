@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .maybeSingle();
 
     if (extRow) {
-      const title = `Ficha Técnica ${extRow.numero_patrimonio} (${extRow.status_conformidade || 'Conforme'}) - SPCI Master`;
+      const title = `Ficha Técnica ${extRow.numero_patrimonio} (${extRow.status_conformidade || 'Conforme'}) - SIGER Master`;
       const description = `Consulta de conformidade NBR para Extintor ${extRow.modelo_tipo || 'PQS ABC'} instalado em ${extRow.local_instalacao || 'Planta Operacional'}. Selo Inmetro: ${extRow.selo_inmetro || 'N/A'}.`;
       return {
         title,
@@ -64,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     if (!row) {
       return {
-        title: `Equipamento ${idUpper} Não Localizado | SISTEMA SPCI`,
+        title: `Equipamento ${idUpper} Não Localizado | SISTEMA SIGER`,
         description: `Ficha técnica de segurança contra incêndio para o ativo ${idUpper}.`,
         alternates: { canonical: canonicalUrl },
         robots: { index: false, follow: true },
@@ -95,7 +95,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             url: d.foto_url || d.fotoUrl || '/og-image.png',
             width: 1200,
             height: 630,
-            alt: `Ativo SPCI ${idUpper}`,
+            alt: `Ativo SIGER ${idUpper}`,
           },
         ],
       },
@@ -108,7 +108,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   } catch {
     return {
-      title: `Consulta de Ativo ${idUpper} | SISTEMA SPCI`,
+      title: `Consulta de Ativo ${idUpper} | SISTEMA SIGER`,
       description: 'Consulta pública de conformidade de ativos contra incêndio.',
       alternates: { canonical: canonicalUrl },
     };

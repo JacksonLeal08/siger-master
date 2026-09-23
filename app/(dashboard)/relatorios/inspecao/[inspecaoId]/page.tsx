@@ -86,7 +86,7 @@ export default function LaudoInspecaoPage() {
     const assetTag = inspecao?.asset_patrimonio || inspecao?.asset_id;
     if (assetTag) {
       const originalTitle = document.title;
-      document.title = `SISTEMA SPCI - Laudo Técnico Pericial - ${assetTag}`;
+      document.title = `SISTEMA SIGER - Laudo Técnico Pericial - ${assetTag}`;
       return () => {
         document.title = originalTitle;
       };
@@ -97,7 +97,7 @@ export default function LaudoInspecaoPage() {
     if (typeof window !== 'undefined') {
       const assetTag = inspecao?.asset_patrimonio || inspecao?.asset_id;
       if (assetTag) {
-        document.title = `SISTEMA SPCI - Laudo Técnico Pericial - ${assetTag}`;
+        document.title = `SISTEMA SIGER - Laudo Técnico Pericial - ${assetTag}`;
       }
       window.print();
     }
@@ -620,7 +620,7 @@ export default function LaudoInspecaoPage() {
 
       {/* Documento Principal do Laudo Técnico (Estilo Prancheta Corporativa) */}
       <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-5 sm:p-8 print:border-none print:shadow-none print:p-0 print:m-0 print:bg-white print:max-w-none print-page-box">
-        {/* Cabeçalho Oficial SPCI Master */}
+        {/* Cabeçalho Oficial SIGER Master */}
         <div className="border-b-2 border-red-600 pb-4 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 print:pb-2.5 print:mb-2.5 print:flex-row">
           <div>
             <div className="flex items-center gap-2.5 print:gap-2">
@@ -629,7 +629,7 @@ export default function LaudoInspecaoPage() {
               </div>
               <div>
                 <h1 className="text-lg sm:text-xl print:text-sm font-black tracking-tight text-slate-900 dark:text-slate-100 print:text-slate-950 uppercase">
-                  SPCI MASTER • LAUDO TÉCNICO PERICIAL
+                  SIGER Master • LAUDO TÉCNICO PERICIAL
                 </h1>
                 <p className="text-[10.5px] print:text-[8.5px] font-semibold text-slate-500 dark:text-slate-400 print:text-slate-600 tracking-wider uppercase">
                   Inspeção Regulatória Conforme Norma ABNT NBR 12962 / NR-23
@@ -753,7 +753,7 @@ export default function LaudoInspecaoPage() {
               <div>
                 <span className="text-[10px] print:text-[7.5px] text-slate-400 block uppercase font-medium">Técnico Inspetor</span>
                 <span className="font-bold text-slate-800 dark:text-slate-200 print:text-[9px]">
-                  {inspecao.tecnico_nome || 'Inspetor SPCI'}
+                  {inspecao.tecnico_nome || 'Inspetor SIGER'}
                 </span>
               </div>
               <div>
@@ -918,7 +918,7 @@ export default function LaudoInspecaoPage() {
 
         {/* Rodapé do Relatório */}
         <div className="mt-4 print:mt-2 pt-2 print:pt-1 border-t border-slate-200 dark:border-slate-800 text-center text-[10px] print:text-[7.5px] text-slate-400 dark:text-slate-500 font-mono avoid-break">
-          SPCI MASTER ENTERPRISE • SISTEMA DE GESTÃO E CONFORMIDADE DE PROTEÇÃO CONTRA INCÊNDIO • LAUDO HOMOLOGADO (PÁGINA 1/1)
+          SIGER Master ENTERPRISE • SISTEMA DE GESTÃO E CONFORMIDADE DE PROTEÇÃO CONTRA INCÊNDIO • LAUDO HOMOLOGADO (PÁGINA 1/1)
         </div>
       </div>
 

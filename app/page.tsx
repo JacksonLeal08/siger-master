@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: {
     absolute: 'SIGER Master | Gestão Integrada de Emergência & Resgate • JIMMP Info',
   },
-  description: 'Plataforma integrada para rastreabilidade de ativos SPCI, telemetria de frotas operacionais e emissão de laudos técnicos em tempo real.',
+  description: 'Plataforma integrada para rastreabilidade de Ativos SIGER, telemetria de frotas operacionais e emissão de laudos técnicos em tempo real.',
   alternates: {
     canonical: '/',
   },
@@ -47,7 +47,7 @@ const homeFaqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: 'Como funciona a vistoria técnica offline-first no SISTEMA SPCI?',
+      name: 'Como funciona a vistoria técnica offline-first no SISTEMA SIGER?',
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'O técnico de campo realiza todo o checklist normativo no smartphone mesmo sem sinal de internet. Ao restabelecer a conexão, os dados e fotos são sincronizados automaticamente com a nuvem em conformidade com o AVCB e NBRs.',

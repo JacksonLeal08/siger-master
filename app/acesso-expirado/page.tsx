@@ -26,7 +26,7 @@ export default function AcessoExpiradoPage() {
             Acesso Expirado
           </h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            O período de vigência da sua credencial de acesso corporativo chegou ao fim no painel de governança do SPCI.
+            O período de vigência da sua credencial de acesso corporativo chegou ao fim no painel de governança do SIGER.
           </p>
         </div>
 

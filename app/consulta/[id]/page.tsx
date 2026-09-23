@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const idUpper = id ? id.toUpperCase() : 'ATIVO';
 
   return {
-    title: `Consulta de Equipamento ${idUpper} | SISTEMA SPCI`,
+    title: `Consulta de Equipamento ${idUpper} | SISTEMA SIGER`,
     description: `Ficha técnica e status de conformidade do ativo de segurança contra incêndio ${idUpper}.`,
     alternates: {
       canonical: `/consulta/${id}`,
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: `Equipamento ${idUpper} - Inspeção SPCI`,
-      description: `Status de conformidade do ativo ${idUpper} no sistema SPCI Compliance.`,
+      description: `Status de conformidade do ativo ${idUpper} no SISTEMA SIGER Compliance.`,
     },
   };
 }

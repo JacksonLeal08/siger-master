@@ -1,7 +1,7 @@
 # Plano de Implementação: Melhorias Robustas de Arquitetura SPCI
 
 ## Overview
-Este plano descreve o detalhamento técnico e a sequência de tarefas para a aplicação de melhorias robustas de sincronização, tempo real, mídia offline com compactação inteligente e visibilidade de fila de sincronismo no SPCI.
+Este plano descreve o detalhamento técnico e a sequência de tarefas para a aplicação de melhorias robustas de sincronização, tempo real, mídia offline com compactação inteligente e visibilidade de fila de sincronismo no SIGER.
 
 **Project Type**: WEB
 

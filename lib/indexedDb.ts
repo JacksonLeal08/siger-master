@@ -1,5 +1,5 @@
 /**
- * Utilitário IndexedDB nativo e assíncrono para o cache local do SPCI.
+ * Utilitário IndexedDB nativo e assíncrono para o cache local do SIGER.
  * Substitui o LocalStorage para contornar o limite de 5MB.
  */
 

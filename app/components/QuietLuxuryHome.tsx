@@ -37,7 +37,7 @@ export default function QuietLuxuryHome() {
       a: 'A inspeção de nível 1 (visual e operacional) deve ser realizada mensalmente, a manutenção de nível 2 (recarga) anualmente e o ensaio hidrostático (nível 3) a cada 5 anos conforme as normas ABNT NBR 12962 e regulamentações do Inmetro.'
     },
     {
-      q: 'Como funciona a vistoria técnica offline-first no SISTEMA SPCI?',
+      q: 'Como funciona a vistoria técnica offline-first no SISTEMA SIGER?',
       a: 'O técnico de campo realiza todo o checklist normativo no smartphone mesmo sem sinal de internet. Ao restabelecer a conexão, os dados e fotos são sincronizados automaticamente com a nuvem em conformidade com o AVCB e NBRs.'
     },
     {

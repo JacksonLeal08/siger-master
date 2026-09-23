@@ -11,14 +11,14 @@ export async function POST(req: Request) {
 
     const loginUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://spci-master.vercel.app/login';
 
-    // HTML corporativo Premium estilizado com a marca "Grupo OMG | SPCI Master"
+    // HTML corporativo Premium estilizado com a marca "Grupo OMG | SIGER Master"
     const htmlTemplate = `
     <!DOCTYPE html>
     <html lang="pt-BR">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Credenciais de Acesso - Grupo OMG | SPCI Master</title>
+      <title>Credenciais de Acesso - Grupo OMG | SIGER Master</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #0f172a; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
       <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #0f172a; padding: 40px 10px;">
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
               <tr>
                 <td style="background-color: #1b2a32; padding: 24px; text-align: center; border-bottom: 2px solid #dc2626;">
                   <h1 style="color: #ffffff; font-size: 20px; font-weight: 900; margin: 0; letter-spacing: 1.5px; text-transform: uppercase;">
-                    🏢 GRUPO OMG <span style="color: #ef4444; font-weight: 300;">|</span> SPCI MASTER
+                    🏢 GRUPO OMG <span style="color: #ef4444; font-weight: 300;">|</span> SIGER Master
                   </h1>
                   <p style="color: #94a3b8; font-size: 11px; font-weight: 700; margin: 4px 0 0 0; text-transform: uppercase; letter-spacing: 2px;">
                     Plataforma de Gestão de Engenharia & Combate a Incêndio
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
                   </h2>
 
                   <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
-                    Seu perfil de acesso ao sistema corporativo <strong>SPCI Master</strong> foi cadastrado e ativado com sucesso. Abaixo estão suas credenciais de primeiro acesso:
+                    Seu perfil de acesso ao sistema corporativo <strong>SIGER Master</strong> foi cadastrado e ativado com sucesso. Abaixo estão suas credenciais de primeiro acesso:
                   </p>
 
                   <!-- Card de Credenciais -->
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
                     <tr>
                       <td align="center">
                         <a href="${loginUrl}" target="_blank" style="display: block; width: 100%; max-width: 320px; background: linear-gradient(to right, #dc2626, #ef4444); color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-align: center; padding: 16px 24px; border-radius: 12px; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);">
-                          Acessar Cockpit SPCI →
+                          Acessar Cockpit SIGER →
                         </a>
                       </td>
                     </tr>
@@ -111,7 +111,7 @@ export async function POST(req: Request) {
               <tr>
                 <td style="background-color: #0f172a; padding: 20px; text-align: center; border-top: 1px solid #1e293b;">
                   <p style="color: #64748b; font-size: 11px; margin: 0;">
-                    Grupo OMG | SPCI Master © 2026 - Todos os Direitos Reservados.
+                    Grupo OMG | SIGER Master © 2026 - Todos os Direitos Reservados.
                   </p>
                 </td>
               </tr>

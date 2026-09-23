@@ -141,7 +141,7 @@ export default function ConsultaClient({ assetId }: { assetId: string }) {
             <div className="flex items-center gap-2">
               <span className="inline-block w-2.5 h-2.5 bg-red-600 animate-pulse" />
               <h1 className="text-xs uppercase tracking-widest text-slate-400 font-semibold">
-                SISTEMA SPCI // CONSULTA PÚBLICA
+                SISTEMA SIGER // CONSULTA PÚBLICA
               </h1>
             </div>
             <p className="text-[10px] text-slate-500 tracking-wider uppercase mt-0.5">

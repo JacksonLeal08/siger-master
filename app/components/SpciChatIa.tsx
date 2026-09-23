@@ -54,7 +54,7 @@ export default function SpciChatIa() {
   // Mensagem inicial padrão
   const initialWelcomeMessage = {
     sender: 'assistant' as const,
-    text: 'Olá Operador! Sou o assistente Inspe IA SPCI 24h. Selecione um dos tópicos do sistema acima ou digite sua dúvida no campo abaixo para esclarecimentos instantâneos!'
+    text: 'Olá Operador! Sou o assistente SIGER IA 24h. Selecione um dos tópicos do sistema acima ou digite sua dúvida no campo abaixo para esclarecimentos instantâneos!'
   };
 
   // Tópicos organizados do sistema (Estilo Elite Coach)
@@ -64,8 +64,8 @@ export default function SpciChatIa() {
       icon: Layers,
       topics: [
         {
-          label: 'O que o SPCI Master é capaz de fazer?',
-          prompt: 'Apresente de forma clara o que a plataforma SPCI Master faz para gestão de extintores, hidrantes, sinalização e rotinas de segurança.'
+          label: 'O que o SIGER Master é capaz de fazer?',
+          prompt: 'Apresente de forma clara o que a plataforma SIGER Master faz para gestão de extintores, hidrantes, sinalização e rotinas de segurança.'
         },
         {
           label: 'Como interpretar o Índice de Conformidade?',
@@ -161,7 +161,7 @@ export default function SpciChatIa() {
     }
   ];
 
-  // Gerador de resposta inteligente local NBR e Sistema SPCI (à prova de falhas)
+  // Gerador de resposta inteligente local NBR e SISTEMA SIGER (à prova de falhas)
   const getSmartLocalNbrAnswer = (promptText: string): string => {
     const p = promptText.toLowerCase();
 
@@ -182,7 +182,7 @@ export default function SpciChatIa() {
     }
 
     if (p.includes('3 momentos') || p.includes('momentos de geocaptura') || p.includes('captura') || (p.includes('gps') && p.includes('ativo'))) {
-      return `📍 **Os 3 Momentos de Geocaptura no SPCI:**\n\nO sistema garante que nenhum ativo fique sem posição através de 3 camadas operacionais:\n\n1. **Estoque / Cadastro Inicial:** Ao receber novos lotes de extintores, o almoxarifado/técnico pode capturar a posição do lote ou inserir uma foto com GPS EXIF.\n2. **Ronda do Brigadista:** Durante a ronda de inspeção preventiva, a leitura do QR Code ou foto de conferência grava a coordenada atual do ativo.\n3. **Inspeção / Vistoria Formal:** No fechamento do checklist mensal NBR 12962, a geolocalização é revalidada e associada ao relatório de conformidade.`;
+      return `📍 **Os 3 Momentos de Geocaptura no SIGER:**\n\nO sistema garante que nenhum ativo fique sem posição através de 3 camadas operacionais:\n\n1. **Estoque / Cadastro Inicial:** Ao receber novos lotes de extintores, o almoxarifado/técnico pode capturar a posição do lote ou inserir uma foto com GPS EXIF.\n2. **Ronda do Brigadista:** Durante a ronda de inspeção preventiva, a leitura do QR Code ou foto de conferência grava a coordenada atual do ativo.\n3. **Inspeção / Vistoria Formal:** No fechamento do checklist mensal NBR 12962, a geolocalização é revalidada e associada ao relatório de conformidade.`;
     }
 
     if (p.includes('mapa') || p.includes('operacional')) {
@@ -190,7 +190,7 @@ export default function SpciChatIa() {
     }
 
     if (p.includes('capaz') || p.includes('apresente') || p.includes('sistema')) {
-      return `🚀 **O que o SPCI Master é capaz de fazer?**\n\nO SPCI Master é a plataforma definitiva de Engenharia de Segurança Contra Incêndios para plantas industriais e corporativas:\n\n• **Gestão de Inventário:** Controle unificado de Extintores, Hidrantes, Sinalização NBR, Iluminação de Emergência e Casa de Bombas.\n• **Mapa Operacional & GPS:** Plotagem geoespacial de ativos, rotas via Waze/Google Maps, extração de GPS EXIF de fotos e modo imersivo.\n• **Vistoria por QR Code:** Leitura instantânea via celular no campo para checklist automatizado.\n• **Conformidade em Tempo Real:** Cálculo de índices, alertas de recarga vencida e testes hidrostáticos (NBR 12962 e NBR 13714).\n• **Assistente com IA 24h:** Esclarecimento de dúvidas normativas e emissão de orientações corretivas em campo.`;
+      return `🚀 **O que o SIGER Master é capaz de fazer?**\n\nO SIGER Master é a plataforma definitiva de Engenharia de Segurança Contra Incêndios para plantas industriais e corporativas:\n\n• **Gestão de Inventário:** Controle unificado de Extintores, Hidrantes, Sinalização NBR, Iluminação de Emergência e Casa de Bombas.\n• **Mapa Operacional & GPS:** Plotagem geoespacial de ativos, rotas via Waze/Google Maps, extração de GPS EXIF de fotos e modo imersivo.\n• **Vistoria por QR Code:** Leitura instantânea via celular no campo para checklist automatizado.\n• **Conformidade em Tempo Real:** Cálculo de índices, alertas de recarga vencida e testes hidrostáticos (NBR 12962 e NBR 13714).\n• **Assistente com IA 24h:** Esclarecimento de dúvidas normativas e emissão de orientações corretivas em campo.`;
     }
 
     if (p.includes('12962')) {
@@ -213,7 +213,7 @@ export default function SpciChatIa() {
       return `📱 **Vistoria via QR Code no Celular:**\n\n1. Abra o menu **QR Code de Inspeção** no cabeçalho do sistema.\n2. Aponte a câmera do seu smartphone para o QR Code colado no extintor ou hidrante.\n3. O sistema abre diretamente a ficha do equipamento com os itens do checklist ABNT para preenchimento com 1 clique!`;
     }
 
-    return `🤖 **Inspe IA (Assistente SPCI NBR):**\n\nEntendido! Para a pergunta "${promptText}", aqui está a orientação técnica baseada no padrão ABNT da sua planta:\n\n• **Conformidade Atual:** ${compliancePercentage}% (${totalAssets} ativos monitorados, ${totalVencidos} pendências).\n• **Extintores (NBR 12962):** Lacre íntegro, ponteiro do manômetro no verde e validade anual em dia.\n• **Sinalização (NBR 13434):** Placas fotoluminescentes instaladas acima dos equipamentos e desobstruídas.\n\nComo posso ajudar detalhando algum quesito específico para a sua vistoria hoje?`;
+    return `🤖 **Inspe IA (Assistente SIGER NBR):**\n\nEntendido! Para a pergunta "${promptText}", aqui está a orientação técnica baseada no padrão ABNT da sua planta:\n\n• **Conformidade Atual:** ${compliancePercentage}% (${totalAssets} ativos monitorados, ${totalVencidos} pendências).\n• **Extintores (NBR 12962):** Lacre íntegro, ponteiro do manômetro no verde e validade anual em dia.\n• **Sinalização (NBR 13434):** Placas fotoluminescentes instaladas acima dos equipamentos e desobstruídas.\n\nComo posso ajudar detalhando algum quesito específico para a sua vistoria hoje?`;
   };
 
   const handleSendPrompt = async (promptToSend?: string) => {
@@ -235,7 +235,7 @@ export default function SpciChatIa() {
           prompt: `Responda de forma sucinta como o Inspe IA SPCI.
           Planta SPCI atual: ${totalAssets} ativos monitorados, ${totalVencidos} vencidos, ${totalAtencao} em atenção. Índice Geral Conformidade: ${compliancePercentage}%.
           Mensagem do operador: ${textToQuery}`,
-          systemInstruction: "Você é o assistente virtual Inspe IA SPCI operando via motor DeepSeek-V3. Responda em português brasileiro, de forma breve, altamente precisa e técnica, baseando-se estritamente em engenharia de segurança contra incêndios (NBR 12693, NBR 12962, NBR 13434, NBR 13714, NBR 10897, NBR 15808, NBR 15809) e nas funcionalidades do sistema SPCI Master (Mapa Operacional com geolocalização de ativos, rotas via Google Maps e Waze, modo imersivo tela cheia, captura de fotos com câmera do dispositivo e extração automática de GPS a partir dos metadados EXIF da imagem). Mantenha as respostas objetivas e formatadas em Markdown quando necessário."
+          systemInstruction: "Você é o assistente virtual Inspe IA SPCI operando via motor DeepSeek-V3. Responda em português brasileiro, de forma breve, altamente precisa e técnica, baseando-se estritamente em engenharia de segurança contra incêndios (NBR 12693, NBR 12962, NBR 13434, NBR 13714, NBR 10897, NBR 15808, NBR 15809) e nas funcionalidades do sistema SIGER Master (Mapa Operacional com geolocalização de ativos, rotas via Google Maps e Waze, modo imersivo tela cheia, captura de fotos com câmera do dispositivo e extração automática de GPS a partir dos metadados EXIF da imagem). Mantenha as respostas objetivas e formatadas em Markdown quando necessário."
         })
       });
 
@@ -255,7 +255,7 @@ export default function SpciChatIa() {
             prompt: `Responda de forma sucinta como o Inspe IA SPCI.
             Planta SPCI atual: ${totalAssets} ativos monitorados, ${totalVencidos} vencidos, ${totalAtencao} em atenção. Índice Geral Conformidade: ${compliancePercentage}%.
             Mensagem do operador: ${textToQuery}`,
-            systemInstruction: "Você é o assistente virtual Inspe IA SPCI. Responda em português brasileiro, de forma breve, muito precisa, baseando-se estritamente em engenharia de segurança contra incêndios e nas funcionalidades do sistema SPCI Master (Mapa Operacional, rotas Waze/Google Maps, fotos com extração de GPS EXIF e modo tela cheia)."
+            systemInstruction: "Você é o assistente virtual Inspe IA SPCI. Responda em português brasileiro, de forma breve, muito precisa, baseando-se estritamente em engenharia de segurança contra incêndios e nas funcionalidades do sistema SIGER Master (Mapa Operacional, rotas Waze/Google Maps, fotos com extração de GPS EXIF e modo tela cheia)."
           })
         });
 
@@ -528,7 +528,7 @@ export default function SpciChatIa() {
                   value={localPrompt} 
                   onChange={(e) => setLocalPrompt(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSendPrompt(); }}
-                  placeholder="Qual sua dúvida sobre o SPCI Master ou NBR?" 
+                  placeholder="Qual sua dúvida sobre o SIGER Master ou NBR?" 
                   className="flex-grow bg-white border border-slate-300 text-slate-900 px-3.5 py-2.5 text-xs font-sans font-bold focus:outline-none focus:border-red-600 rounded-xl shadow-xs" 
                 />
                 <button 

@@ -89,7 +89,7 @@ export const TerminalMobileShareModal: React.FC<TerminalMobileShareModalProps> =
 
   const handleWhatsAppShare = () => {
     const text = encodeURIComponent(
-      `🚒 *SPCI MASTER - TERMINAL DE ABASTECIMENTO*\n\n` +
+      `🚒 *SIGER Master - TERMINAL DE ABASTECIMENTO*\n\n` +
       `Olá condutor/socorrista! Acesse o terminal de campo pelo link abaixo para registrar os abastecimentos da frota:\n\n` +
       `🔗 ${terminalUrl}\n\n` +
       `_Contrato Ativo: ${contratoId.toUpperCase()} | Operação Offline-First_`
@@ -240,7 +240,7 @@ export const TerminalMobileShareModal: React.FC<TerminalMobileShareModalProps> =
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
             PWA OFFLINE COMPATÍVEL
           </span>
-          <span>SPCI MASTER // FROTA</span>
+          <span>SIGER Master // FROTA</span>
         </div>
       </div>
     </div>,

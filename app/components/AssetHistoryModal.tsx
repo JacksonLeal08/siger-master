@@ -92,7 +92,7 @@ export default function AssetHistoryModal({ isOpen, asset, onClose }: AssetHisto
       date: registerDate,
       time: '08:00:00',
       type: 'registration',
-      title: 'Ativação & Cadastro no SPCI',
+      title: 'Ativação & Cadastro no SIGER',
       icon: '📥',
       status: 'Cadastro Ativo',
       description: `Dispositivo registrado com sucesso no local ${asset.location} ${asset.subLocation ? ' - ' + asset.subLocation : ''}. Homologação física e operacional consolidada.`,
@@ -217,7 +217,7 @@ export default function AssetHistoryModal({ isOpen, asset, onClose }: AssetHisto
 
     const historyText = timelineEvents.map(e => `- [${e.date} ${e.time || ''}] ${e.title} (${e.status}): ${e.description}`).join('\n');
 
-    const fallbackReport = `📋 **PARECER TÉCNICO DE ENGENHARIA SPCI MASTER**
+    const fallbackReport = `📋 **PARECER TÉCNICO DE ENGENHARIA SIGER Master**
 **Identificação do Ativo:** ${assetId} | Categoria: ${asset.category?.toUpperCase() || 'EXTINTORES'}
 **Modelo/Capacidade:** ${(asset as any).model || 'Padrão NBR'} — Local: ${asset.location} ${asset.subLocation ? ' (' + asset.subLocation + ')' : ''}
 **Status Operacional Atual:** [${localStatus?.toUpperCase()}] | Taxa de Conformidade: ${complianceScore}%
@@ -235,7 +235,7 @@ ${historyText || '- Nenhum evento crítico registrado.'}
 3. **Carga e Teste Hidrostático (NBR 15808):** Validade anual da recarga e ciclo quinquenal do ensaio de pressão do recipiente.
 
 ### IV. RECOMENDAÇÕES E REAPROVAÇÃO
-- Manter rotina de inspeção visual mensal cadastrada via QR Code no SPCI Master.
+- Manter rotina de inspeção visual mensal cadastrada via QR Code no SIGER Master.
 - Efetuar a pronta correção de qualquer apontamento não conforme registrado na linha do tempo.
 - Homologação emitida em ${new Date().toLocaleDateString('pt-BR')} pelo Sistema Inspe IA.`;
 
@@ -278,7 +278,7 @@ ${historyText || '- Nenhum evento crítico registrado.'}
         sender: 'assistant', 
         text: fallbackReport 
       }]);
-      triggerSuccessNotification('Parecer Técnico SPCI Gerado!', `Laudo técnico sintetizado para o ativo ${assetId}.`);
+      triggerSuccessNotification('Parecer Técnico SIGER Gerado!', `Laudo técnico sintetizado para o ativo ${assetId}.`);
     } finally {
       setAiGenerating(false);
     }
@@ -313,7 +313,7 @@ ${historyText || '- Nenhum evento crítico registrado.'}
                 {asset.category} • {assetId}
               </span>
               <h3 className="text-base font-extrabold text-slate-900 uppercase tracking-tight mt-1 truncate font-['Hanken_Grotesk']">
-                {(asset as any).model || 'Ativo SPCI'}
+                {(asset as any).model || 'Ativo SIGER'}
               </h3>
               <p className="text-slate-500 text-xs mt-0.5 font-medium flex items-center gap-1">
                 📍 {asset.location} — {asset.subLocation || 'Sem subsetor'}

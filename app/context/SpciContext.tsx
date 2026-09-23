@@ -570,7 +570,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (action === 'LOGIN') {
         triggerSuccessNotification(
           "🚪 Novo Login Registrado",
-          `${userName} (${userEmail}) realizou login no sistema SPCI.`
+          `${userName} (${userEmail}) realizou login no SISTEMA SIGER.`
         );
       }
     } catch (err) {
@@ -1757,7 +1757,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const deleteAsset = useCallback(async (category: string, assetId: string) => {
     try {
-      const userName = userProfile?.name || currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : 'Operador SPCI');
+      const userName = userProfile?.name || currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : 'Operador SIGER');
       const userEmail = userProfile?.email || currentUser?.email || undefined;
       await deleteAssetFromDb(category, assetId, userName, userEmail);
       

@@ -1562,7 +1562,7 @@ function InspecaoOuCadastroContent() {
                 </h3>
                 <p className={`text-xs leading-relaxed font-sans max-w-sm mx-auto ${textMutedClass}`}>
                   {isOnline 
-                    ? 'O novo equipamento foi cadastrado e sincronizado com o banco de dados principal do SPCI.'
+                    ? 'O novo equipamento foi cadastrado e sincronizado com o banco de dados principal do SIGER.'
                     : 'O equipamento foi cadastrado e salvo offline na fila local. Ele será transmitido ao Banco de Dados automaticamente ao detectar conexão.'}
                 </p>
               </div>
@@ -2113,7 +2113,7 @@ function InspecaoOuCadastroContent() {
                 <p className={`text-xs leading-relaxed font-sans max-w-sm mx-auto ${textMutedClass}`}>
                   {submissionStatus === 'success_offline' 
                     ? 'A vistoria foi gravada localmente na fila do celular por falta de rede. Ela será enviada ao Banco de Dados automaticamente quando você se conectar.'
-                    : 'Laudo de inspeção transmitido e integrado ao banco de dados histórico do SPCI com sucesso.'}
+                    : 'Laudo de inspeção transmitido e integrado ao banco de dados histórico do SIGER com sucesso.'}
                 </p>
               </div>
 
@@ -2183,7 +2183,7 @@ function InspecaoOuCadastroContent() {
       <footer className={`w-full text-center py-6 border-t z-15 select-none transition-colors ${
         isDark ? 'border-slate-900 bg-slate-950 text-slate-700' : 'border-slate-250 bg-slate-100 text-slate-500'
       }`}>
-        <p className="text-[8px] uppercase tracking-[0.25em]">SISTEMA SPCI • PORTAL DE INSPEÇÕES PÚBLICAS v2.2</p>
+        <p className="text-[8px] uppercase tracking-[0.25em]">SISTEMA SIGER • PORTAL DE INSPEÇÕES PÚBLICAS v2.2</p>
         <p className="text-[7px] mt-1 font-sans">Desenvolvido em conformidade com as normas ABNT e NBR brasileiras.</p>
       </footer>
 
@@ -2403,7 +2403,7 @@ function InspecaoOuCadastroContent() {
                   isDark ? 'text-white' : 'text-slate-900'
                 }`}>
                   <Flame size={15} className="text-red-600" />
-                  Foto do Equipamento ({ativo?.idAtivo || 'Ativo SPCI'})
+                  Foto do Equipamento ({ativo?.idAtivo || 'Ativo SIGER'})
                 </span>
                 <button
                   type="button"

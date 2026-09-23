@@ -118,7 +118,7 @@ export default function ExtintorPublicClient({ hash }: { hash: string }) {
               SPCI
             </span>
             <div>
-              <h1 className="text-xs font-black uppercase tracking-wider text-slate-900">SISTEMA SPCI</h1>
+              <h1 className="text-xs font-black uppercase tracking-wider text-slate-900">SISTEMA SIGER</h1>
               <p className="text-[8px] text-slate-400 uppercase tracking-widest font-sans">Segurança Contra Incêndio</p>
             </div>
           </div>
@@ -262,7 +262,7 @@ export default function ExtintorPublicClient({ hash }: { hash: string }) {
 
       <footer className="mt-8 text-center text-slate-400 text-[8px] sm:text-[9px] font-sans">
         <p className="flex items-center justify-center gap-1">
-          <Award className="w-3 h-3" /> Sistema Corporativo SPCI • Homologado e Criptografado
+          <Award className="w-3 h-3" /> Sistema CorporAtivo SIGER • Homologado e Criptografado
         </p>
       </footer>
     </div>

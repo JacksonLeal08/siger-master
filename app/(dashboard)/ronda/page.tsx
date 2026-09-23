@@ -63,7 +63,7 @@ export default function RondaPage() {
     { key: 'hidrantes', label: 'Hidrantes', icon: <Droplet size={15} />, color: 'text-sky-500', bg: 'bg-sky-500/10' },
     { key: 'sinalizacoes', label: 'Sinalização', icon: <TriangleAlert size={15} />, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     { key: 'iluminacoes', label: 'Iluminação', icon: <Lightbulb size={15} />, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
-    { key: 'bombas', label: 'Bombas SPCI', icon: <Cog size={15} />, color: 'text-slate-500', bg: 'bg-slate-500/10' },
+    { key: 'bombas', label: 'Bombas SIGER', icon: <Cog size={15} />, color: 'text-slate-500', bg: 'bg-slate-500/10' },
   ] as const;
 
   // Função para retornar os ativos da categoria ativa
@@ -207,9 +207,9 @@ export default function RondaPage() {
   const handleSendWhatsApp = (type: 'vistoria' | 'cadastro') => {
     let msg = '';
     if (type === 'vistoria' && selectedAsset) {
-      msg = `Olá Técnico SPCI! Realize a inspeção periódica obrigatória do ativo ${selectedAsset.idAtivo || selectedAsset.id} (${selectedAsset.model || selectedAsset.name || 'PQS'}) localizado no setor [${selectedAsset.location}]. Clique no link para vistoriar: ${linkVistoria}`;
+      msg = `Olá Técnico SIGER! Realize a inspeção periódica obrigatória do ativo ${selectedAsset.idAtivo || selectedAsset.id} (${selectedAsset.model || selectedAsset.name || 'PQS'}) localizado no setor [${selectedAsset.location}]. Clique no link para vistoriar: ${linkVistoria}`;
     } else {
-      msg = `Olá Técnico SPCI! Acesse o portal público para realizar o cadastro de novos equipamentos de combate a incêndio: ${linkCadastro}`;
+      msg = `Olá Técnico SIGER! Acesse o portal público para realizar o cadastro de novos equipamentos de combate a incêndio: ${linkCadastro}`;
     }
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
     window.open(whatsappUrl, '_blank');
@@ -779,7 +779,7 @@ export default function RondaPage() {
       <AssetSwapModal
         isOpen={isSwapModalOpen}
         onClose={() => setIsSwapModalOpen(false)}
-        currentUserName={userProfile?.displayName || userProfile?.nome || 'Operador SPCI'}
+        currentUserName={userProfile?.displayName || userProfile?.nome || 'Operador SIGER'}
         currentUserEmail={userProfile?.email || undefined}
         preSelectedAssetId={selectedAsset?.idAtivo || selectedAsset?.id}
         onSuccess={() => {

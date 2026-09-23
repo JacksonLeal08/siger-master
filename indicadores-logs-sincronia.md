@@ -90,7 +90,7 @@ Abaixo estão divididos os componentes que sofrerão alteração:
 - Adicionar um botão de refresh instantâneo ao lado do timestamp para forçar a sincronização de forma manual e elegante.
 - Implementar estado local `statusFilter` (`'ALL' | 'CONFORME' | 'VENCIDO' | 'MANUTENCAO'`).
 - Adicionar detectores de clique nos cards superiores de KPI de Extintores para alternar `statusFilter` e aplicar filtro visual na tabela de inventário de ativos na mesma página, realçando o card selecionado com borda ou efeito *glow* correspondente.
-- **Remoção do Botão Redundante**: Excluir o botão `+ NOVO EXTINTOR` que está ao lado do campo de pesquisa no bloco "INVENTÁRIO DE EXTINTORES SPCI".
+- **Remoção do Botão Redundante**: Excluir o botão `+ NOVO EXTINTOR` que está ao lado do campo de pesquisa no bloco "INVENTÁRIO DE Extintores SIGER".
 - **Ícones e Classificações de Extinção**:
   - Implementar o método `getExtinguisherIconAndClass(model)` que mapeia o modelo para o respectivo ícone educativo e descrição da Classe de Fogo (NBR).
   - Exibir esse indicador visual dinâmico de forma elegante no cabeçalho de cada card de Extintor.

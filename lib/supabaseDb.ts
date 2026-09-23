@@ -482,7 +482,7 @@ export async function registerOrLoginUserProfile(user: { uid: string; displayNam
     const initialRole = isMasterDev ? 'Desenvolvedor' : 'Usuário';
     const newProfile: UserProfile = {
       uid: user.uid,
-      name: user.displayName || user.email?.split('@')[0] || 'Usuário SPCI',
+      name: user.displayName || user.email?.split('@')[0] || 'Usuário SIGER',
       email: user.email || '',
       userName: getSafeUserName(user.email),
       photoURL: user.photoURL || '',
@@ -508,7 +508,7 @@ export async function registerOrLoginUserProfile(user: { uid: string; displayNam
     console.warn('[registerOrLoginUserProfile] Retornando perfil seguro com cache local:', error.message || error);
     return {
       uid: user.uid,
-      name: user.displayName || user.email?.split('@')[0] || 'Usuário SPCI',
+      name: user.displayName || user.email?.split('@')[0] || 'Usuário SIGER',
       email: user.email || '',
       userName: getSafeUserName(user.email),
       photoURL: user.photoURL || '',

@@ -93,7 +93,7 @@ export const EtiquetaPreviewA4: React.FC<EtiquetaPreviewA4Props> = ({
               <div className="flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-600 print:bg-red-700" />
                 <span className="text-[7.5px] font-sans font-black tracking-tighter uppercase text-slate-800">
-                  SPCI MASTER // OMG
+                  SIGER Master // OMG
                 </span>
               </div>
               <span className="text-[7px] font-bold uppercase text-red-700 bg-red-50 print:bg-transparent px-1 rounded">

@@ -448,7 +448,7 @@ export function emitirLaudoChecklistPdf(checklist: ChecklistVeicular): void {
       </td>
       <td>
         <div class="sig-line">Gestão de Frotas & Brigada de Emergência</div>
-        <div class="sig-sub">Homologação Técnica SPCI Master</div>
+        <div class="sig-sub">Homologação Técnica SIGER Master</div>
       </td>
     </tr>
   </table>

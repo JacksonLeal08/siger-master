@@ -65,7 +65,7 @@ export default function ConfiguracoesPage() {
     }
   };
 
-  // Guard: exclusivo para administradores credenciados do SPCI
+  // Guard: exclusivo para administradores credenciados do SIGER
   const isAdmin = userProfile?.role === 'Administrador' || 
     userProfile?.role === 'Desenvolvedor' || 
     userProfile?.role === 'Gestor' || 
@@ -104,7 +104,7 @@ export default function ConfiguracoesPage() {
         <span className="text-4xl" role="img" aria-label="Acesso restrito">🚫</span>
         <h3 className="font-bold text-sm text-slate-900 dark:text-zinc-100 uppercase tracking-wider">Acesso Restrito</h3>
         <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans leading-relaxed">
-          Esta área de configurações e governança do sistema é exclusiva para administradores credenciados do SPCI Master.
+          Esta área de configurações e governança do sistema é exclusiva para administradores credenciados do SIGER Master.
         </p>
         <button 
           onClick={() => router.push('/dashboard')}

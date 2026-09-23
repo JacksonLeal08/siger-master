@@ -1615,7 +1615,7 @@ export default function OperationalMap({
         isOpen={!!zoomedAsset}
         onClose={() => setZoomedAsset(null)}
         imageUrl={zoomedAsset?.foto_url}
-        title={zoomedAsset?.idAtivo || zoomedAsset?.patrimonio || 'Ativo SPCI'}
+        title={zoomedAsset?.idAtivo || zoomedAsset?.patrimonio || 'Ativo SIGER'}
         subtitle={zoomedAsset?.model}
         location={zoomedAsset ? `${zoomedAsset.location}${zoomedAsset.subLocation ? ` - ${zoomedAsset.subLocation}` : ''}` : undefined}
         date={zoomedAsset?.data_ultima_localizacao}

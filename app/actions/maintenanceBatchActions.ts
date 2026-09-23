@@ -190,7 +190,7 @@ export async function createMaintenanceBatchAction(payload: CreateBatchPayload) 
         total_condenados: 0,
         data_envio: new Date().toISOString(),
         previsao_retorno: payload.previsao_retorno || null,
-        usuario_envio_nome: payload.usuario_envio_nome || 'Operador SPCI',
+        usuario_envio_nome: payload.usuario_envio_nome || 'Operador SIGER',
         usuario_envio_email: payload.usuario_envio_email || null,
         observacoes: payload.observacoes?.trim() || null,
       })
@@ -261,7 +261,7 @@ export async function createMaintenanceBatchAction(payload: CreateBatchPayload) 
       numero_lote: numeroLote,
       status_origem: 'ESTOQUE MANUTENÇÃO',
       status_destino: 'EM MANUTENÇÃO',
-      usuario_responsavel_nome: payload.usuario_envio_nome || 'Operador SPCI',
+      usuario_responsavel_nome: payload.usuario_envio_nome || 'Operador SIGER',
       usuario_responsavel_email: payload.usuario_envio_email || null,
       descricao_evento: `Envio para recarga/teste hidrostático junto ao fornecedor: ${payload.fornecedor_nome}`,
       detalhes_alteracao: {
@@ -549,7 +549,7 @@ export async function triageBatchReturnAction(payload: TriageBatchPayload) {
           numero_lote: lote.numero_lote,
           status_origem: 'EM MANUTENÇÃO',
           status_destino: 'ESTOQUE APLICAÇÃO',
-          usuario_responsavel_nome: payload.usuario_triagem_nome || 'Operador SPCI',
+          usuario_responsavel_nome: payload.usuario_triagem_nome || 'Operador SIGER',
           usuario_responsavel_email: payload.usuario_triagem_email || null,
           descricao_evento: 'Retorno de manutenção aprovado com selo Inmetro e novas validades aplicadas.',
           detalhes_alteracao: {
@@ -569,7 +569,7 @@ export async function triageBatchReturnAction(payload: TriageBatchPayload) {
           numero_lote: lote.numero_lote,
           status_origem: 'EM MANUTENÇÃO',
           status_destino: 'CONDENADOS',
-          usuario_responsavel_nome: payload.usuario_triagem_nome || 'Operador SPCI',
+          usuario_responsavel_nome: payload.usuario_triagem_nome || 'Operador SIGER',
           usuario_responsavel_email: payload.usuario_triagem_email || null,
           descricao_evento: `Ativo condenado no retorno de manutenção. Motivo: ${itemResult.motivo_condenacao || 'Não especificado'}`,
           detalhes_alteracao: {
@@ -600,7 +600,7 @@ export async function triageBatchReturnAction(payload: TriageBatchPayload) {
         total_aprovados: totalAprovadosLote,
         total_condenados: totalCondenadosLote,
         data_conclusao: isLoteFinalizado ? nowIso : null,
-        usuario_triagem_nome: payload.usuario_triagem_nome || 'Operador SPCI',
+        usuario_triagem_nome: payload.usuario_triagem_nome || 'Operador SIGER',
         usuario_triagem_email: payload.usuario_triagem_email || null,
         updated_at: nowIso,
       })
@@ -661,7 +661,7 @@ export async function reconcileBatchesAndAssetsAction() {
     await supabase
       .from('lotes_manutencao')
       .update({ usuario_envio_nome: 'Jackson Leal' })
-      .eq('usuario_envio_nome', 'Operador SPCI');
+      .eq('usuario_envio_nome', 'Operador SIGER');
 
     // 1. Buscar todos os lotes finalizados ou concluídos
     const { data: lotesFinalizados } = await supabase

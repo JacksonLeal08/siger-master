@@ -1,6 +1,6 @@
-# Walkthrough: SPCI - Gestão de Ativos, Notificações, Duplicidades e Responsividade
+# Walkthrough: SIGER - Gestão de Ativos, Notificações, Duplicidades e Responsividade
 
-Este walkthrough descreve as implementações de melhorias de interface, tempo real, resiliência e usabilidade mobile efetuadas no ecossistema SPCI.
+Este walkthrough descreve as implementações de melhorias de interface, tempo real, resiliência e usabilidade mobile efetuadas no ecosSISTEMA SIGER.
 
 ---
 
@@ -27,7 +27,7 @@ Este walkthrough descreve as implementações de melhorias de interface, tempo r
 - **Alerta HUD ([page.tsx](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/inspecao/[id]/page.tsx)):** No portal de campo do técnico, ao tentar abrir ou enviar um laudo para um ativo que já recebeu inspeção no dia corrente, o sistema bloqueia e exibe um modal estilo HUD: "Ativo já Inspecionado Hoje", listando o técnico responsável e o horário do laudo. O usuário pode optar por **Voltar** (cancela) ou **Prosseguir/Sobrescrever**.
 
 ### 5. Logout Interativo
-- **Confirmação Pré-Logout ([LogoutClient.tsx](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/logout/LogoutClient.tsx)):** Ao acessar `/logout`, o sistema exibe uma tela escura interativa com o aviso "Encerrar Sessão no SPCI?".
+- **Confirmação Pré-Logout ([LogoutClient.tsx](file:///c:/Users/jacks/OneDrive/Documentos/Jackson%20Leal/ANTIGRAVITY_PROJECTS/New_Project_SPCI---Master/app/logout/LogoutClient.tsx)):** Ao acessar `/logout`, o sistema exibe uma tela escura interativa com o aviso "Encerrar Sessão no SIGER?".
 - O usuário pode clicar em **Cancelar** para voltar com segurança ao dashboard ou em **Sair** para iniciar a barra de progresso industrial de 3 segundos que apaga cookies e redireciona ao `/login`.
 
 ### 6. Gestão de Setores (CRUD) e Sub-Locais (CRUD)

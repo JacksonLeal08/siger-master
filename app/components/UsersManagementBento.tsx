@@ -494,7 +494,7 @@ export default function UsersManagementBento({
               <div>
                 <h4 className="font-black text-sm uppercase">Compartilhar Acesso</h4>
                 <p className="text-[10px] text-slate-500 dark:text-zinc-400 font-sans">
-                  Link direto e credenciais corporativas do Cockpit SPCI
+                  Link direto e credenciais corporativas do Cockpit SIGER
                 </p>
               </div>
             </div>
@@ -528,7 +528,7 @@ export default function UsersManagementBento({
               <button
                 type="button"
                 onClick={() => {
-                  const text = `🏢 *GRUPO OMG // SPCI MASTER*\n───────────────\n🔥 *CREDENCIAIS DE ACESSO CORPORATIVO*\n\nOlá, *${sharingUser.name}*!\nSeu perfil no *SPCI Master* está ativo.\n\n📍 *Nível:* ${sharingUser.role}\n🌐 *Cockpit:* https://spci-master.vercel.app/login\n📧 *Login:* ${sharingUser.email}\n👤 *Username:* @${sharingUser.userName || sharingUser.username}\n🏢 *Contrato:* ${sharingUser.site || 'Acesso Global'}\n\n_Grupo OMG © 2026_`;
+                  const text = `🏢 *GRUPO OMG // SIGER Master*\n───────────────\n🔥 *CREDENCIAIS DE ACESSO CORPORATIVO*\n\nOlá, *${sharingUser.name}*!\nSeu perfil no *SIGER Master* está ativo.\n\n📍 *Nível:* ${sharingUser.role}\n🌐 *Cockpit:* https://spci-master.vercel.app/login\n📧 *Login:* ${sharingUser.email}\n👤 *Username:* @${sharingUser.userName || sharingUser.username}\n🏢 *Contrato:* ${sharingUser.site || 'Acesso Global'}\n\n_Grupo OMG © 2026_`;
                   copyToClipboard(text);
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2000);
@@ -542,7 +542,7 @@ export default function UsersManagementBento({
               <button
                 type="button"
                 onClick={() => {
-                  const text = `🏢 *GRUPO OMG // SPCI MASTER*\n───────────────\n🔥 *CREDENCIAIS DE ACESSO CORPORATIVO*\n\nOlá, *${sharingUser.name}*!\nSeu perfil no *SPCI Master* está ativo.\n\n📍 *Nível:* ${sharingUser.role}\n🌐 *Cockpit:* https://spci-master.vercel.app/login\n📧 *Login:* ${sharingUser.email}\n👤 *Username:* @${sharingUser.userName || sharingUser.username}\n🏢 *Contrato:* ${sharingUser.site || 'Acesso Global'}\n\n_Grupo OMG © 2026_`;
+                  const text = `🏢 *GRUPO OMG // SIGER Master*\n───────────────\n🔥 *CREDENCIAIS DE ACESSO CORPORATIVO*\n\nOlá, *${sharingUser.name}*!\nSeu perfil no *SIGER Master* está ativo.\n\n📍 *Nível:* ${sharingUser.role}\n🌐 *Cockpit:* https://spci-master.vercel.app/login\n📧 *Login:* ${sharingUser.email}\n👤 *Username:* @${sharingUser.userName || sharingUser.username}\n🏢 *Contrato:* ${sharingUser.site || 'Acesso Global'}\n\n_Grupo OMG © 2026_`;
                   const cleanPhone = (sharingUser.telefoneWhatsapp || sharingUser.phone || '').replace(/\D/g, '');
                   const url = cleanPhone
                     ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`
@@ -615,7 +615,7 @@ export default function UsersManagementBento({
               <button
                 type="button"
                 onClick={() => {
-                  const text = `🏢 *GRUPO OMG // SPCI MASTER*\n───────────────\n🔥 *CREDENCIAIS DE ACESSO CORPORATIVO*\n\nOlá, *${createdCredentials.name}*!\nSeu perfil no *SPCI Master* foi cadastrado.\n\n📍 *Nível:* ${createdCredentials.role}\n🌐 *Cockpit:* https://spci-master.vercel.app/login\n📧 *Login:* ${createdCredentials.email}\n👤 *Username:* @${createdCredentials.username}\n🔑 *Senha Temporária:* ${createdCredentials.password}\n🏢 *Contrato:* ${createdCredentials.site || 'Acesso Global'}\n\n_Grupo OMG © 2026_`;
+                  const text = `🏢 *GRUPO OMG // SIGER Master*\n───────────────\n🔥 *CREDENCIAIS DE ACESSO CORPORATIVO*\n\nOlá, *${createdCredentials.name}*!\nSeu perfil no *SIGER Master* foi cadastrado.\n\n📍 *Nível:* ${createdCredentials.role}\n🌐 *Cockpit:* https://spci-master.vercel.app/login\n📧 *Login:* ${createdCredentials.email}\n👤 *Username:* @${createdCredentials.username}\n🔑 *Senha Temporária:* ${createdCredentials.password}\n🏢 *Contrato:* ${createdCredentials.site || 'Acesso Global'}\n\n_Grupo OMG © 2026_`;
                   copyToClipboard(text);
                   setCopied(true);
                   setTimeout(() => setCopied(false), 2000);

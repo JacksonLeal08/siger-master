@@ -807,7 +807,7 @@ export default function ExtintoresManagementDashboard() {
             {/* Rodapé da Tabela */}
             <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-[11px] font-mono text-slate-600">
               <span>Exibindo {filteredExtintores.length} de {extintores.length} extintores monitorados</span>
-              <span className="font-bold">Conformidade ABNT NBR 12962 / SPCI Master</span>
+              <span className="font-bold">Conformidade ABNT NBR 12962 / SIGER Master</span>
             </div>
           </>
         )}

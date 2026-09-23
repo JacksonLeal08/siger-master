@@ -424,7 +424,7 @@ export default function AssetInspectionHistoryModal({
                         </div>
                         <div>
                           <h1 className="text-lg font-black tracking-wider uppercase">
-                            SPCI MASTER — LAUDO TÉCNICO DE VISTORIA
+                            SIGER Master — LAUDO TÉCNICO DE VISTORIA
                           </h1>
                           <p className="text-[10px] uppercase font-mono text-slate-400 tracking-wider">
                             SISTEMA DE PROTEÇÃO CONTRA INCÊNDIO & PÂNICO • NBR 12962 / NBR 13434
@@ -589,7 +589,7 @@ export default function AssetInspectionHistoryModal({
                           Inspetor Técnico de Campo
                         </span>
                         <span className="text-[9px] text-slate-500 font-mono">
-                          Assinatura Digital SPCI Mobile
+                          Assinatura Digital SIGER Mobile
                         </span>
                       </div>
 

@@ -12,7 +12,7 @@ export default function AlertsPage() {
   const [alertFormChannel, setAlertFormChannel] = useState<'whatsapp' | 'telegram' | 'email'>('whatsapp');
   const [alertTargetContact, setAlertTargetContact] = useState('');
   const [generatedReportText, setGeneratedReportText] = useState(
-    `🚨 ALERTA SPCI - RELATÓRIO DE NÃO CONFORMIDADES\n\nPrezado Gestor,\n\nSolicitamos a verificação periódica de conformidade nos ativos SPCI com status pendente de recarga/inspeção.\n\n_Responsável:_ SPCI Compliance`
+    `🚨 ALERTA SIGER - RELATÓRIO DE NÃO CONFORMIDADES\n\nPrezado Gestor,\n\nSolicitamos a verificação periódica de conformidade nos Ativos SIGER com status pendente de recarga/inspeção.\n\n_Responsável:_ SPCI Compliance`
   );
 
   const dispatchAlertNotification = () => {

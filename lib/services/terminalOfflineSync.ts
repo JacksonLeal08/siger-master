@@ -1,6 +1,6 @@
 /**
  * terminalOfflineSync.ts
- * Mecanismo Offline-First via IndexedDB para o Terminal Mobile de Abastecimento do SPCI Master.
+ * Mecanismo Offline-First via IndexedDB para o Terminal Mobile de Abastecimento do SIGER Master.
  * 
  * Stores:
  * - viaturas_cache: Armazena a lista de viaturas para consulta offline.

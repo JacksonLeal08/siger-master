@@ -78,7 +78,7 @@ export default function InstallPwaBanner() {
 
         <div className="flex-grow space-y-1">
           <h4 className="text-xs font-black font-sans tracking-tight uppercase text-slate-100 flex items-center gap-1.5">
-            Instalar Aplicativo SPCI
+            Instalar AplicAtivo SIGER
           </h4>
           <p className="text-[10.5px] leading-relaxed text-slate-400 font-sans">
             Acesse o portal mais rápido, realize inspeções e vistorias offline em campo sem interrupções de rede.

@@ -139,7 +139,7 @@ export default function LogoutClient() {
           <div className="space-y-6">
             <div className="space-y-2">
               <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest">
-                Encerrar Sessão no SPCI?
+                Encerrar Sessão no SIGER?
               </h3>
               <p className="text-[10px] text-slate-600 dark:text-slate-400 font-sans leading-relaxed px-4">
                 Deseja realmente sair do cockpit? Todas as suas configurações e registros de sincronismo local no IndexedDB continuarão seguros neste dispositivo.

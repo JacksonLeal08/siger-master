@@ -344,7 +344,7 @@ export function generateBatchRomaneioPDF(
     </head>
     <body>
       <div class="no-print" style="background: #0f172a; color: white; padding: 12px 16px; margin: -10px -10px 16px -10px; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 8px 8px;">
-        <span style="font-weight: bold; font-size: 12px;">Visualização de Romaneio de Envio - SPCI Master</span>
+        <span style="font-weight: bold; font-size: 12px;">Visualização de Romaneio de Envio - SIGER Master</span>
         <button onclick="window.print()" style="background: #af101a; color: white; border: none; padding: 8px 18px; font-weight: bold; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 11px;">
           🖨️ Imprimir / Salvar PDF
         </button>
@@ -352,7 +352,7 @@ export function generateBatchRomaneioPDF(
 
       <div class="header-container">
         <div>
-          <div class="brand-title">SISTEMA SPCI MASTER</div>
+          <div class="brand-title">SISTEMA SIGER Master</div>
           <div class="brand-subtitle">Gestão & Governança de Combate a Incêndio • Grupo OMG</div>
         </div>
         <div class="doc-badge">
@@ -453,7 +453,7 @@ export function generateBatchRomaneioPDF(
       <div class="signatures-container">
         <div class="sign-box">
           <div class="sign-role">Responsável pelo Envio</div>
-          <div class="sign-sub">SPCI Master / Emissor</div>
+          <div class="sign-sub">SIGER Master / Emissor</div>
         </div>
         <div class="sign-box">
           <div class="sign-role">Transportador / Coleta</div>
@@ -466,7 +466,7 @@ export function generateBatchRomaneioPDF(
       </div>
 
       <div class="footer">
-        <span>Documento gerado eletronicamente pelo Sistema SPCI Master • Rastreabilidade Perpétua de Ativos</span>
+        <span>Documento gerado eletronicamente pelo Sistema SIGER Master • Rastreabilidade Perpétua de Ativos</span>
         <span>Página 1 de 1</span>
       </div>
 
@@ -495,7 +495,7 @@ export function exportBatchRomaneioXLSX(
 
   // Cabeçalho de metadados
   const sheetData: any[][] = [
-    ['SISTEMA SPCI MASTER - ROMANEIO DE ENVIO PARA MANUTENÇÃO'],
+    ['SISTEMA SIGER Master - ROMANEIO DE ENVIO PARA MANUTENÇÃO'],
     [`Número do Lote:`, lote.numero_lote, '', `Data de Envio:`, dataEnvioStr],
     [`Fornecedor:`, lote.fornecedor_nome, '', `Previsão de Retorno:`, lote.previsao_retorno || 'N/A'],
     [`Responsável pelo Envio:`, lote.usuario_envio_nome, '', `Total de Extintores:`, itensList.length],

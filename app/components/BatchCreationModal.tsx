@@ -146,7 +146,7 @@ export default function BatchCreationModal({
         fornecedor_cnpj: fornecedorCnpj.trim() || undefined,
         previsao_retorno: previsaoRetorno || undefined,
         observacoes: observacoes.trim() || undefined,
-        usuario_envio_nome: currentUserName || 'Operador SPCI',
+        usuario_envio_nome: currentUserName || 'Operador SIGER',
         usuario_envio_email: currentUserEmail,
         itens: itemsPayload,
       });
@@ -170,7 +170,7 @@ export default function BatchCreationModal({
       fornecedor_nome: fornecedorNome.trim() || 'Empresa Prestadora Não Definida',
       data_envio: new Date().toISOString(),
       previsao_retorno: previsaoRetorno || undefined,
-      usuario_envio_nome: currentUserName || 'Operador SPCI',
+      usuario_envio_nome: currentUserName || 'Operador SIGER',
       status: 'EM_ANDAMENTO',
       observacoes: observacoes || undefined,
     };
@@ -196,7 +196,7 @@ export default function BatchCreationModal({
       fornecedor_nome: fornecedorNome.trim() || 'Empresa Prestadora Não Definida',
       data_envio: new Date().toISOString(),
       previsao_retorno: previsaoRetorno || undefined,
-      usuario_envio_nome: currentUserName || 'Operador SPCI',
+      usuario_envio_nome: currentUserName || 'Operador SIGER',
       status: 'EM_ANDAMENTO',
       observacoes: observacoes || undefined,
     };

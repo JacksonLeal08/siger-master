@@ -553,7 +553,7 @@ export async function getAssetSwapsAction(filters?: {
                 `Substituição realizada no ponto. Ativo retirado: ${ret.id_ativo || ret.patrimonio}. Substituto instalado: ${subst?.id_ativo || subst?.patrimonio || subCod}.`,
               foto_antes_url: d.foto_antes_url || ret.foto_url || d.foto_url || '',
               foto_depois_url: d.foto_depois_url || subst?.foto_url || (subst?.details as any)?.foto_url || '',
-              tecnico_responsavel_nome: d.tecnico_responsavel_nome || 'Operador SPCI',
+              tecnico_responsavel_nome: d.tecnico_responsavel_nome || 'Operador SIGER',
               tecnico_responsavel_email: d.tecnico_responsavel_email || undefined,
               status_troca: 'CONCLUIDA',
               criado_em: d.data_troca || ret.updated_at || new Date().toISOString(),

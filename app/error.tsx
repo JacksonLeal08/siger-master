@@ -43,7 +43,7 @@ export default function ErrorPage({
 
   useEffect(() => {
     // Loga o erro em ambiente de desenvolvimento ou telemetria
-    console.error('[SPCI Route Error]', error);
+    console.error('[SIGER Route Error]', error);
 
     // Auto-recuperação para erros de incompatibilidade de versão (chunks do webpack)
     if (isChunkOrCallError && typeof window !== 'undefined') {
@@ -67,7 +67,7 @@ export default function ErrorPage({
   };
 
   const handleCopyDiagnostics = () => {
-    const diagnostics = `[SPCI SYSTEM RECOVERY DIAGNOSTICS]
+    const diagnostics = `[SIGER SYSTEM RECOVERY DIAGNOSTICS]
 Timestamp: ${new Date().toISOString()}
 Message: ${error.message}
 Digest: ${error.digest || 'N/A'}
@@ -101,7 +101,7 @@ URL: ${typeof window !== 'undefined' ? window.location.href : 'N/A'}`;
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono tracking-widest text-red-400 uppercase font-bold">
-                ESCUDO DE PROTEÇÃO // SISTEMA SPCI
+                ESCUDO DE PROTEÇÃO // SISTEMA SIGER
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl font-black text-white mt-1 uppercase tracking-tight">

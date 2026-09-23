@@ -85,7 +85,7 @@ export async function fetchContractsOverviewAction(): Promise<{
     if (!cErr && cData && cData.length > 0) {
       rawContratos = cData;
     } else {
-      // Fallback para os 2 contratos protegidos do SPCI
+      // Fallback para os 2 contratos protegidos do SIGER
       rawContratos = [
         {
           id: '6ca3347b-1184-4743-afd7-2928a00ccd4f',
@@ -485,7 +485,7 @@ export async function deleteOrDeactivateContractAction(
     if (cleanNome === 'SALOBO' || cleanNome === 'ONÇA PUMA' || cleanNome === 'ONCA PUMA') {
       return {
         success: false,
-        error: `O contrato base "${cleanNome}" é um pilar estrutural do SPCI e protegido contra exclusão.`
+        error: `O contrato base "${cleanNome}" é um pilar estrutural do SIGER e protegido contra exclusão.`
       };
     }
 

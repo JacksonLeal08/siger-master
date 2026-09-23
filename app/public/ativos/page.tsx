@@ -4,20 +4,20 @@ import { SITE_URL } from '@/config/seo';
 import AtivosPublicCatalogClient, { CatalogAssetItem } from './AtivosPublicCatalogClient';
 
 export const metadata: Metadata = {
-  title: 'Catálogo de Ativos na Área & Visibilidade Operacional | SPCI Master',
+  title: 'Catálogo de Ativos na Área & Visibilidade Operacional | SIGER Master',
   description: 'Portal público de rastreabilidade e consulta de extintores, hidrantes, casas de bombas e equipamentos de combate a incêndio ativos na planta.',
   alternates: {
     canonical: '/public/ativos',
   },
   openGraph: {
-    title: 'Catálogo Público de Ativos SPCI Master',
+    title: 'Catálogo Público de Ativos SIGER Master',
     description: 'Verificação em tempo real de conformidade e integridade dos equipamentos de combate a incêndio.',
     url: `${SITE_URL}/public/ativos`,
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Catálogo Público de Ativos SPCI Master',
+    title: 'Catálogo Público de Ativos SIGER Master',
     description: 'Auditoria técnica e visibilidade pública de equipamentos de segurança contra incêndio.',
   },
 };

@@ -139,7 +139,7 @@ export const TwiEducationalCard: React.FC<TwiEducationalCardProps> = ({ isDark: 
           </div>
         </div>
         <span className={`flex items-center gap-1 text-[9.5px] ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-          <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Diretriz de Frota SPCI Master
+          <CheckCircle2 className="w-3 h-3 text-emerald-500" /> Diretriz de Frota SIGER Master
         </span>
       </div>
     </div>

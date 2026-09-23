@@ -149,7 +149,7 @@ export default function BatchTriageModal({
 
       const res = await triageBatchReturnAction({
         lote_id: loteId,
-        usuario_triagem_nome: currentUserName || 'Operador SPCI',
+        usuario_triagem_nome: currentUserName || 'Operador SIGER',
         usuario_triagem_email: currentUserEmail,
         itens_triagem: payloadList,
       });

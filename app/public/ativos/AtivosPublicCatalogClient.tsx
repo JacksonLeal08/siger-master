@@ -165,7 +165,7 @@ export default function AtivosPublicCatalogClient({ initialAssets }: Props) {
           </div>
           <div>
             <span className="font-['Hanken_Grotesk'] text-base font-black uppercase tracking-wider text-white block">
-              SPCI MASTER
+              SIGER Master
             </span>
             <span className="text-[10px] text-slate-400 uppercase tracking-widest block">
               Portal Público de Visibilidade & Auditoria

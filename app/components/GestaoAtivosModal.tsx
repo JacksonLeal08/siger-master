@@ -2047,7 +2047,7 @@ export const GestaoAtivosModal: React.FC<GestaoAtivosModalProps> = ({ isOpen, on
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               className="w-full max-w-xl bg-white border border-red-200 shadow-2xl rounded-2xl overflow-hidden font-sans text-slate-900 relative"
             >
-              {/* CABEÇALHO CORPORATIVO SPCI RED */}
+              {/* CABEÇALHO CORPORAtivo SIGER RED */}
               <div className="bg-red-800 text-white p-5 border-b border-red-900 relative">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20">
@@ -2055,7 +2055,7 @@ export const GestaoAtivosModal: React.FC<GestaoAtivosModalProps> = ({ isOpen, on
                   </div>
                   <div>
                     <h3 className="text-sm font-black font-mono uppercase tracking-wider text-white">
-                      SISTEMA SPCI MASTER · ALERTA FORMAL DE ESTOQUE
+                      SISTEMA SIGER Master · ALERTA FORMAL DE ESTOQUE
                     </h3>
                     <p className="text-[11px] text-red-100 font-sans font-bold">
                       Notificação Corporativa de Conformidade Operacional
@@ -2120,7 +2120,7 @@ export const GestaoAtivosModal: React.FC<GestaoAtivosModalProps> = ({ isOpen, on
                 <div className="pt-2 text-slate-700 border-t border-slate-100 font-sans">
                   <p>Atenciosamente,</p>
                   <p className="font-black font-mono text-slate-900 text-xs mt-0.5">
-                    Sistema SPCI Master - Controle de Ativos.
+                    Sistema SIGER Master - Controle de Ativos.
                   </p>
                 </div>
               </div>

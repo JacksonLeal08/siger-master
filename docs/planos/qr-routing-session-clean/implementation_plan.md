@@ -1,6 +1,6 @@
 # Correções de QR Code, Sessão e Interface SPCI
 
-Este plano aborda a correção de três anomalias reportadas no sistema SPCI e propõe melhorias na experiência do usuário técnico e administrativo, além de orientações para personalização do link de acesso.
+Este plano aborda a correção de três anomalias reportadas no SISTEMA SIGER e propõe melhorias na experiência do usuário técnico e administrativo, além de orientações para personalização do link de acesso.
 
 ## User Review Required
 

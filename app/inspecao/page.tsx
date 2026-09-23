@@ -808,7 +808,7 @@ export default function PortalTecnicoPage() {
       <footer className={`w-full text-center py-6 border-t z-15 select-none transition-colors ${
         isDark ? 'border-slate-900 bg-slate-950 text-slate-700' : 'border-slate-200 bg-slate-100 text-slate-500'
       }`}>
-        <p className="text-[8px] uppercase tracking-[0.25em]">SISTEMA SPCI • PORTAL DE INSPEÇÕES PÚBLICAS v2.2</p>
+        <p className="text-[8px] uppercase tracking-[0.25em]">SISTEMA SIGER • PORTAL DE INSPEÇÕES PÚBLICAS v2.2</p>
         <p className="text-[7px] mt-1 font-sans">Desenvolvido em conformidade com as normas ABNT e NBR da Brigada de Bombeiros.</p>
       </footer>
 

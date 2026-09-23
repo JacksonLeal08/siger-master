@@ -593,7 +593,7 @@ function TerminalAbastecerContent() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] font-black tracking-widest text-red-500 uppercase">
-                    SPCI // TERMINAL
+                    SIGER // TERMINAL
                   </span>
                   <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-bold border ${
                     theme === 'dark' ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-slate-100 border-slate-300 text-slate-700'
@@ -1249,7 +1249,7 @@ function TerminalAbastecerContent() {
 
         {/* Rodapé Mobile App Shell */}
         <footer className="p-3 border-t border-zinc-900 text-center text-[10px] font-mono text-zinc-600 flex items-center justify-between px-4">
-          <span>SPCI MASTER V2.11</span>
+          <span>SIGER Master V2.11</span>
           <span>SESSÃO SEGURA DO CONDUTOR</span>
         </footer>
       </div>

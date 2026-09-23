@@ -78,7 +78,7 @@ function HistoricoInspecoesContent() {
   const [manualForm, setManualForm] = useState({
     asset_patrimonio: paramAtivo || '',
     status: 'Conforme' as 'Conforme' | 'Não Conforme',
-    tecnico_nome: userProfile?.name || 'Técnico SPCI',
+    tecnico_nome: userProfile?.name || 'Técnico SIGER',
     data_inspecao: new Date().toISOString().slice(0, 16),
     observacoes: '',
     site: userProfile?.site || 'SALOBO'
@@ -109,7 +109,7 @@ function HistoricoInspecoesContent() {
 
   // Sincronizar nome do técnico se perfil carregar depois
   useEffect(() => {
-    if (userProfile?.name && manualForm.tecnico_nome === 'Técnico SPCI') {
+    if (userProfile?.name && manualForm.tecnico_nome === 'Técnico SIGER') {
       setManualForm((prev) => ({ 
         ...prev, 
         tecnico_nome: userProfile.name,
@@ -263,7 +263,7 @@ function HistoricoInspecoesContent() {
         asset_id: manualForm.asset_patrimonio.trim(),
         asset_patrimonio: manualForm.asset_patrimonio.trim().toUpperCase(),
         status: manualForm.status,
-        tecnico_nome: manualForm.tecnico_nome.trim() || 'Técnico SPCI',
+        tecnico_nome: manualForm.tecnico_nome.trim() || 'Técnico SIGER',
         data_inspecao: new Date(manualForm.data_inspecao).toISOString(),
         observacoes: manualForm.observacoes.trim(),
         site: manualForm.site,
@@ -279,7 +279,7 @@ function HistoricoInspecoesContent() {
         setManualForm({
           asset_patrimonio: '',
           status: 'Conforme',
-          tecnico_nome: userProfile?.name || 'Técnico SPCI',
+          tecnico_nome: userProfile?.name || 'Técnico SIGER',
           data_inspecao: new Date().toISOString().slice(0, 16),
           observacoes: '',
           site: 'SALOBO'
@@ -558,7 +558,7 @@ function HistoricoInspecoesContent() {
                           </span>
                         </td>
                         <td className="py-3 px-4 font-semibold text-slate-800 dark:text-slate-200">
-                          {item.tecnico_nome || 'Inspetor SPCI'}
+                          {item.tecnico_nome || 'Inspetor SIGER'}
                         </td>
                         <td className="py-3 px-4 whitespace-nowrap">
                           {hasGps ? (
@@ -684,7 +684,7 @@ function HistoricoInspecoesContent() {
                           )}
                         </div>
                         <span className="text-[10.5px] font-mono text-slate-500 block mt-0.5">
-                          {dataFormatada} &bull; {item.tecnico_nome || 'Inspetor SPCI'}
+                          {dataFormatada} &bull; {item.tecnico_nome || 'Inspetor SIGER'}
                         </span>
                       </div>
 

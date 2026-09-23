@@ -47,7 +47,7 @@ export default function GestaoTrocasPage() {
   const router = useRouter();
   const { currentUser, userProfile, activeSite, isGlobalScope, openSwapModal } = useSpci();
 
-  const loggedUserName = userProfile?.name || currentUser?.displayName || 'Operador SPCI';
+  const loggedUserName = userProfile?.name || currentUser?.displayName || 'Operador SIGER';
   const loggedUserEmail = userProfile?.email || currentUser?.email || undefined;
 
   // Determinar o contrato ativo para isolamento de dados

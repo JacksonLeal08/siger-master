@@ -370,7 +370,7 @@ export default function BulkDeleteLocationModal({
                     <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl text-xs text-amber-900 dark:text-amber-200/90 space-y-1.5 shadow-sm">
                       <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-extrabold uppercase text-[10px] tracking-wider">
                         <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                        Trava de Segurança Restritiva (SPCI Master)
+                        Trava de Segurança Restritiva (SIGER Master)
                       </div>
                       <p className="text-[11px] leading-relaxed text-amber-800/90 dark:text-amber-200/80">
                         Não é permitido excluir locais com equipamentos em operação. Realize a movimentação ou descarte prévio dos ativos antes de remover o ponto da planta.

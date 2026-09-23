@@ -222,7 +222,7 @@ export default function LogsAuditoriaPage() {
     const html = `
       <html>
         <head>
-          <title>SPCI - Relatório de Auditoria de Logs</title>
+          <title>SIGER - Relatório de Auditoria de Logs</title>
           <style>
             body { font-family: sans-serif; padding: 20px; color: #333; }
             h1 { font-size: 20px; margin-bottom: 5px; color: #af101a; }
@@ -240,7 +240,7 @@ export default function LogsAuditoriaPage() {
           </style>
         </head>
         <body>
-          <h1>SPCI - SISTEMA DE PREVENÇÃO E COMBATE A INCÊNDIO</h1>
+          <h1>SIGER - Sistema DE PREVENÇÃO E COMBATE A INCÊNDIO</h1>
           <p>Relatório de Auditoria de Logs do Sistema | Gerado em ${new Date().toLocaleString('pt-BR')}</p>
           <table>
             <thead>
@@ -281,7 +281,7 @@ export default function LogsAuditoriaPage() {
   };
 
   const handleShareLogs = async () => {
-    const shareText = `SPCI Relatório de Auditoria de Logs\nTotal de registros filtrados: ${filteredLogs.length}\nGerado em: ${new Date().toLocaleString('pt-BR')}\nConsulte o console corporativo do SPCI.`;
+    const shareText = `SPCI Relatório de Auditoria de Logs\nTotal de registros filtrados: ${filteredLogs.length}\nGerado em: ${new Date().toLocaleString('pt-BR')}\nConsulte o console corporativo do SIGER.`;
     
     if (navigator.share) {
       try {

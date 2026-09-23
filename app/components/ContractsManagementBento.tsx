@@ -90,7 +90,7 @@ export default function ContractsManagementBento({ theme = 'light' }: ContractsM
     if (isProtected) {
       showAlertModal(
         'Contrato Estrutural Protegido 🔒',
-        `O contrato "${contrato.nome}" é a base do sistema SPCI e não pode ser removido ou desativado.`,
+        `O contrato "${contrato.nome}" é a base do SISTEMA SIGER e não pode ser removido ou desativado.`,
         'warning'
       );
       return;
@@ -394,7 +394,7 @@ export default function ContractsManagementBento({ theme = 'light' }: ContractsM
                   {/* Razão Social & Localidade */}
                   <div className="space-y-1 text-xs font-sans text-slate-700 dark:text-zinc-300">
                     <p className="font-bold truncate" title={c.razao_social}>
-                      {c.razao_social || 'Cliente Corporativo SPCI'}
+                      {c.razao_social || 'Cliente CorporAtivo SIGER'}
                     </p>
                     <p className="text-[11px] text-slate-500 dark:text-zinc-400 flex items-center gap-1.5 truncate">
                       <MapPin size={12} className="shrink-0 text-red-600" />
@@ -598,7 +598,7 @@ export default function ContractsManagementBento({ theme = 'light' }: ContractsM
           loadData();
           setIsModalOpen(false);
 
-          const userName = userProfile?.name || userProfile?.userName || 'Operador SPCI';
+          const userName = userProfile?.name || userProfile?.userName || 'Operador SIGER';
           const isEdit = details?.isEdit ?? Boolean(contractToEdit);
           const contractName = details?.contractNome || contractToEdit?.nome || 'Contrato';
           const hasLogo = details?.hasLogo;
@@ -615,7 +615,7 @@ export default function ContractsManagementBento({ theme = 'light' }: ContractsM
             ? '\n• Logotipo Corporativo: Vinculado e otimizado com sucesso.' 
             : '';
 
-          const fullMessage = `👤 Usuário: ${userName}\n⚙️ Ação: ${actionDesc}.${logoDesc}\n🕒 Data/Hora: ${new Date().toLocaleString('pt-BR')}\n\nAs diretrizes e parametrizações deste contrato foram sincronizadas em todo o ecossistema SPCI.`;
+          const fullMessage = `👤 Usuário: ${userName}\n⚙️ Ação: ${actionDesc}.${logoDesc}\n🕒 Data/Hora: ${new Date().toLocaleString('pt-BR')}\n\nAs diretrizes e parametrizações deste contrato foram sincronizadas em todo o ecosSISTEMA SIGER.`;
 
           // 1. Popup Modal Executivo de Confirmação com usuário e ação
           showAlertModal(

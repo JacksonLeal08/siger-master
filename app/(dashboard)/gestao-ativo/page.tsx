@@ -164,7 +164,7 @@ export default function GestaoAtivoPage() {
             </h1>
           </div>
           <p className="text-slate-500 text-xs mt-1">
-            Painel centralizado de tabelas auxiliares, checklists e configurações estruturais do SPCI.
+            Painel centralizado de tabelas auxiliares, checklists e configurações estruturais do SIGER.
           </p>
         </div>
         
@@ -354,7 +354,7 @@ export default function GestaoAtivoPage() {
                 { name: 'Hidrantes NBR 13714', desc: 'Mangueiras, esguicho e chave' },
                 { name: 'Sinalização NBR 13434', desc: 'Fotoluminescência e rota' },
                 { name: 'Iluminação NBR 10898', desc: 'Autonomia e bateria' },
-                { name: 'Casa de Bombas SPCI', desc: 'Jockey, Principal e Diesel' }
+                { name: 'Casa de Bombas SIGER', desc: 'Jockey, Principal e Diesel' }
               ].map((item, idx) => (
                 <div key={idx} className="bg-slate-50 border border-slate-200/50 p-3 rounded-xl hover:bg-slate-100/80 transition-colors">
                   <p className="text-[10px] font-bold text-slate-800 uppercase tracking-tight truncate">{item.name}</p>

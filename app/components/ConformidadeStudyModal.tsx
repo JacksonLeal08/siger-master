@@ -91,7 +91,7 @@ export default function ConformidadeStudyModal({
   const theme = getStatusTheme();
 
   const handleShare = async () => {
-    const shareText = `🧯 SPCI - Relatório de Conformidade (Planta Extintores)
+    const shareText = `🧯 SIGER - Relatório de Conformidade (Planta Extintores)
 Data/Hora: ${new Date().toLocaleString('pt-BR')}
 Taxa de Conformidade: ${compliancePercent}%
 --------------------------------------
@@ -106,7 +106,7 @@ Acesse o painel para verificar os detalhes: ${window.location.origin}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'SPCI - Relatório de Conformidade',
+          title: 'SIGER - Relatório de Conformidade',
           text: shareText,
           url: window.location.href
         });

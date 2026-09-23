@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       };
     }
 
-    const pageTitle = `Ativo ${data.numero_patrimonio} (${data.status_conformidade}) - SPCI Master`;
+    const pageTitle = `Ativo ${data.numero_patrimonio} (${data.status_conformidade}) - SIGER Master`;
     const pageDesc = `Ficha pública de conformidade de combate a incêndio do ativo ${data.numero_patrimonio} instalado em ${data.local_instalacao}.`;
 
     return {
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch (error) {
     return {
       title: 'Ficha de Segurança - SPCI Compliance',
-      description: 'Consulta pública de conformidade e status de ativos SPCI.',
+      description: 'Consulta pública de conformidade e status de Ativos SIGER.',
       alternates: { canonical: canonicalUrl },
     };
   }
