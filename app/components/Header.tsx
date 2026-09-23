@@ -58,16 +58,20 @@ export const Header = ({ onScanClick, onProfileClick, onMenuClick, onGestaoAtivo
             <Menu className="w-5 h-5" />
           </button>
         )}
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <img 
-            src="/assets/branding/logo-jimmp-info.png" 
-            alt="Logo JIMMP Info" 
-            className="h-7 sm:h-8 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(104,211,70,0.55)]" 
-          />
-          <div className="h-5 w-[1.5px] bg-slate-200 dark:bg-zinc-700 hidden sm:block" />
-          <span className="hidden md:flex items-center gap-2 font-['Hanken_Grotesk'] font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 text-xs sm:text-sm">
-            <span className="text-[#68D346] font-bold">●</span> SIGER MASTER • SISTEMA INTEGRADO DE GESTÃO DE EMERGÊNCIA & RESGATE
-          </span>
+        {/* Indicador Tático Limpo (Logo retirada para permanência exclusiva na Sidebar) */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 dark:bg-[#282A2F] border border-slate-200 dark:border-[#3C3F45] text-[#68D346] shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-[#68D346] animate-pulse" />
+          </div>
+          <div className="hidden sm:flex items-center gap-2 font-['Hanken_Grotesk']">
+            <span className="text-[11px] font-mono uppercase tracking-widest text-slate-500 dark:text-[#7E8289]">
+              SIGER
+            </span>
+            <span className="text-slate-300 dark:text-[#3C3F45] font-mono text-xs">/</span>
+            <span className="text-xs sm:text-sm font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
+              COCKPIT OPERACIONAL
+            </span>
+          </div>
         </div>
       </div>
 

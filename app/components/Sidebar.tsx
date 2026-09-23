@@ -340,26 +340,48 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
       {/* Botão para recolher/expandir a Sidebar no Desktop */}
       <button
         onClick={toggleCollapse}
-        className="hidden lg:flex absolute -right-3.5 top-6 bg-red-600 hover:bg-red-500 text-white p-1 rounded-full border-2 border-white dark:border-slate-900 shadow-xl cursor-pointer z-50 transition-transform hover:scale-110 active:scale-95"
+        className="hidden lg:flex absolute -right-3.5 top-6 bg-[#282A2F] hover:bg-[#3C3F45] text-[#68D346] border border-[#68D346]/40 shadow-[0_0_10px_rgba(104,211,70,0.25)] p-1 rounded-full cursor-pointer z-50 transition-all hover:scale-110 active:scale-95"
         title={isCollapsed ? "Expandir barra lateral" : "Recolher barra lateral"}
         aria-label="Recolher/Expandir barra lateral"
       >
         {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
       </button>
 
-      {/* Marca Principal JIMMP Info - SIGER Master */}
-      <div className={`flex flex-col items-center justify-center mb-5 pt-1 transition-all shrink-0 ${isCollapsed ? 'px-0' : 'px-2'}`}>
-        <img 
-          src={isCollapsed ? "/assets/branding/icon-jimmp.png" : "/assets/branding/logo-jimmp-info.png"} 
-          alt="Logo JIMMP Info" 
-          className={`object-contain shrink-0 filter transition-all duration-300 hover:drop-shadow-[0_0_10px_rgba(104,211,70,0.55)] ${
-            isCollapsed ? 'h-8 w-auto max-w-[48px]' : 'h-11 w-auto'
-          }`} 
-        />
-        {!isCollapsed && (
-          <h2 className="text-[11px] font-black font-mono text-slate-800 dark:text-zinc-100 tracking-widest uppercase mt-2 leading-none text-center">
-            <span className="text-[#68D346]">●</span> SIGER MASTER
-          </h2>
+      {/* 1. Âncora de Marca: Cápsula Titânio Cyber-Glass com Logo JIMMP Info em Alta Evidência */}
+      <div className={`transition-all duration-300 shrink-0 mb-5 ${isCollapsed ? 'px-0' : 'px-1'}`}>
+        {isCollapsed ? (
+          <div 
+            className="flex items-center justify-center p-2 rounded-xl bg-gradient-to-b from-[#282A2F] to-[#1E2024] border border-[#3C3F45] shadow-[0_0_12px_rgba(104,211,70,0.2)] hover:border-[#68D346]/60 transition-all duration-300 group cursor-pointer"
+            title="SIGER MASTER // JIMMP Info"
+          >
+            <img 
+              src="/assets/branding/icon-jimmp.png" 
+              alt="Ícone JIMMP Info" 
+              className="h-8 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(104,211,70,0.4)] group-hover:scale-110 transition-transform" 
+            />
+          </div>
+        ) : (
+          <div className="relative p-3.5 rounded-2xl bg-gradient-to-b from-[#282A2F] to-[#1E2024] border-t border-[#D5D9DC]/30 border-b border-[#68D346]/40 border-x border-[#3C3F45]/60 shadow-[0_4px_20px_rgba(0,0,0,0.35),0_0_15px_rgba(104,211,70,0.15)] hover:shadow-[0_4px_25px_rgba(0,0,0,0.45),0_0_22px_rgba(104,211,70,0.3)] transition-all duration-300 group">
+            {/* Logo JIMMP Info com Recorte Transparente em Alta Evidência */}
+            <div className="flex items-center justify-center py-1">
+              <img 
+                src="/assets/branding/logo-jimmp-info.png" 
+                alt="Logo JIMMP Info" 
+                className="h-12 w-auto max-w-[200px] object-contain filter drop-shadow-[0_0_10px_rgba(104,211,70,0.35)] group-hover:scale-105 group-hover:drop-shadow-[0_0_16px_rgba(104,211,70,0.65)] transition-all duration-300" 
+              />
+            </div>
+            
+            {/* Faixa Tática de Governança e Status Online */}
+            <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-[#3C3F45]/60 px-0.5">
+              <span className="text-[9px] font-mono font-bold tracking-widest text-slate-300 dark:text-[#D5D9DC] uppercase">
+                SIGER MASTER
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[8px] font-mono font-extrabold text-[#68D346] bg-[#1C4E26]/40 px-1.5 py-0.5 rounded border border-[#68D346]/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#68D346] animate-pulse" />
+                ONLINE
+              </span>
+            </div>
+          </div>
         )}
       </div>
 

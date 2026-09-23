@@ -56,18 +56,20 @@ export default function QuietLuxuryHome() {
       <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
-          {/* Logo & Brand Mark */}
+          {/* Logo & Brand Mark - Em Evidência Opção A */}
           <div className="flex items-center gap-4">
-            <Image 
-              src="/assets/branding/logo-jimmp-info.png" 
-              alt="Logo JIMMP Info" 
-              width={160}
-              height={44}
-              priority
-              className="h-10 w-auto object-contain filter drop-shadow-sm transition-transform hover:scale-105 hover:drop-shadow-[0_0_12px_rgba(104,211,70,0.55)]" 
-            />
+            <div className="relative py-1.5 px-3 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-200/60 dark:from-[#282A2F] dark:to-[#1E2024] border border-slate-300/70 dark:border-[#3C3F45] shadow-[0_0_15px_rgba(104,211,70,0.12)] hover:shadow-[0_0_22px_rgba(104,211,70,0.35)] transition-all duration-300 flex items-center justify-center">
+              <Image 
+                src="/assets/branding/logo-jimmp-info.png" 
+                alt="Logo JIMMP Info" 
+                width={180}
+                height={50}
+                priority
+                className="h-11 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(104,211,70,0.4)] transition-transform hover:scale-105" 
+              />
+            </div>
             <div className="border-l border-slate-200 dark:border-slate-800 pl-4 py-1 hidden sm:block">
-              <span className="text-[9px] font-black text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA</span>
+              <span className="text-[9px] font-black text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA OFICIAL</span>
               <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
             </div>
           </div>
