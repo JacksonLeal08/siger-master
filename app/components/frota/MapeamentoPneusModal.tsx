@@ -47,7 +47,8 @@ import {
 
 interface MapeamentoPneusModalProps {
   isOpen: boolean;
-  viatura: Viatura;
+  viatura?: Viatura;
+  viaturasDisponiveis?: Viatura[];
   contratoId?: string;
   onClose: () => void;
   onMinimize?: () => void;
@@ -74,6 +75,7 @@ const SLOTS_RODAS: SlotRodaConfig[] = [
 export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   isOpen,
   viatura,
+  viaturasDisponiveis,
   contratoId,
   onClose,
   onMinimize,
@@ -85,6 +87,39 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   const activeTheme = (themeProp && themeProp !== 'system') ? themeProp : (contextTheme || 'dark');
   const isDark = activeTheme === 'dark';
 
+  // Viatura Ativa Dinâmica
+  const fallbackViatura: Viatura = {
+    id: 'resgate-01-uuid',
+    contrato_id: contratoId || 'SALOBO',
+    prefixo_frota: 'RESGATE 01',
+    placa: 'BRAZ1234',
+    tipo_veiculo: 'CAMINHONETE',
+    marca: 'TOYOTA',
+    modelo: 'HILUX 2.8',
+    tipo_combustivel: 'DIESEL_S10',
+    odometro_atual_km: 213806,
+    status_operacional: 'DISPONIVEL'
+  };
+
+  const [currentViatura, setCurrentViatura] = useState<Viatura>(() => {
+    return viatura || (viaturasDisponiveis && viaturasDisponiveis[0]) || fallbackViatura;
+  });
+
+  // Rastreamento de alterações para confirmação de segurança (Opção 1)
+  const [isDirty, setIsDirty] = useState<boolean>(false);
+
+  // Sincroniza se a viatura passada via props mudar
+  useEffect(() => {
+    if (viatura) {
+      setCurrentViatura(viatura);
+      setOdometroInput(String(viatura.odometro_atual_km || 0));
+      setIsDirty(false);
+    } else if (viaturasDisponiveis && viaturasDisponiveis.length > 0) {
+      setCurrentViatura(viaturasDisponiveis[0]);
+      setOdometroInput(String(viaturasDisponiveis[0].odometro_atual_km || 0));
+      setIsDirty(false);
+    }
+  }, [viatura, viaturasDisponiveis]);
 
   // Estado de Controles de Janela (Maximizar / Restaurar)
   const [isMaximized, setIsMaximized] = useState(false);
@@ -100,9 +135,10 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   const [medicoes, setMedicoes] = useState<Record<PosicaoPneuAbreviada, ItemAfericaoPneu>>(() => {
     const initial: Partial<Record<PosicaoPneuAbreviada, ItemAfericaoPneu>> = {};
     const refPadrao = CATALOGO_PNEUS_HOMOLOGADOS_PADRAO[0];
+    const initialVtr = viatura || (viaturasDisponiveis && viaturasDisponiveis[0]) || fallbackViatura;
     
     SLOTS_RODAS.forEach((slot) => {
-      const calc = TireWearCalculator.calcularMetrologiaCompleta(refPadrao.profundidade_original_mm, 8.0, viatura.odometro_atual_km || 0);
+      const calc = TireWearCalculator.calcularMetrologiaCompleta(refPadrao.profundidade_original_mm, 8.0, initialVtr.odometro_atual_km || 0);
       initial[slot.posicao] = {
         posicao_pneu: slot.posicao,
         pneu_referencia_id: refPadrao.id,
@@ -126,7 +162,7 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   const [fotoMedicaoUrl, setFotoMedicaoUrl] = useState<string>('');
   
   // Parâmetros Gerais da Sessão de Inspeção
-  const [odometroInput, setOdometroInput] = useState<string>(String(viatura.odometro_atual_km || 0));
+  const [odometroInput, setOdometroInput] = useState<string>(String(currentViatura?.odometro_atual_km || viatura?.odometro_atual_km || 0));
   const [houveCalibracao, setHouveCalibracao] = useState<boolean>(true);
   const [observacoesGerais, setObservacoesGerais] = useState<string>('');
   const [showTwiGuide, setShowTwiGuide] = useState<boolean>(false);
@@ -182,13 +218,59 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
     return catalogo.find((p) => p.id === selectedCatalogoId) || catalogo[0] || CATALOGO_PNEUS_HOMOLOGADOS_PADRAO[0];
   }, [catalogo, selectedCatalogoId]);
 
+  // Alternância de Viatura no Cabeçalho do Modal (Opção 1: Confirmação de Segurança)
+  const handleTrocarViatura = (novaViaturaId: string) => {
+    if (novaViaturaId === currentViatura.id) return;
+
+    if (isDirty) {
+      const confirmou = window.confirm(
+        'Atenção: Existem medições preenchidas ou alteradas para a viatura atual. Deseja realmente trocar de veículo e reiniciar as medições?'
+      );
+      if (!confirmou) return;
+    }
+
+    const novaVtr = viaturasDisponiveis?.find((v) => v.id === novaViaturaId);
+    if (!novaVtr) return;
+
+    setCurrentViatura(novaVtr);
+    setOdometroInput(String(novaVtr.odometro_atual_km || 0));
+    setIsDirty(false);
+
+    // Reinicia as 5 medições com valores padrão para a nova viatura
+    const refPadrao = catalogo.find((p) => p.id === selectedCatalogoId) || catalogo[0] || CATALOGO_PNEUS_HOMOLOGADOS_PADRAO[0];
+    const initial: Partial<Record<PosicaoPneuAbreviada, ItemAfericaoPneu>> = {};
+    SLOTS_RODAS.forEach((slot) => {
+      const calc = TireWearCalculator.calcularMetrologiaCompleta(
+        refPadrao.profundidade_original_mm,
+        8.0,
+        novaVtr.odometro_atual_km || 0
+      );
+      initial[slot.posicao] = {
+        posicao_pneu: slot.posicao,
+        pneu_referencia_id: refPadrao.id,
+        marca: refPadrao.marca,
+        modelo: refPadrao.modelo,
+        medida: refPadrao.medida,
+        profundidade_original_mm: refPadrao.profundidade_original_mm,
+        profundidade_sulco_mm: 8.0,
+        desgaste_acumulado_mm: calc.deltaDesgaste,
+        percentual_vida_util: calc.percentualVidaUtil,
+        pressao_psi: refPadrao.pressao_recomendada_psi,
+        status_twi: calc.statusTwi
+      };
+    });
+    setMedicoes(initial as Record<PosicaoPneuAbreviada, ItemAfericaoPneu>);
+    setSulcoInput('8.0');
+    setPressaoInput(String(refPadrao.pressao_recomendada_psi || 32.0));
+  };
+
   // Cálculo Metrológico Dinâmico em Tempo Real
   const metrologiaAtual = useMemo(() => {
     const sOrig = refAtual.profundidade_original_mm;
     const sAferido = parseFloat(sulcoInput) || 0;
-    const odometroNum = parseFloat(odometroInput) || viatura.odometro_atual_km || 0;
+    const odometroNum = parseFloat(odometroInput) || currentViatura.odometro_atual_km || 0;
     return TireWearCalculator.calcularMetrologiaCompleta(sOrig, sAferido, odometroNum);
-  }, [refAtual, sulcoInput, odometroInput, viatura.odometro_atual_km]);
+  }, [refAtual, sulcoInput, odometroInput, currentViatura.odometro_atual_km]);
 
   // Estatística de Rodas Inspecionadas
   const totalInspecionados = useMemo(() => {
@@ -201,6 +283,7 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
     const pneu = catalogo.find((p) => p.id === pneuId);
     if (pneu) {
       setPressaoInput(String(pneu.pressao_recomendada_psi));
+      setIsDirty(true);
     }
   };
 
@@ -238,6 +321,7 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
       ...prev,
       [selectedPosicao]: itemAtualizado
     }));
+    setIsDirty(true);
 
     // Se estiver crítico, emite alerta sonoro de alta prioridade
     if (metrologiaAtual.statusTwi === 'CRITICO_PROIBIDO') {
@@ -255,12 +339,12 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
   const handleGravarInspecaoCompleta = async () => {
     setIsSaving(true);
     try {
-      const odometroNum = parseFloat(odometroInput) || viatura.odometro_atual_km || 0;
+      const odometroNum = parseFloat(odometroInput) || currentViatura.odometro_atual_km || 0;
       const itensLista = Object.values(medicoes);
 
       const res = await salvarInspecaoRodagemAction({
-        contrato_id: contratoId || viatura.contrato_id || 'SALOBO',
-        viatura_id: viatura.id,
+        contrato_id: contratoId || currentViatura.contrato_id || 'SALOBO',
+        viatura_id: currentViatura.id,
         odometro_km: odometroNum,
         houve_calibracao: houveCalibracao,
         tecnico_nome: tecnicoPadrao,
@@ -321,15 +405,39 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                   CONTRAN 558/80
                 </span>
               </div>
-              <p className={`text-xs font-mono flex items-center gap-2 mt-0.5 ${
-                isDark ? 'text-slate-400' : 'text-slate-600'
-              }`}>
-                <span className={isDark ? 'text-slate-200 font-bold' : 'text-slate-900 font-bold'}>{viatura.prefixo_frota}</span>
-                <span>•</span>
-                <span>Placa: <strong className={isDark ? 'text-slate-100' : 'text-slate-900'}>{viatura.placa}</strong></span>
-                <span>•</span>
-                <span>Odômetro: <strong className={isDark ? 'text-slate-100' : 'text-slate-900'}>{(viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</strong></span>
-              </p>
+              {viaturasDisponiveis && viaturasDisponiveis.length > 1 ? (
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] font-mono uppercase font-bold text-slate-400 shrink-0">
+                    Viatura:
+                  </span>
+                  <select
+                    value={currentViatura.id}
+                    onChange={(e) => handleTrocarViatura(e.target.value)}
+                    className={`border rounded-lg px-2 py-0.5 text-xs font-mono font-bold outline-none cursor-pointer transition-colors max-w-[280px] sm:max-w-md truncate ${
+                      isDark 
+                        ? 'bg-slate-800 border-slate-700 text-slate-100 hover:border-slate-600 focus:border-red-500' 
+                        : 'bg-white border-slate-300 text-slate-900 hover:border-slate-400 focus:border-red-500 shadow-2xs'
+                    }`}
+                    title="Selecione para alternar a viatura em inspeção"
+                  >
+                    {viaturasDisponiveis.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.prefixo_frota} • {v.placa} — {v.marca} {v.modelo} ({(v.odometro_atual_km || 0).toLocaleString('pt-BR')} km)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <p className={`text-xs font-mono flex items-center gap-2 mt-0.5 ${
+                  isDark ? 'text-slate-400' : 'text-slate-600'
+                }`}>
+                  <span className={isDark ? 'text-slate-200 font-bold' : 'text-slate-900 font-bold'}>{currentViatura.prefixo_frota}</span>
+                  <span>•</span>
+                  <span>Placa: <strong className={isDark ? 'text-slate-100' : 'text-slate-900'}>{currentViatura.placa}</strong></span>
+                  <span>•</span>
+                  <span>Odômetro: <strong className={isDark ? 'text-slate-100' : 'text-slate-900'}>{(currentViatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</strong></span>
+                </p>
+              )}
             </div>
           </div>
 
@@ -507,13 +615,13 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
                   isDark ? 'border-slate-700/80 bg-slate-950/80 text-slate-300' : 'border-slate-300 bg-slate-50/90 text-slate-700'
                 }`}>
                   <span className="text-[11px] font-mono font-black text-red-600 uppercase tracking-wider">
-                    {viatura.prefixo_frota}
+                    {currentViatura.prefixo_frota}
                   </span>
                   <span className="text-xs font-mono font-bold">
-                    {viatura.marca} {viatura.modelo}
+                    {currentViatura.marca} {currentViatura.modelo}
                   </span>
                   <span className={`text-[9.5px] font-mono mt-0.5 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Placa: {viatura.placa} • Tração 4x4 / Chassi Longarinas
+                    Placa: {currentViatura.placa} • Tração 4x4 / Chassi Longarinas
                   </span>
                 </div>
               </div>

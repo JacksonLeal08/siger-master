@@ -931,6 +931,7 @@ export default function ViaturasPage() {
         <MapeamentoPneusModal
           isOpen={isTireModalOpen}
           viatura={selectedViaturaForTire}
+          viaturasDisponiveis={viaturas}
           contratoId={currentContratoId}
           onClose={() => setIsTireModalOpen(false)}
           onMinimize={() => {

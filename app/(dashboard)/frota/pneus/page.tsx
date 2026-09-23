@@ -163,7 +163,8 @@ export default function GestaoPneusPage() {
             type="button"
             onClick={() => {
               if (viaturas.length > 0) {
-                handleAbrirInspecao(viaturas[0]);
+                // Abre priorizando a primeira viatura do filtro atual ou a primeira cadastrada
+                handleAbrirInspecao(viaturasFiltradas[0] || viaturas[0]);
               } else {
                 alert('Nenhuma viatura cadastrada para este contrato.');
               }
@@ -402,6 +403,7 @@ export default function GestaoPneusPage() {
         <MapeamentoPneusModal
           isOpen={modalInspecaoOpen}
           viatura={viaturaParaInspecao}
+          viaturasDisponiveis={viaturas}
           contratoId={currentContratoId}
           onClose={() => {
             setModalInspecaoOpen(false);
