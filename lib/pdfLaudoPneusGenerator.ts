@@ -27,12 +27,14 @@ function getMetadadosCatalogoItem(item: ItemAfericaoPneu) {
 
 /**
  * Gera e abre em nova janela o Laudo Técnico Pericial de Rodagem Veicular formatado para impressão executiva / PDF
- * Padrão Corporativo de Romaneios e Laudos Periciais do SIGER Master (A4 Paisagem • Página Única)
+ * Padrão Corporativo de Romaneios e Laudos Periciais do SIGER Master
+ * Suporta alternância dinâmica entre orientação Retrato (Portrait) e Paisagem (Landscape)
  */
 export function generateLaudoPneusPDF(
   inspecao: InspecaoRodagemPneus,
   viatura: Viatura,
-  responsavelNome: string = 'Jackson Leal - Engenheiro Responsável'
+  responsavelNome: string = 'Jackson Leal - Engenheiro Responsável',
+  orientacaoInicial: 'portrait' | 'landscape' = 'portrait'
 ) {
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
@@ -116,53 +118,53 @@ export function generateLaudoPneusPDF(
 
     return `
       <tr style="${rowBg}">
-        <td style="text-align: center; font-weight: 800; font-family: monospace; color: #0f172a; padding: 2px 4px;">
-          <span style="display: block; font-size: 11px; color: #af101a; line-height: 1;">${item.posicao_pneu}</span>
-          <span style="font-size: 7.5px; color: #64748b; text-transform: uppercase;">
+        <td style="text-align: center; font-weight: 800; font-family: monospace; color: #0f172a; font-size: 11px;">
+          <span style="display: block; font-size: 12px; color: #af101a;">${item.posicao_pneu}</span>
+          <span style="font-size: 8px; color: #64748b; text-transform: uppercase;">
             ${item.posicao_pneu === 'DE' ? 'Diant. Esq.' : item.posicao_pneu === 'DD' ? 'Diant. Dir.' : item.posicao_pneu === 'TE' ? 'Tras. Esq.' : item.posicao_pneu === 'TD' ? 'Tras. Dir.' : 'Estepe'}
           </span>
         </td>
-        <td style="padding: 2px 6px;">
-          <div style="font-weight: 800; color: #0f172a; font-size: 9.5px; line-height: 1.1;">${item.marca || 'CHENGSHAN'} ${item.modelo || 'MASPIRE M/T'}</div>
-          <div style="font-family: monospace; color: #475569; font-size: 8.5px; margin-top: 1px;">
+        <td>
+          <div style="font-weight: 800; color: #0f172a; font-size: 10.5px;">${item.marca || 'CHENGSHAN'} ${item.modelo || 'MASPIRE M/T'}</div>
+          <div style="font-family: monospace; color: #475569; font-size: 9.5px; margin-top: 1px;">
             ${item.medida || 'LT265/65 R17'}
-            <span style="display: inline-block; padding: 0px 4px; border-radius: 3px; font-weight: bold; font-size: 8px; margin-left: 3px; ${terrainBadgeColor}">
+            <span style="display: inline-block; padding: 1px 5px; border-radius: 4px; font-weight: bold; font-size: 8.5px; margin-left: 4px; ${terrainBadgeColor}">
               ${tipoTerreno}
             </span>
           </div>
         </td>
-        <td style="text-align: center; font-family: monospace; font-size: 9px; padding: 2px 4px;">
+        <td style="text-align: center; font-family: monospace; font-size: 10px;">
           <div><strong>${sOrig.toFixed(2)}</strong> mm</div>
-          <div style="font-size: 7.5px; color: #64748b;">(B<sub>útil</sub>: ${bUtil.toFixed(2)} mm)</div>
+          <div style="font-size: 8.5px; color: #64748b;">(B<sub>útil</sub>: ${bUtil.toFixed(2)} mm)</div>
         </td>
-        <td style="text-align: center; font-family: monospace; font-size: 9px; color: #475569; padding: 2px 4px;">
+        <td style="text-align: center; font-family: monospace; font-size: 10px; color: #475569;">
           ${pressaoNominal.toFixed(0)} PSI
         </td>
-        <td style="text-align: center; font-family: monospace; font-size: 10px; font-weight: 800; color: ${isCritico ? '#dc2626' : isAtencao ? '#d97706' : '#16a34a'}; padding: 2px 4px;">
+        <td style="text-align: center; font-family: monospace; font-size: 11px; font-weight: 800; color: ${isCritico ? '#dc2626' : isAtencao ? '#d97706' : '#16a34a'};">
           ${sMedido.toFixed(2)} mm
         </td>
-        <td style="text-align: center; font-family: monospace; font-size: 9px; padding: 2px 4px;">
+        <td style="text-align: center; font-family: monospace; font-size: 10px;">
           <strong>${pressaoReal.toFixed(1)}</strong> PSI
-          <span style="font-size: 7.5px; color: ${Math.abs(desvioPsi) <= 1.0 ? '#16a34a' : '#d97706'};">
+          <span style="font-size: 8.5px; color: ${Math.abs(desvioPsi) <= 1.0 ? '#16a34a' : '#d97706'};">
             (${desvioPsi >= 0 ? '+' : ''}${desvioPsi.toFixed(1)})
           </span>
         </td>
-        <td style="text-align: center; font-family: monospace; font-size: 9px; color: #64748b; padding: 2px 4px;">
+        <td style="text-align: center; font-family: monospace; font-size: 10px; color: #64748b;">
           <div>${deltaDesgaste.toFixed(2)} mm</div>
-          <div style="font-size: 7.5px; color: #af101a;">(${percentualGasto}% gasto)</div>
+          <div style="font-size: 8.5px; color: #af101a;">(${percentualGasto}% gasto)</div>
         </td>
-        <td style="text-align: center; font-family: monospace; font-size: 9.5px; font-weight: bold; color: ${isCritico ? '#dc2626' : '#0f172a'}; padding: 2px 4px;">
+        <td style="text-align: center; font-family: monospace; font-size: 10.5px; font-weight: bold; color: ${isCritico ? '#dc2626' : '#0f172a'};">
           ${saldoTwi.toFixed(2)} mm
         </td>
-        <td style="text-align: center; width: 75px; padding: 2px 4px;">
-          <div style="font-weight: 800; font-family: monospace; font-size: 9.5px; color: ${isCritico ? '#dc2626' : '#0f172a'}; line-height: 1;">
+        <td style="text-align: center; width: 85px;">
+          <div style="font-weight: 800; font-family: monospace; font-size: 10.5px; color: ${isCritico ? '#dc2626' : '#0f172a'};">
             ${vidaUtil.toFixed(1)}%
           </div>
-          <div style="width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; margin-top: 2px;">
+          <div style="width: 100%; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin-top: 3px;">
             <div style="width: ${Math.min(100, Math.max(0, vidaUtil))}%; height: 100%; background: ${barColor};"></div>
           </div>
         </td>
-        <td style="text-align: center; padding: 2px 4px;">
+        <td style="text-align: center;">
           ${statusBadge}
         </td>
       </tr>
@@ -187,299 +189,202 @@ export function generateLaudoPneusPDF(
     <head>
       <meta charset="UTF-8">
       <title>Laudo Técnico Pericial de Rodagem & Metrologia - ${viatura.prefixo_frota}</title>
-      <style>
-        /* Configuração Mandatória de Impressão em Modo Paisagem A4 (Single-Page) */
+      <style id="page-orientation-style">
         @page {
-          size: A4 landscape;
-          margin: 5mm 6mm 5mm 6mm;
+          size: A4 ${orientacaoInicial};
+          margin: 8mm 10mm 8mm 10mm;
         }
-
+      </style>
+      <style>
         * {
           box-sizing: border-box;
           margin: 0;
           padding: 0;
         }
-
-        html, body {
+        body {
           font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
           color: #0f172a;
-          background-color: #e2e8f0;
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-        }
-
-        body {
-          padding: 10px;
+          font-size: 10.5px;
+          line-height: 1.35;
+          background-color: #f1f5f9;
+          padding: 16px;
           display: flex;
           flex-direction: column;
           align-items: center;
         }
-
-        /* Container Folha A4 Paisagem (297mm x 210mm) */
         .container {
-          width: 285mm;
-          max-width: 100%;
+          width: 100%;
+          max-width: ${orientacaoInicial === 'landscape' ? '285mm' : '210mm'};
           background: #ffffff;
-          border-radius: 6px;
-          padding: 8px 12px;
-          box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+          padding: 18px 22px;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          transition: max-width 0.2s ease;
         }
-
-        /* Barra de Ações para Impressão na Tela */
-        .print-actions {
-          width: 285mm;
-          max-width: 100%;
-          background: #090d16;
-          color: #ffffff;
-          padding: 6px 14px;
-          border-radius: 6px;
-          margin-bottom: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        .btn-print {
-          background-color: #dc2626;
-          color: #ffffff;
-          border: none;
-          padding: 6px 14px;
-          font-weight: 700;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 11px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: background 0.15s ease;
-        }
-        .btn-print:hover {
-          background-color: #b91c1c;
-        }
-
+        
         /* Cabeçalho Oficial */
         .header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-bottom: 2px solid #af101a;
-          padding-bottom: 5px;
-          margin-bottom: 6px;
+          border-bottom: 3px solid #af101a;
+          padding-bottom: 10px;
+          margin-bottom: 12px;
         }
         .header-logo {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
         }
         .logo-box {
-          background: linear-gradient(135deg, #af101a 0%, #880b14 100%);
+          background-color: #af101a;
           color: #ffffff;
-          padding: 4px 10px;
-          border-radius: 5px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid rgba(255,255,255,0.2);
-        }
-        .logo-main {
+          padding: 6px 12px;
           font-weight: 900;
-          font-size: 15px;
-          letter-spacing: 1px;
+          font-size: 16px;
+          letter-spacing: 1.2px;
+          border-radius: 6px;
           font-family: monospace;
-          line-height: 1;
-        }
-        .logo-sub {
-          font-weight: 700;
-          font-size: 7.5px;
-          letter-spacing: 1.5px;
-          color: #fecaca;
-          line-height: 1;
-          margin-top: 1px;
+          line-height: 1.1;
+          text-align: center;
         }
         .header-titles h1 {
-          font-size: 12.5px;
+          font-size: 14px;
           font-weight: 800;
           color: #0f172a;
           text-transform: uppercase;
-          letter-spacing: 0.3px;
-          line-height: 1.15;
+          letter-spacing: 0.5px;
         }
         .header-titles p {
-          font-size: 8.5px;
+          font-size: 9.5px;
           color: #64748b;
           font-weight: 600;
-          margin-top: 1px;
         }
         .header-protocol {
           text-align: right;
           font-family: monospace;
-          font-size: 8.5px;
-          line-height: 1.25;
+          font-size: 9.5px;
         }
         .header-protocol .badge-doc {
           background-color: #f1f5f9;
           border: 1px solid #cbd5e1;
           color: #334155;
-          padding: 1px 6px;
+          padding: 2px 7px;
           border-radius: 4px;
           font-weight: bold;
-          font-size: 8px;
           display: inline-block;
-          margin-bottom: 2px;
+          margin-bottom: 3px;
         }
 
-        /* Linha Dupla: Identificação da Viatura (Esquerda) + 4 KPIs (Direita) */
-        .row-vtr-kpis {
-          display: grid;
-          grid-template-columns: 57% 42%;
-          gap: 1%;
-          margin-bottom: 6px;
-          align-items: stretch;
-        }
-
-        /* Ficha Técnica da Viatura (CRLV) */
+        /* Ficha Técnica da Viatura */
         .card-veiculo {
           border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          padding: 5px 8px;
+          border-radius: 8px;
+          padding: 9px 12px;
           background-color: #f8fafc;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          margin-bottom: 12px;
         }
         .card-veiculo h3 {
-          font-size: 9px;
+          font-size: 10.5px;
           text-transform: uppercase;
           font-weight: 800;
           color: #af101a;
-          margin-bottom: 4px;
+          margin-bottom: 6px;
           border-bottom: 1px solid #e2e8f0;
-          padding-bottom: 2px;
+          padding-bottom: 3px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-        }
-        .status-pill {
-          font-family: monospace;
-          font-size: 7.5px;
-          font-weight: bold;
-          padding: 1px 5px;
-          border-radius: 3px;
-        }
-        .status-ok {
-          background: #dcfce7;
-          color: #15803d;
-          border: 1px solid #86efac;
-        }
-        .status-alerta {
-          background: #fee2e2;
-          color: #b91c1c;
-          border: 1px solid #fca5a5;
         }
         .grid-veiculo {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 3px 6px;
-          font-size: 8.5px;
+          gap: 6px 12px;
+          font-size: 10px;
         }
         .grid-item span {
           display: block;
-          font-size: 7px;
+          font-size: 8.5px;
           color: #64748b;
           text-transform: uppercase;
           font-weight: 700;
-          line-height: 1;
         }
         .grid-item strong {
           color: #0f172a;
           font-family: monospace;
-          font-size: 8.5px;
-          line-height: 1.15;
+          font-size: 10.5px;
         }
 
-        /* Painel 4 KPIs no Topo */
+        /* Painel de 4 KPIs no Topo da Seção Metrológica */
         .kpi-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 5px;
+          gap: 8px;
+          margin-bottom: 12px;
         }
         .kpi-card {
           border: 1px solid #cbd5e1;
-          border-radius: 6px;
-          padding: 4px 6px;
+          border-radius: 8px;
+          padding: 8px 10px;
           background: #ffffff;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
         }
         .kpi-label {
-          font-size: 7px;
-          font-weight: 800;
+          font-size: 8.5px;
+          font-weight: 700;
           text-transform: uppercase;
           color: #64748b;
-          line-height: 1;
-          margin-bottom: 2px;
+          margin-bottom: 3px;
         }
         .kpi-value {
           font-family: monospace;
-          font-size: 11px;
+          font-size: 14px;
           font-weight: 900;
           color: #0f172a;
-          line-height: 1.1;
         }
         .kpi-sub {
-          font-size: 6.5px;
+          font-size: 8.5px;
           color: #64748b;
-          line-height: 1;
           margin-top: 2px;
         }
 
-        /* Matriz Comparativa (Tabela) */
-        .section-header-compact {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 3px;
-        }
+        /* Matriz Comparativa */
         .section-title {
-          font-size: 9.5px;
+          font-size: 11px;
           font-weight: 800;
           text-transform: uppercase;
           color: #0f172a;
-          letter-spacing: 0.2px;
-        }
-        .section-sub {
-          font-size: 7.5px;
-          color: #64748b;
-          font-weight: 600;
+          margin-bottom: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
         table {
           width: 100%;
           border-collapse: collapse;
-          margin-bottom: 6px;
+          margin-bottom: 12px;
         }
         th {
           background-color: #0f172a;
           color: #ffffff;
-          font-size: 7.5px;
+          font-size: 9px;
           font-weight: 700;
           text-transform: uppercase;
-          padding: 4px 4px;
+          padding: 6px 6px;
           border: 1px solid #0f172a;
-          letter-spacing: 0.1px;
+          letter-spacing: 0.2px;
         }
         td {
+          padding: 5px 6px;
           border: 1px solid #e2e8f0;
-          font-size: 8.5px;
+          font-size: 9.5px;
         }
 
         /* Badges de Status */
         .badge {
-          font-size: 7px;
+          font-size: 8px;
           font-weight: 800;
-          padding: 1px 4px;
-          border-radius: 3px;
+          padding: 2px 5px;
+          border-radius: 4px;
           text-transform: uppercase;
           display: inline-block;
           font-family: monospace;
@@ -501,298 +406,315 @@ export function generateLaudoPneusPDF(
           border: 1px solid #fecaca;
         }
 
-        /* Linha Inferior: Memória de Cálculo (34%) + Glossário (42%) + Assinaturas (23%) */
-        .row-bottom-grid {
-          display: grid;
-          grid-template-columns: 34% 42% 22%;
-          gap: 1%;
-          align-items: stretch;
-        }
-
         /* Memória de Cálculo */
         .card-calculo {
           border: 1px solid #cbd5e1;
-          border-left: 3px solid #af101a;
-          border-radius: 5px;
-          padding: 4px 6px;
+          border-left: 4px solid #af101a;
+          border-radius: 6px;
+          padding: 8px 12px;
           background-color: #f8fafc;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          margin-bottom: 12px;
         }
         .card-calculo h4 {
-          font-size: 8px;
+          font-size: 10px;
           text-transform: uppercase;
           color: #0f172a;
           font-weight: 800;
-          margin-bottom: 2px;
+          margin-bottom: 4px;
         }
         .formula-box {
           background-color: #ffffff;
           border: 1px solid #e2e8f0;
-          padding: 3px 5px;
-          border-radius: 3px;
+          padding: 6px 10px;
+          border-radius: 4px;
           font-family: monospace;
-          font-size: 7.5px;
+          font-size: 9.5px;
           color: #0f172a;
-          line-height: 1.35;
+          margin-bottom: 4px;
+          line-height: 1.45;
         }
         .formula-box strong {
           color: #af101a;
         }
-        .formula-obs {
-          font-size: 6.5px;
-          color: #64748b;
-          font-style: italic;
-          margin-top: 2px;
-          line-height: 1.15;
-        }
 
-        /* Glossário Normativo */
+        /* Glossário Normativo de Rodapé */
         .glossario-card {
           border: 1px solid #cbd5e1;
-          border-radius: 5px;
-          padding: 4px 6px;
-          background: #ffffff;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
+          border-radius: 8px;
+          padding: 8px 12px;
+          background: #fdfefe;
+          margin-bottom: 12px;
         }
         .glossario-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
           border-bottom: 1px solid #e2e8f0;
-          padding-bottom: 2px;
-          margin-bottom: 3px;
+          padding-bottom: 4px;
+          margin-bottom: 6px;
         }
         .glossario-title {
-          font-size: 8px;
+          font-size: 9.5px;
           font-weight: 800;
           text-transform: uppercase;
           color: #0f172a;
         }
         .glossario-norma {
-          font-size: 7px;
+          font-size: 8.5px;
           color: #64748b;
           font-family: monospace;
         }
         .glossario-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 2px 6px;
-          font-size: 7px;
+          gap: 5px 12px;
+          font-size: 8.5px;
           color: #334155;
-          line-height: 1.2;
+          line-height: 1.3;
         }
         .glossario-item strong {
           color: #0f172a;
         }
 
-        /* Assinaturas Técnicas */
-        .signatures-card {
-          border: 1px solid #cbd5e1;
-          border-radius: 5px;
-          padding: 4px 6px;
-          background: #ffffff;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          text-align: center;
+        /* Assinaturas */
+        .signatures {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 40px;
+          margin-top: 18px;
+          padding-top: 8px;
         }
         .sign-box {
-          margin-top: 2px;
+          text-align: center;
         }
         .sign-line {
           border-top: 1px solid #475569;
-          margin-bottom: 2px;
+          margin-bottom: 4px;
         }
         .sign-title {
           font-weight: bold;
-          font-size: 8px;
+          font-size: 10px;
           color: #0f172a;
-          line-height: 1.1;
         }
         .sign-sub {
-          font-size: 6.5px;
+          font-size: 8.5px;
           color: #64748b;
-          line-height: 1.1;
-        }
-        .doc-auth-stamp {
-          margin-top: 2px;
-          font-size: 6px;
-          font-family: monospace;
-          color: #047857;
-          background: #ecfdf5;
-          border: 1px dashed #a7f3d0;
-          padding: 1px 3px;
-          border-radius: 3px;
-          font-weight: bold;
         }
 
-        /* REGRAS CRÍTICAS PARA IMPRESSÃO EM FOLHA ÚNICA PAISAGEM */
+        /* Barra de Ações para Impressão */
+        .print-actions {
+          width: 100%;
+          max-width: ${orientacaoInicial === 'landscape' ? '285mm' : '210mm'};
+          background-color: #0f172a;
+          color: #ffffff;
+          padding: 8px 16px;
+          border-radius: 8px;
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          transition: max-width 0.2s ease;
+        }
+        .orientacao-control {
+          display: flex;
+          align-items: center;
+          background: #1e293b;
+          border: 1px solid #334155;
+          border-radius: 6px;
+          padding: 2px;
+          gap: 2px;
+        }
+        .btn-orientacao {
+          background: transparent;
+          color: #94a3b8;
+          border: none;
+          padding: 4px 10px;
+          border-radius: 4px;
+          font-size: 10.5px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .btn-orientacao:hover {
+          color: #ffffff;
+        }
+        .btn-orientacao.active {
+          background-color: #dc2626;
+          color: #ffffff;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .btn-print {
+          background-color: #dc2626;
+          color: #ffffff;
+          border: none;
+          padding: 7px 16px;
+          font-weight: bold;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 11px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: background 0.15s ease;
+        }
+        .btn-print:hover {
+          background-color: #b91c1c;
+        }
+
         @media print {
-          @page {
-            size: A4 landscape;
-            margin: 5mm 6mm 5mm 6mm;
-          }
-          html, body {
-            width: 297mm !important;
-            height: 210mm !important;
-            max-height: 210mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            background: #ffffff !important;
-          }
           .print-actions {
             display: none !important;
           }
-          .container {
-            width: 100% !important;
-            max-width: 100% !important;
-            height: 100% !important;
-            max-height: 200mm !important;
+          body {
+            background-color: #ffffff !important;
             padding: 0 !important;
-            border-radius: 0 !important;
+            print-color-adjust: exact !important;
+            -webkit-print-color-adjust: exact !important;
+          }
+          .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
             box-shadow: none !important;
-            overflow: hidden !important;
-            page-break-after: avoid !important;
-            page-break-inside: avoid !important;
+            border-radius: 0 !important;
           }
           table, tr, td, th {
-            page-break-inside: avoid !important;
+            page-break-inside: avoid;
           }
         }
       </style>
     </head>
-    <body>
-      <!-- Barra de Ações no Navegador -->
+    <body class="${orientacaoInicial}">
+      <!-- Barra de Ações no Navegador com Seletor Retrato / Paisagem -->
       <div class="print-actions">
-        <span><strong>SIGER Master</strong> • Emissão Oficial de Laudo Técnico Pericial de Rodagem & Metrologia (A4 Paisagem • Folha Única)</span>
-        <button class="btn-print" onclick="window.print()">🖨️ IMPRIMIR / SALVAR EM PDF (PAISAGEM)</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span><strong>SIGER Master</strong> • Emissão de Laudo Técnico Pericial</span>
+          <div class="orientacao-control">
+            <button id="btn-portrait" class="btn-orientacao ${orientacaoInicial === 'portrait' ? 'active' : ''}" onclick="toggleOrientacao('portrait')">
+              📄 Retrato
+            </button>
+            <button id="btn-landscape" class="btn-orientacao ${orientacaoInicial === 'landscape' ? 'active' : ''}" onclick="toggleOrientacao('landscape')">
+              🖼️ Paisagem
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-print" onclick="window.print()">🖨️ IMPRIMIR / SALVAR EM PDF</button>
       </div>
 
-      <div class="container">
-        <!-- 1. Cabeçalho Oficial -->
+      <div class="container" id="laudo-container">
+        <!-- Cabeçalho Oficial -->
         <div class="header">
           <div class="header-logo">
-            <div class="logo-box">
-              <span class="logo-main">SIGER</span>
-              <span class="logo-sub">MASTER</span>
-            </div>
+            <div class="logo-box">SIGER MASTER</div>
             <div class="header-titles">
               <h1>Laudo Técnico Pericial de Rodagem & Metrologia</h1>
               <p>Auditoria de Conformidade Normativa • Resolução CONTRAN nº 558/80 • Art. 230 CTB • SIGER Master Gestão de Frotas</p>
             </div>
           </div>
           <div class="header-protocol">
-            <div class="badge-doc">LAUDO PERICIAL • A4 PAISAGEM</div>
+            <div class="badge-doc">LAUDO TÉCNICO PERICIAL</div>
             <div><strong>Emissão:</strong> ${dataHoraEmissao}</div>
             <div><strong>Contrato:</strong> ${inspecao.contrato_id}</div>
           </div>
         </div>
 
-        <!-- 2. Linha Dupla: Identificação da Viatura (CRLV) + 4 KPIs Metrológicos -->
-        <div class="row-vtr-kpis">
-          <!-- Card Veículo (Esquerda) -->
-          <div class="card-veiculo">
-            <h3>
-              <span>Identificação Técnica da Viatura (CRLV Oficial)</span>
-              <span class="status-pill ${inspecao.status_geral_twi === 'CONFORME' ? 'status-ok' : 'status-alerta'}">
-                STATUS: ${inspecao.status_geral_twi || 'CONFORME'}
-              </span>
-            </h3>
-            <div class="grid-veiculo">
-              <div class="grid-item">
-                <span>Prefixo Operacional</span>
-                <strong>${viatura.prefixo_frota}</strong>
-              </div>
-              <div class="grid-item">
-                <span>Placa Oficial Mercosul</span>
-                <strong>${viatura.placa}</strong>
-              </div>
-              <div class="grid-item">
-                <span>Marca / Modelo Homologado</span>
-                <strong>${viatura.marca_modelo_crlv || `${viatura.marca} ${viatura.modelo}`}</strong>
-              </div>
-              <div class="grid-item">
-                <span>Número de Chassi</span>
-                <strong>${viatura.chassi || 'NÃO CONSTA'}</strong>
-              </div>
-              <div class="grid-item">
-                <span>Odômetro Registrado</span>
-                <strong>${(inspecao.odometro_km || viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</strong>
-              </div>
-              <div class="grid-item">
-                <span>Calibração Efetuada</span>
-                <strong>${inspecao.houve_calibracao ? 'SIM (CONFORME)' : 'NÃO REALIZADA'}</strong>
-              </div>
-              <div class="grid-item">
-                <span>Técnico Responsável</span>
-                <strong>${inspecao.tecnico_nome || responsavelNome}</strong>
-              </div>
-              <div class="grid-item">
-                <span>Regulamentação Vigente</span>
-                <strong>CONTRAN 558/80 (TWI 1.60 mm)</strong>
-              </div>
+        <!-- Ficha Técnica da Viatura (CRLV Oficial) -->
+        <div class="card-veiculo">
+          <h3>
+            <span>Identificação Técnica da Viatura (CRLV Oficial)</span>
+            <span style="font-family: monospace; color: #475569;">STATUS: ${inspecao.status_geral_twi}</span>
+          </h3>
+          <div class="grid-veiculo">
+            <div class="grid-item">
+              <span>Prefixo Operacional</span>
+              <strong>${viatura.prefixo_frota}</strong>
             </div>
-          </div>
-
-          <!-- Painel 4 KPIs no Topo (Direita) -->
-          <div class="kpi-grid">
-            <div class="kpi-card">
-              <div class="kpi-label">Média Vida Útil</div>
-              <div class="kpi-value" style="color: ${Number(mediaVidaUtil) < 30 ? '#dc2626' : Number(mediaVidaUtil) < 50 ? '#d97706' : '#16a34a'};">
-                ${mediaVidaUtil}%
-              </div>
-              <div class="kpi-sub">Borracha restante da frota</div>
+            <div class="grid-item">
+              <span>Placa Oficial Mercosul</span>
+              <strong>${viatura.placa}</strong>
             </div>
-
-            <div class="kpi-card">
-              <div class="kpi-label">Pneu Crítico</div>
-              <div class="kpi-value" style="color: ${pneuMaisCritico && (pneuMaisCritico.profundidade_sulco_mm || 0) <= 1.6 ? '#dc2626' : '#0f172a'}; font-size: 10px;">
-                ${pneuMaisCritico ? `${pneuMaisCritico.posicao_pneu} • ${(pneuMaisCritico.profundidade_sulco_mm || 0).toFixed(1)} mm` : 'N/A'}
-              </div>
-              <div class="kpi-sub">${pneuMaisCritico ? `Vida útil: ${(pneuMaisCritico.percentual_vida_util || 0).toFixed(1)}%` : 'Sem medição'}</div>
+            <div class="grid-item">
+              <span>Marca / Modelo Homologado</span>
+              <strong>${viatura.marca_modelo_crlv || `${viatura.marca} ${viatura.modelo}`}</strong>
             </div>
-
-            <div class="kpi-card">
-              <div class="kpi-label">Pressão Pneumática</div>
-              <div class="kpi-value" style="font-size: 9.5px; padding-top: 1px;">
-                ${conformidadePressaoTexto}
-              </div>
-              <div class="kpi-sub">Aderência aos padrões</div>
+            <div class="grid-item">
+              <span>Número de Chassi</span>
+              <strong>${viatura.chassi || 'NÃO CONSTA NO SISTEMA'}</strong>
             </div>
-
-            <div class="kpi-card" style="background: ${parecerGeral.bg}; border-color: ${parecerGeral.border};">
-              <div class="kpi-label" style="color: ${parecerGeral.color};">Parecer Geral</div>
-              <div class="kpi-value" style="font-size: 8.5px; color: ${parecerGeral.color}; line-height: 1.15;">
-                ${parecerGeral.status}
-              </div>
-              <div class="kpi-sub" style="color: ${parecerGeral.color};">${parecerGeral.subtitulo}</div>
+            <div class="grid-item">
+              <span>Odômetro Registrado</span>
+              <strong>${(inspecao.odometro_km || viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</strong>
+            </div>
+            <div class="grid-item">
+              <span>Calibração Efetuada</span>
+              <strong>${inspecao.houve_calibracao ? 'SIM (CONFORME)' : 'NÃO REALIZADA'}</strong>
+            </div>
+            <div class="grid-item">
+              <span>Técnico Responsável</span>
+              <strong>${inspecao.tecnico_nome || responsavelNome}</strong>
+            </div>
+            <div class="grid-item">
+              <span>Regulamentação Vigente</span>
+              <strong>CONTRAN 558/80 (TWI 1.60 mm)</strong>
             </div>
           </div>
         </div>
 
-        <!-- 3. Matriz Metrológica Comparativa: Especificações de Fábrica vs. Aferição Operacional -->
-        <div class="section-header-compact">
-          <span class="section-title">Matriz Metrológica Comparativa: Especificações de Fábrica vs. Aferição Operacional</span>
-          <span class="section-sub">Limite Mandatório: 1,60 mm (TWI) • Resolução CONTRAN nº 558/80</span>
+        <!-- Painel Sintético de 4 KPIs Metrológicos -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Média de Vida Útil</div>
+            <div class="kpi-value" style="color: ${Number(mediaVidaUtil) < 30 ? '#dc2626' : Number(mediaVidaUtil) < 50 ? '#d97706' : '#16a34a'};">
+              ${mediaVidaUtil}%
+            </div>
+            <div class="kpi-sub">Borracha restante da frota</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-label">Pneu Mais Crítico</div>
+            <div class="kpi-value" style="color: ${pneuMaisCritico && (pneuMaisCritico.profundidade_sulco_mm || 0) <= 1.6 ? '#dc2626' : '#0f172a'};">
+              ${pneuMaisCritico ? `${pneuMaisCritico.posicao_pneu} • ${(pneuMaisCritico.profundidade_sulco_mm || 0).toFixed(1)} mm` : 'N/A'}
+            </div>
+            <div class="kpi-sub">${pneuMaisCritico ? `Vida útil: ${(pneuMaisCritico.percentual_vida_util || 0).toFixed(1)}%` : 'Sem medição'}</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-label">Pressão Pneumática</div>
+            <div class="kpi-value" style="font-size: 12px; padding-top: 2px;">
+              ${conformidadePressaoTexto}
+            </div>
+            <div class="kpi-sub">Calibração nominal atendida</div>
+          </div>
+
+          <div class="kpi-card" style="background: ${parecerGeral.bg}; border-color: ${parecerGeral.border};">
+            <div class="kpi-label" style="color: ${parecerGeral.color};">Parecer Geral</div>
+            <div class="kpi-value" style="font-size: 11px; color: ${parecerGeral.color}; line-height: 1.2;">
+              ${parecerGeral.status}
+            </div>
+            <div class="kpi-sub" style="color: ${parecerGeral.color};">${parecerGeral.subtitulo}</div>
+          </div>
+        </div>
+
+        <!-- 3. MATRIZ METROLÓGICA COMPARATIVA: ESPECIFICAÇÕES DO FABRICANTE VS. AFERIÇÃO OPERACIONAL -->
+        <div class="section-title">
+          <span>Matriz Metrológica Comparativa: Especificações de Fábrica vs. Aferição Operacional</span>
+          <span style="font-size: 9px; font-weight: normal; color: #64748b;">Limite Mandatório: 1,60 mm (TWI)</span>
         </div>
         <table>
           <thead>
             <tr>
-              <th style="width: 42px; text-align: center;">Posição</th>
+              <th style="width: 48px; text-align: center;">Posição</th>
               <th>Engenharia do Fabricante</th>
-              <th style="width: 74px; text-align: center;">Sulco Fábrica (S<sub>orig</sub>)</th>
-              <th style="width: 60px; text-align: center;">PSI Base</th>
-              <th style="width: 74px; text-align: center;">Aferido (S<sub>medido</sub>)</th>
+              <th style="width: 75px; text-align: center;">Sulco Fábrica (S<sub>orig</sub>)</th>
+              <th style="width: 65px; text-align: center;">PSI Base</th>
+              <th style="width: 75px; text-align: center;">Aferido (S<sub>medido</sub>)</th>
               <th style="width: 65px; text-align: center;">Pressão Real</th>
-              <th style="width: 74px; text-align: center;">Desgaste (Δ)</th>
-              <th style="width: 74px; text-align: center;">Saldo até TWI</th>
-              <th style="width: 75px; text-align: center;">Vida Útil (% V<sub>útil</sub>)</th>
-              <th style="width: 105px; text-align: center;">Parecer Legal</th>
+              <th style="width: 75px; text-align: center;">Desgaste (Δ)</th>
+              <th style="width: 75px; text-align: center;">Saldo até TWI</th>
+              <th style="width: 85px; text-align: center;">Vida Útil (% V<sub>útil</sub>)</th>
+              <th style="width: 110px; text-align: center;">Parecer Legal</th>
             </tr>
           </thead>
           <tbody>
@@ -800,71 +722,111 @@ export function generateLaudoPneusPDF(
           </tbody>
         </table>
 
-        <!-- 4. Linha Inferior: Memória de Cálculo + Glossário Técnico + Assinaturas de Responsabilidade -->
-        <div class="row-bottom-grid">
-          <!-- Coluna 1: Memória de Cálculo Formal -->
-          <div class="card-calculo">
-            <h4>Memória de Cálculo Metrológico & Auditoria Técnica</h4>
-            <div class="formula-box">
-              <div><strong>1. Borracha Útil:</strong> B<sub>útil</sub> = S<sub>orig</sub> - 1,60 mm = [${sOrigDem} mm] - 1,60 mm = <strong>${bUtilDem} mm</strong></div>
-              <div><strong>2. Margem ao TWI:</strong> Saldo = S<sub>medido</sub> - 1,60 mm = [${sMedidoDem} mm] - 1,60 mm = <strong>${saldoDem} mm</strong></div>
-              <div><strong>3. Equação Formal de Vida Útil Restante:</strong></div>
-              <div style="padding-left: 6px;">% V<sub>útil</sub> = ((${sMedidoDem} - 1,60) / (${sOrigDem} - 1,60)) × 100 = <strong>${vidaUtilDem}%</strong></div>
-            </div>
-            <p class="formula-obs">
-              * O ressalto de 1,60 mm (TWI) delimita o fim da vida útil legal. Pneus ≤ 1,60 mm configuram infração grave e retenção imediata do veículo (Art. 230 CTB).
-            </p>
+        <!-- Memória de Cálculo & Parâmetros Metrológicos -->
+        <div class="card-calculo">
+          <h4>Memória de Cálculo Metrológico & Auditoria Técnica (Demonstrativo Formal)</h4>
+          <p style="margin-bottom: 4px; font-size: 9.5px; color: #475569;">
+            Demonstração matemática auditável da taxa de consumo de banda e percentual de vida útil restante:
+          </p>
+          <div class="formula-box">
+            <strong>1. Borracha Operacional Útil de Projeto:</strong> B<sub>útil</sub> = S<sub>orig</sub> - 1,60 mm = [${sOrigDem} mm] - 1,60 mm = <strong>${bUtilDem} mm</strong><br>
+            <strong>2. Margem de Segurança até o TWI Legal:</strong> Saldo = S<sub>medido</sub> - 1,60 mm = [${sMedidoDem} mm] - 1,60 mm = <strong>${saldoDem} mm</strong><br>
+            <strong>3. Equação Formal de Vida Útil Restante:</strong><br>
+            % V<sub>útil</sub> = ((S<sub>medido</sub> - 1,60) / (S<sub>orig</sub> - 1,60)) × 100 ⟹ (([${sMedidoDem}] - 1,60) / ([${sOrigDem}] - 1,60)) × 100 = <strong>${vidaUtilDem}%</strong>
           </div>
+          <p style="font-size: 8.5px; color: #64748b; font-style: italic;">
+            * O ressalto de 1,60 mm do TWI delimita o fim da vida útil legal. Pneus com sulcos iguais ou inferiores a 1,60 mm configuram infração de trânsito grave e risco crítico de aquaplanagem.
+          </p>
+        </div>
 
-          <!-- Coluna 2: Glossário Técnico Normativo -->
-          <div class="glossario-card">
-            <div class="glossario-header">
-              <span class="glossario-title">GLOSSÁRIO TÉCNICO & DEFINIÇÕES NORMATIVAS</span>
-              <span class="glossario-norma">CONTRAN 558/80 • CTB 230 • ABNT NBR NM 225</span>
-            </div>
-            <div class="glossario-grid">
-              <div class="glossario-item">
-                <strong>TWI:</strong> Ressalto vulcanizado a <strong>1,60 mm</strong> nos sulcos. Limite legal mínimo.
-              </div>
-              <div class="glossario-item">
-                <strong>PSI:</strong> Pound-force per Square Inch. Pressão pneumática de carga e aderência.
-              </div>
-              <div class="glossario-item">
-                <strong>S<sub>orig</sub>:</strong> Sulco nominal fornecido pelo fabricante para pneu novo (0 km).
-              </div>
-              <div class="glossario-item">
-                <strong>S<sub>medido</sub>:</strong> Medição física obtida com profundímetro digital metrológico.
-              </div>
-              <div class="glossario-item">
-                <strong>B<sub>útil</sub>:</strong> Borracha consumível útil (S<sub>orig</sub> - 1,60 mm).
-              </div>
-              <div class="glossario-item">
-                <strong>Δ<sub>desgaste</sub>:</strong> Espessura degradada pelo atrito (S<sub>orig</sub> - S<sub>medido</sub>).
-              </div>
-              <div class="glossario-item" style="grid-column: span 2;">
-                <strong>Perfis de Terreno:</strong> <strong>H/T:</strong> 80% Asfalto / 20% Terra • <strong>A/T:</strong> 50% / 50% Misto • <strong>R/T:</strong> 35% Asfalto / 65% Rochoso • <strong>M/T:</strong> 20% Asfalto / 80% Lama.
-              </div>
-            </div>
+        <!-- GLOSSÁRIO TÉCNICO & DEFINIÇÕES NORMATIVAS -->
+        <div class="glossario-card">
+          <div class="glossario-header">
+            <span class="glossario-title">GLOSSÁRIO TÉCNICO & DEFINIÇÕES NORMATIVAS METROLÓGICAS</span>
+            <span class="glossario-norma">Resolução CONTRAN nº 558/80 • Art. 230 CTB • ABNT NBR NM 225</span>
           </div>
-
-          <!-- Coluna 3: Assinaturas de Responsabilidade Técnica -->
-          <div class="signatures-card">
-            <div class="sign-box">
-              <div class="sign-line"></div>
-              <div class="sign-title">${inspecao.tecnico_nome || 'Inspetor Metrológico de Campo'}</div>
-              <div class="sign-sub">Técnico em Metrologia • SIGER Master</div>
+          <div class="glossario-grid">
+            <div class="glossario-item">
+              <strong>TWI (Tread Wear Indicator):</strong>
+              Ressalto de borracha vulcanizado a <strong>1,60 mm</strong> de altura nos sulcos principais. Sulcos ≤ 1,60 mm acarretam retenção imediata da viatura e risco severo de aquaplanagem.
             </div>
-            <div class="sign-box" style="margin-top: 10px;">
-              <div class="sign-line"></div>
-              <div class="sign-title">${responsavelNome}</div>
-              <div class="sign-sub">Gestor Operacional • SIGER Master</div>
+            <div class="glossario-item">
+              <strong>PSI (Pound-force per Square Inch):</strong>
+              Unidade de pressão pneumática (1 PSI ≈ 0,0689 bar). Determina a calibração necessária para sustentação de carga, estabilidade direcional e aderência.
             </div>
-            <div class="doc-auth-stamp">
-              AUTENTICIDADE CONFORME SISTEMA SIGER MASTER
+            <div class="glossario-item">
+              <strong>S<sub>orig</sub> (Profundidade Nominal de Fábrica):</strong>
+              Altura nominal do sulco fornecida pelo fabricante para o pneu novo (0 km), servindo como estaca zero metrológica.
+            </div>
+            <div class="glossario-item">
+              <strong>S<sub>medido</sub> (Profundidade Atual Aferida):</strong>
+              Medição física obtida nos pontos de maior desgaste da banda de rodagem através de profundímetro digital metrológico.
+            </div>
+            <div class="glossario-item">
+              <strong>B<sub>útil</sub> (Borracha Operacional Útil):</strong>
+              Borracha consumível entre o estado novo e a barreira mandatória legal: <em>B<sub>útil</sub> = S<sub>orig</sub> - 1,60 mm</em>.
+            </div>
+            <div class="glossario-item">
+              <strong>Δ<sub>desgaste</sub> (Desgaste Acumulado):</strong>
+              Espessura de borracha degradada pelo atrito operacional da viatura: <em>Δ<sub>desgaste</sub> = S<sub>orig</sub> - S<sub>medido</sub></em>.
+            </div>
+            <div class="glossario-item">
+              <strong>% V<sub>útil</sub> (Vida Útil Restante):</strong>
+              Percentual disponível até o TWI: <em>% V<sub>útil</sub> = ((S<sub>medido</sub> - 1,60) / (S<sub>orig</sub> - 1,60)) × 100</em>.
+            </div>
+            <div class="glossario-item">
+              <strong>Posições de Rodagem:</strong>
+              <strong>DE:</strong> Dianteiro Esquerdo | <strong>DD:</strong> Dianteiro Direito | <strong>TE:</strong> Traseiro Esquerdo | <strong>TD:</strong> Traseiro Direito | <strong>ESTEPE:</strong> Reserva
+            </div>
+            <div class="glossario-item" style="grid-column: span 2;">
+              <strong>Classificação de Terreno:</strong>
+              <strong>H/T (Highway):</strong> 80% Asfalto / 20% Terra leve • 
+              <strong>A/T (All-Terrain):</strong> 50% Asfalto / 50% Terra mista • 
+              <strong>R/T (Rugged):</strong> 35% Asfalto / 65% Terreno severo/rochoso • 
+              <strong>M/T (Mud-Terrain):</strong> 20% Asfalto / 80% Lama e solo fofo.
             </div>
           </div>
         </div>
+
+        <!-- Assinaturas de Responsabilidade Técnica -->
+        <div class="signatures">
+          <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-title">${inspecao.tecnico_nome || 'Inspetor Metrológico de Campo'}</div>
+            <div class="sign-sub">Técnico em Metrologia e Segurança Veicular • SIGER Master</div>
+          </div>
+          <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-title">${responsavelNome}</div>
+            <div class="sign-sub">Gestor Operacional de Frota • SIGER Master</div>
+          </div>
+        </div>
       </div>
+
+      <!-- Script Dinâmico de Alternância Retrato / Paisagem -->
+      <script>
+        function toggleOrientacao(mode) {
+          const styleEl = document.getElementById('page-orientation-style');
+          const container = document.getElementById('laudo-container');
+          const actionsBar = document.querySelector('.print-actions');
+          const btnPortrait = document.getElementById('btn-portrait');
+          const btnLandscape = document.getElementById('btn-landscape');
+
+          if (mode === 'landscape') {
+            styleEl.innerHTML = '@page { size: A4 landscape; margin: 8mm 10mm 8mm 10mm; }';
+            container.style.maxWidth = '285mm';
+            if (actionsBar) actionsBar.style.maxWidth = '285mm';
+            btnLandscape.classList.add('active');
+            btnPortrait.classList.remove('active');
+          } else {
+            styleEl.innerHTML = '@page { size: A4 portrait; margin: 8mm 10mm 8mm 10mm; }';
+            container.style.maxWidth = '210mm';
+            if (actionsBar) actionsBar.style.maxWidth = '210mm';
+            btnPortrait.classList.add('active');
+            btnLandscape.classList.remove('active');
+          }
+        }
+      </script>
     </body>
     </html>
   `;

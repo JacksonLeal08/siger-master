@@ -20,10 +20,12 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
   onClose,
   responsavelNome = 'Jackson Leal - Engenheiro Responsável'
 }) => {
+  const [orientacao, setOrientacao] = React.useState<'portrait' | 'landscape'>('portrait');
+
   if (!isOpen) return null;
 
   const handlePrint = () => {
-    generateLaudoPneusPDF(inspecao, viatura, responsavelNome);
+    generateLaudoPneusPDF(inspecao, viatura, responsavelNome, orientacao);
   };
 
   const isCritico = inspecao.status_geral_twi === 'CRITICO_PROIBIDO';
@@ -86,10 +88,61 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
             </div>
           </div>
 
+          {/* Seletor de Orientação para Impressão */}
+          <div className="space-y-2">
+            <label className="text-xs font-mono font-bold uppercase text-slate-300 flex items-center justify-between">
+              <span>Orientação do Laudo (Impressão / PDF):</span>
+              <span className="text-[11px] text-slate-400 font-normal">
+                {orientacao === 'portrait' ? 'A4 Retrato (Padrão Executivo)' : 'A4 Paisagem (Horizontal)'}
+              </span>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setOrientacao('portrait')}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                  orientacao === 'portrait'
+                    ? 'bg-red-600/10 border-red-500 text-white shadow-lg shadow-red-500/10 ring-1 ring-red-500/30'
+                    : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base ${
+                  orientacao === 'portrait' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400'
+                }`}>
+                  📄
+                </div>
+                <div>
+                  <div className="text-xs font-bold font-mono">Retrato (Padrão)</div>
+                  <div className="text-[10px] text-slate-400">Layout Vertical Executivo</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setOrientacao('landscape')}
+                className={`p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                  orientacao === 'landscape'
+                    ? 'bg-red-600/10 border-red-500 text-white shadow-lg shadow-red-500/10 ring-1 ring-red-500/30'
+                    : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base ${
+                  orientacao === 'landscape' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400'
+                }`}>
+                  🖼️
+                </div>
+                <div>
+                  <div className="text-xs font-bold font-mono">Paisagem</div>
+                  <div className="text-[10px] text-slate-400">Layout Horizontal Expandido</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
           <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs flex items-start gap-2.5">
             <ShieldCheck className="w-4 h-4 shrink-0 text-blue-400 mt-0.5" />
             <span>
-              O laudo gerado segue a diagramação executiva da plataforma SIGER Master no formato <strong>A4 Paisagem (Página Única)</strong>, incluindo matriz comparativa metrológica de fábrica vs campo, memória de cálculo formal, glossário normativo e campos de assinatura técnica.
+              O laudo gerado segue a diagramação executiva da plataforma <strong>SIGER Master</strong> com suporte a <strong>Retrato ou Paisagem</strong>, incluindo matriz comparativa metrológica de fábrica vs campo, memória de cálculo formal, glossário normativo e campos de assinatura técnica.
             </span>
           </div>
         </div>
