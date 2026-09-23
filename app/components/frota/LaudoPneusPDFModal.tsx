@@ -89,7 +89,7 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
           <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs flex items-start gap-2.5">
             <ShieldCheck className="w-4 h-4 shrink-0 text-blue-400 mt-0.5" />
             <span>
-              O laudo gerado segue a diagramação executiva dos romaneios da plataforma SPCI Master, incluindo discriminação de sulco original vs aferido, memória de cálculo demonstrativa formal e campos de assinatura técnica.
+              O laudo gerado segue a diagramação executiva da plataforma SIGER Master no formato <strong>A4 Paisagem (Página Única)</strong>, incluindo matriz comparativa metrológica de fábrica vs campo, memória de cálculo formal, glossário normativo e campos de assinatura técnica.
             </span>
           </div>
         </div>
