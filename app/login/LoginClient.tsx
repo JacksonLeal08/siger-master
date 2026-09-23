@@ -203,26 +203,26 @@ export default function LoginClient() {
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent dark:from-slate-950" />
 
-          {/* Logo Brand top - Grupo OMG */}
+          {/* Logo Brand top - JIMMP Info */}
           <div className="relative flex items-center gap-5">
             <Image 
-              src="/logo-omg.png" 
-              alt="Logo Grupo OMG" 
+              src="/assets/branding/logo-jimmp-info.png" 
+              alt="Logo JIMMP Info" 
               width={180}
               height={56}
               priority
-              className="h-14 lg:h-16 w-auto object-contain brightness-110 drop-shadow-[0_4px_16px_rgba(220,38,38,0.4)] transition-transform hover:scale-105" 
+              className="h-14 lg:h-16 w-auto object-contain brightness-110 drop-shadow-[0_4px_16px_rgba(104,211,70,0.45)] transition-transform hover:scale-105" 
             />
             <div>
-              <span className="text-[10px] text-red-500 font-bold tracking-[0.2em] block uppercase leading-none">PLATAFORMA</span>
-              <span className="text-base font-black text-white tracking-tight leading-none mt-1 block">SPCI MASTER</span>
+              <span className="text-[10px] text-[#68D346] font-bold tracking-[0.2em] block uppercase leading-none">PLATAFORMA</span>
+              <span className="text-base font-black text-white tracking-tight leading-none mt-1 block font-mono">SIGER MASTER</span>
             </div>
           </div>
 
           {/* Title and Legal Compliance middle/bottom */}
           <div className="relative space-y-6 max-w-xl mt-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-950/60 border border-red-800/70 text-red-400 text-[10px] uppercase font-extrabold tracking-wider rounded-lg backdrop-blur-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1C4E26]/40 border border-[#68D346]/50 text-[#B7F365] text-[10px] uppercase font-extrabold tracking-wider rounded-lg backdrop-blur-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#68D346] animate-pulse"></span>
               Conformidade Legal NBR 12962 / 13434 / 13714
             </div>
             <div className="space-y-3">
@@ -237,7 +237,7 @@ export default function LoginClient() {
 
           {/* Footer stats bottom */}
           <div className="relative pt-6 border-t border-slate-800/80 flex items-center justify-start text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-12">
-            <span>SISTEMA DE SEGURANÇA GRUPO OMG</span>
+            <span>SISTEMA INTEGRADO DE GESTÃO DE EMERGÊNCIA & RESGATE • JIMMP INFO</span>
           </div>
         </div>
 
@@ -248,15 +248,15 @@ export default function LoginClient() {
             {/* Header info for mobile (logo + branding) */}
             <div className="md:hidden flex items-center gap-3 mb-6">
               <Image 
-                src="/logo-omg.png" 
-                alt="Logo Grupo OMG" 
+                src="/assets/branding/logo-jimmp-info.png" 
+                alt="Logo JIMMP Info" 
                 width={120}
                 height={40}
-                className="h-10 w-auto object-contain drop-shadow-md" 
+                className="h-10 w-auto object-contain drop-shadow-[0_2px_10px_rgba(104,211,70,0.35)]" 
               />
               <div>
-                <span className="text-[8px] text-red-600 dark:text-red-500 font-bold tracking-[0.2em] block uppercase leading-none">PLATAFORMA</span>
-                <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mt-1 block">SPCI MASTER</span>
+                <span className="text-[8px] text-[#68D346] font-bold tracking-[0.2em] block uppercase leading-none">PLATAFORMA</span>
+                <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mt-1 block font-mono">SIGER MASTER</span>
               </div>
             </div>
 

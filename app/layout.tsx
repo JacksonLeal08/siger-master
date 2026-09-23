@@ -30,7 +30,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#dc2626',
+  themeColor: '#1E2024',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -105,14 +105,14 @@ const jsonLdData = {
     {
       '@type': 'Organization',
       '@id': `${SITE_URL}/#organization`,
-      name: 'Grupo OMG - Segurança Contra Incêndio',
+      name: 'JIMMP Info - Gestão & Tecnologia Operacional',
       url: SITE_URL,
-      logo: `${SITE_URL}/logo-omg.png`,
+      logo: `${SITE_URL}/assets/branding/logo-jimmp-info.png`,
     },
     {
       '@type': 'WebApplication',
       '@id': `${SITE_URL}/#webapp`,
-      name: 'SISTEMA SPCI Master',
+      name: 'SISTEMA SIGER Master',
       applicationCategory: 'SecurityApplication',
       operatingSystem: 'All',
       url: SITE_URL,

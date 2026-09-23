@@ -193,23 +193,32 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
 
       {/* Header do Cluster */}
       <header className={`relative z-10 flex items-center justify-between px-6 py-4 border-b backdrop-blur-md transition-colors ${
-        isDark ? 'border-zinc-900/80 bg-zinc-950/60' : 'border-slate-200 bg-white/80'
+        isDark ? 'border-zinc-900/80 bg-zinc-950/70' : 'border-slate-200 bg-white/80'
       }`}>
         <div className="flex items-center gap-3">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+          <img 
+            src="/assets/branding/logo-jimmp-info.png" 
+            alt="JIMMP Info" 
+            className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_8px_rgba(104,211,70,0.4)]" 
+          />
+          <div className="h-6 w-[1.5px] bg-zinc-700/60 hidden sm:block" />
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-black tracking-widest uppercase text-red-500">
-                SPCI // FLEET CLUSTER
+              <span className="text-[11px] font-black tracking-widest uppercase text-[#B7F365]">
+                SIGER // FLEET CLUSTER
               </span>
               <span className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-bold border ${
-                isDark ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-slate-100 border-slate-300 text-slate-700'
+                isDark ? 'bg-[#282A2F] border-[#3C3F45] text-zinc-300' : 'bg-slate-100 border-slate-300 text-slate-700'
               }`}>
                 SITE: {contratoNome}
               </span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded font-mono font-bold bg-[#1C4E26]/40 text-[#B7F365] border border-[#68D346]/40 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#68D346] animate-pulse" />
+                CAN ONLINE
+              </span>
             </div>
-            <p className={`text-[10px] tracking-wider ${isDark ? 'text-zinc-500' : 'text-slate-500'}`}>
-              TERMINAL ELETRÔNICO DE CAMPO V2.11
+            <p className={`text-[10px] tracking-wider ${isDark ? 'text-zinc-400' : 'text-slate-500'}`}>
+              TERMINAL ELETRÔNICO DE CAMPO • JIMMP INFO
             </p>
           </div>
         </div>
@@ -229,7 +238,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
             {isAudioMuted ? (
               <VolumeX className="w-4 h-4 text-slate-400" />
             ) : (
-              <Volume2 className="w-4 h-4 text-emerald-500 animate-pulse" />
+              <Volume2 className="w-4 h-4 text-[#68D346] animate-pulse" />
             )}
           </button>
 
@@ -253,6 +262,15 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
       {/* Mostrador Central (Velocímetro / Can Gauge) */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4">
         <div className="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center">
+          {/* Marca d'água técnica do símbolo JIMMP centralizada */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-25">
+            <img 
+              src="/assets/branding/logo-jimmp-info.png" 
+              alt="Marca d'água JIMMP" 
+              className="w-36 h-36 object-contain filter grayscale contrast-125"
+            />
+          </div>
+
           {/* Ticks Perimetrais */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {ticks.map(({ angle, isMajor, index }) => (
@@ -264,7 +282,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
                 <div
                   className={`rounded-full transition-colors duration-300 ${
                     progress >= (index / 24) * 100
-                      ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'
+                      ? 'bg-[#68D346] shadow-[0_0_8px_rgba(104,211,70,0.85)]'
                       : isDark ? 'bg-zinc-800' : 'bg-slate-300'
                   } ${isMajor ? 'h-3.5 w-1' : 'h-2 w-0.5'}`}
                 />
@@ -275,9 +293,9 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 240 240">
             <defs>
               <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ef4444" />
-                <stop offset="60%" stopColor="#f59e0b" />
-                <stop offset="100%" stopColor="#10b981" />
+                <stop offset="0%" stopColor="#7E8289" />
+                <stop offset="60%" stopColor="#68D346" />
+                <stop offset="100%" stopColor="#B7F365" />
               </linearGradient>
               <filter id="glow">
                 <feGaussianBlur stdDeviation="3" result="coloredBlur" />
@@ -302,7 +320,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
               className="origin-center transform rotate-[150deg]"
             />
 
-            {/* Arco Ativo com Brilho em Gradiente */}
+            {/* Arco Ativo com Brilho em Gradiente Metálico-Neon */}
             <circle
               cx="120"
               cy="120"
@@ -332,7 +350,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
               }`}>
                 {progress}
               </span>
-              <span className="text-2xl font-black text-red-500 font-mono ml-1">%</span>
+              <span className="text-2xl font-black text-[#68D346] font-mono ml-1">%</span>
             </div>
 
             <div className="flex items-center gap-1 mt-1">
@@ -341,7 +359,7 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
                 isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-slate-200 border-slate-300'
               }`}>
                 <div
-                  className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 rounded-full transition-all duration-75"
+                  className="h-full bg-gradient-to-r from-[#7E8289] via-[#68D346] to-[#B7F365] rounded-full transition-all duration-75"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -355,28 +373,28 @@ export const FleetLoadingScreen: React.FC<FleetLoadingScreenProps> = ({
           isDark ? 'bg-zinc-900/60 border-zinc-800/80 text-zinc-100' : 'bg-white border-slate-300 text-slate-900 shadow-slate-200/60'
         }`}>
           <div className="flex flex-col items-center gap-1" title="Injeção Eletrônica / ECM">
-            <Cpu className={`w-4 h-4 transition-all duration-300 ${progress < 30 ? 'text-zinc-400' : 'text-amber-500 animate-pulse drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]'}`} />
+            <Cpu className={`w-4 h-4 transition-all duration-300 ${progress < 30 ? 'text-zinc-400' : 'text-[#68D346] animate-pulse drop-shadow-[0_0_8px_rgba(104,211,70,0.8)]'}`} />
             <span className="text-[9px] font-mono font-bold opacity-75">ECM</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Tensão de Carga 14.2V">
-            <BatteryCharging className={`w-4 h-4 transition-all duration-300 ${progress < 50 ? 'text-red-500' : 'text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]'}`} />
+            <BatteryCharging className={`w-4 h-4 transition-all duration-300 ${progress < 50 ? 'text-zinc-400' : 'text-[#68D346] drop-shadow-[0_0_8px_rgba(104,211,70,0.8)]'}`} />
             <span className="text-[9px] font-mono font-bold opacity-75">14.2V</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Sistema TPMS / TWI">
-            <Disc className={`w-4 h-4 transition-all duration-300 ${progress < 80 ? 'text-zinc-400' : 'text-emerald-500 animate-bounce drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]'}`} />
+            <Disc className={`w-4 h-4 transition-all duration-300 ${progress < 80 ? 'text-zinc-400' : 'text-[#68D346] animate-bounce drop-shadow-[0_0_8px_rgba(104,211,70,0.8)]'}`} />
             <span className="text-[9px] font-mono font-bold opacity-75">TPMS</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Telemetria de Posicionamento">
-            <Satellite className={`w-4 h-4 transition-all duration-300 ${progress < 70 ? 'text-zinc-400' : 'text-cyan-500 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]'}`} />
+            <Satellite className={`w-4 h-4 transition-all duration-300 ${progress < 70 ? 'text-zinc-400' : 'text-[#B7F365] drop-shadow-[0_0_8px_rgba(183,243,101,0.8)]'}`} />
             <span className="text-[9px] font-mono font-bold opacity-75">GPS</span>
           </div>
 
           <div className="flex flex-col items-center gap-1" title="Estado Operacional">
             {isCompleted ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 animate-pulse" />
+              <CheckCircle2 className="w-4 h-4 text-[#B7F365] animate-pulse" />
             ) : (
               <AlertTriangle className="w-4 h-4 text-amber-500" />
             )}

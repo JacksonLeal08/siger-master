@@ -347,18 +347,18 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
         {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
       </button>
 
-      {/* Marca Principal Grupo OMG - Empilhada (Logo + SPCI MASTER abaixo) */}
+      {/* Marca Principal JIMMP Info - SIGER Master */}
       <div className={`flex flex-col items-center justify-center mb-5 pt-1 transition-all shrink-0 ${isCollapsed ? 'px-0' : 'px-2'}`}>
         <img 
-          src="/logo-omg.png" 
-          alt="Logo Grupo OMG" 
-          className={`object-contain shrink-0 filter drop-shadow-md transition-all ${
-            isCollapsed ? 'h-8 w-auto max-w-[48px]' : 'h-13 w-auto'
+          src={isCollapsed ? "/assets/branding/icon-jimmp.png" : "/assets/branding/logo-jimmp-info.png"} 
+          alt="Logo JIMMP Info" 
+          className={`object-contain shrink-0 filter transition-all duration-300 hover:drop-shadow-[0_0_10px_rgba(104,211,70,0.55)] ${
+            isCollapsed ? 'h-8 w-auto max-w-[48px]' : 'h-11 w-auto'
           }`} 
         />
         {!isCollapsed && (
-          <h2 className="text-xs font-black text-slate-800 dark:text-slate-100 tracking-wider uppercase mt-2 leading-none text-center">
-            SPCI MASTER
+          <h2 className="text-[11px] font-black font-mono text-slate-800 dark:text-zinc-100 tracking-widest uppercase mt-2 leading-none text-center">
+            <span className="text-[#68D346]">●</span> SIGER MASTER
           </h2>
         )}
       </div>

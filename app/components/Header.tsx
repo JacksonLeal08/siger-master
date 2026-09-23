@@ -47,7 +47,7 @@ export const Header = ({ onScanClick, onProfileClick, onMenuClick, onGestaoAtivo
   const unreadCount = (notifications || []).filter(n => !n.read).length;
 
   return (
-    <header className="hidden md:flex bg-white dark:bg-zinc-900 text-slate-800 dark:text-slate-200 justify-between items-center w-full px-6 h-16 shrink-0 shadow-xs border-b border-slate-100 dark:border-zinc-800 z-30 select-none font-sans relative">
+    <header className="hidden md:flex bg-white dark:bg-[#1E2024] text-slate-800 dark:text-zinc-200 justify-between items-center w-full px-6 h-16 shrink-0 shadow-xs border-b border-slate-200/80 dark:border-zinc-800 z-30 select-none font-sans relative">
       <div className="flex items-center gap-3">
         {onMenuClick && (
           <button 
@@ -58,10 +58,15 @@ export const Header = ({ onScanClick, onProfileClick, onMenuClick, onGestaoAtivo
             <Menu className="w-5 h-5" />
           </button>
         )}
-        <div className="flex items-center gap-2.5">
-          <img src="/logo-omg.png" alt="Logo Grupo OMG" className="h-6 w-auto object-contain md:hidden" />
-          <span className="hidden md:flex items-center gap-2 font-['Hanken_Grotesk'] font-extrabold tracking-tight text-slate-900 text-sm">
-            <span className="text-red-600 font-bold">●</span> GRUPO OMG // PLANTA DE SEGURANÇA SPCI
+        <div className="flex items-center gap-3 group cursor-pointer">
+          <img 
+            src="/assets/branding/logo-jimmp-info.png" 
+            alt="Logo JIMMP Info" 
+            className="h-7 sm:h-8 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_12px_rgba(104,211,70,0.55)]" 
+          />
+          <div className="h-5 w-[1.5px] bg-slate-200 dark:bg-zinc-700 hidden sm:block" />
+          <span className="hidden md:flex items-center gap-2 font-['Hanken_Grotesk'] font-extrabold tracking-tight text-slate-900 dark:text-zinc-100 text-xs sm:text-sm">
+            <span className="text-[#68D346] font-bold">●</span> SIGER MASTER • SISTEMA INTEGRADO DE GESTÃO DE EMERGÊNCIA & RESGATE
           </span>
         </div>
       </div>

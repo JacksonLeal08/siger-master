@@ -78,8 +78,11 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
       {/* ==================================================================== */}
       {/* A. BARRA SUPERIOR DE CONTEXTO */}
       {/* ==================================================================== */}
+      {/* ==================================================================== */}
+      {/* A. BARRA SUPERIOR DE CONTEXTO */}
+      {/* ==================================================================== */}
       <header className={`px-4 py-3 border-b backdrop-blur-md sticky top-0 z-30 transition-colors ${
-        isDark ? 'bg-zinc-900/90 border-zinc-800' : 'bg-white/95 border-slate-300 shadow-2xs'
+        isDark ? 'bg-[#1E2024]/90 border-[#3C3F45]' : 'bg-white/95 border-slate-300 shadow-2xs'
       }`}>
         <div className="max-w-xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -89,7 +92,7 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
               title="Trocar Viatura"
               className={`p-2 rounded-xl border transition-all active:scale-95 ${
                 isDark 
-                  ? 'bg-zinc-800/80 border-zinc-700 text-zinc-300 hover:bg-zinc-800' 
+                  ? 'bg-[#282A2F] border-[#3C3F45] text-zinc-300 hover:text-white hover:border-[#68D346]' 
                   : 'bg-slate-50 border-slate-300 text-slate-700 hover:bg-slate-100 shadow-2xs'
               }`}
             >
@@ -98,18 +101,18 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
 
             <div>
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-sm font-black tracking-wider uppercase text-red-600 dark:text-red-500">
+                <span className="text-sm font-black tracking-wider uppercase text-[#68D346] dark:text-[#B7F365]">
                   {viatura.prefixo_frota} • {viatura.placa}
                 </span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                  isDark ? 'bg-zinc-800 text-zinc-300 border-zinc-700' : 'bg-slate-200 text-slate-800 border-slate-300'
+                  isDark ? 'bg-[#282A2F] text-zinc-300 border-[#3C3F45]' : 'bg-slate-200 text-slate-800 border-slate-300'
                 }`}>
                   {categoriaNome}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 dark:text-zinc-400">
                 <span className="flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-red-500" />
+                  <Building2 className="w-3 h-3 text-[#68D346]" />
                   SITE: {contratoId}
                 </span>
                 <span>•</span>
@@ -128,12 +131,12 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
         {/* Banner de Boas-Vindas Tático */}
         <div className={`p-4 rounded-2xl border flex items-center justify-between ${
           isDark 
-            ? 'bg-gradient-to-r from-zinc-900 to-zinc-950 border-zinc-800' 
+            ? 'bg-gradient-to-r from-[#282A2F] to-[#1E2024] border-[#3C3F45]' 
             : 'bg-gradient-to-r from-white to-slate-50 border-slate-300 shadow-xs'
         }`}>
           <div>
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-red-500">
-              TERMINAL OPERACIONAL DE CAMPO
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#68D346]">
+              TERMINAL OPERACIONAL DE CAMPO • JIMMP INFO
             </span>
             <h2 className={`text-sm font-black ${isDark ? 'text-zinc-100' : 'text-slate-900'}`}>
               Selecione a Operação Desejada
@@ -141,7 +144,7 @@ export const TerminalActionHub: React.FC<TerminalActionHubProps> = ({
           </div>
           <div className="text-right font-mono text-[11px]">
             <span className="text-zinc-500 block">ODÔMETRO BASE</span>
-            <span className={`font-black text-sm ${isDark ? 'text-zinc-200' : 'text-slate-800'}`}>
+            <span className={`font-black text-sm ${isDark ? 'text-[#B7F365]' : 'text-slate-800'}`}>
               {(viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km
             </span>
           </div>

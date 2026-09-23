@@ -36,7 +36,7 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
         {/* Cabeçalho */}
         <header className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-600/10 border border-red-600/30 flex items-center justify-center text-red-500">
+            <div className="w-10 h-10 rounded-xl bg-[#1C4E26]/20 border border-[#68D346]/40 flex items-center justify-center text-[#68D346]">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -102,12 +102,12 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
                 onClick={() => setOrientacao('portrait')}
                 className={`p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
                   orientacao === 'portrait'
-                    ? 'bg-red-600/10 border-red-500 text-white shadow-lg shadow-red-500/10 ring-1 ring-red-500/30'
+                    ? 'bg-[#1C4E26]/30 border-[#68D346] text-white shadow-lg shadow-[rgba(104,211,70,0.2)] ring-1 ring-[#68D346]/50'
                     : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
                 }`}
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base ${
-                  orientacao === 'portrait' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400'
+                  orientacao === 'portrait' ? 'bg-[#68D346] text-zinc-950' : 'bg-slate-800 text-slate-400'
                 }`}>
                   📄
                 </div>
@@ -122,12 +122,12 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
                 onClick={() => setOrientacao('landscape')}
                 className={`p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
                   orientacao === 'landscape'
-                    ? 'bg-red-600/10 border-red-500 text-white shadow-lg shadow-red-500/10 ring-1 ring-red-500/30'
+                    ? 'bg-[#1C4E26]/30 border-[#68D346] text-white shadow-lg shadow-[rgba(104,211,70,0.2)] ring-1 ring-[#68D346]/50'
                     : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
                 }`}
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base ${
-                  orientacao === 'landscape' ? 'bg-red-600 text-white' : 'bg-slate-800 text-slate-400'
+                  orientacao === 'landscape' ? 'bg-[#68D346] text-zinc-950' : 'bg-slate-800 text-slate-400'
                 }`}>
                   🖼️
                 </div>
@@ -139,8 +139,8 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs flex items-start gap-2.5">
-            <ShieldCheck className="w-4 h-4 shrink-0 text-blue-400 mt-0.5" />
+          <div className="p-3.5 rounded-xl bg-[#1C4E26]/15 border border-[#68D346]/30 text-zinc-300 text-xs flex items-start gap-2.5">
+            <ShieldCheck className="w-4 h-4 shrink-0 text-[#68D346] mt-0.5" />
             <span>
               O laudo gerado segue a diagramação executiva da plataforma <strong>SIGER Master</strong> com suporte a <strong>Retrato ou Paisagem</strong>, incluindo matriz comparativa metrológica de fábrica vs campo, memória de cálculo formal, glossário normativo e campos de assinatura técnica.
             </span>
@@ -159,7 +159,7 @@ export const LaudoPneusPDFModal: React.FC<LaudoPneusPDFModalProps> = ({
           <button
             type="button"
             onClick={handlePrint}
-            className="px-5 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-mono font-bold flex items-center gap-2 cursor-pointer border-none shadow-lg shadow-red-600/30 transition-all active:scale-95"
+            className="px-5 py-2 bg-[#1C4E26] hover:bg-[#68D346] text-[#B7F365] hover:text-[#0f172a] rounded-xl text-xs font-mono font-bold flex items-center gap-2 cursor-pointer border border-[#68D346] shadow-lg shadow-[rgba(104,211,70,0.3)] transition-all active:scale-95"
           >
             <Printer className="w-4 h-4" />
             <span>Abrir / Imprimir Laudo em PDF</span>

@@ -49,18 +49,18 @@ export const ViaturaCardTerminal: React.FC<ViaturaCardTerminalProps> = ({
       <div
         onClick={() => onSelect(viatura)}
         className={`group relative overflow-hidden rounded-2xl p-4 transition-all duration-300 cursor-pointer select-none font-sans
-          border shadow-lg active:scale-[0.98] hover:-translate-y-1 hover:shadow-2xl
+          border active:scale-[0.98] hover:-translate-y-1 hover:shadow-2xl
           ${
             isDark
-              ? 'bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950 border-zinc-800/80 border-t-zinc-700/60 text-zinc-100 shadow-black/40'
-              : 'bg-gradient-to-br from-white via-slate-50 to-slate-100 border-slate-200 border-t-white text-slate-900 shadow-slate-300/50'
+              ? 'bg-[#282A2F]/90 backdrop-blur-md border-[#3C3F45]/80 border-t-[#D5D9DC]/30 text-zinc-100 hover:border-[#68D346] hover:shadow-[0_0_15px_-2px_rgba(104,211,70,0.45)]'
+              : 'bg-white border-slate-200 border-t-white text-slate-900 shadow-slate-300/50 hover:border-[#1C4E26] hover:shadow-md'
           }`}
       >
-        {/* Chanfro Tridimensional no Topo (3D Depth Highlight) */}
-        <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
+        {/* Chanfro Tridimensional no Topo (Metallic Bevel Highlight) */}
+        <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
 
-        {/* Faixa Tática Esquerda */}
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-red-600 group-hover:bg-red-500 transition-colors shadow-sm" />
+        {/* Faixa Tática Esquerda com Realce Neon no Hover */}
+        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#7E8289] group-hover:bg-[#68D346] transition-colors shadow-sm" />
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
           {/* ================================================================ */}
@@ -70,10 +70,10 @@ export const ViaturaCardTerminal: React.FC<ViaturaCardTerminalProps> = ({
             onClick={handlePhotoClick}
             className={`relative w-full sm:w-36 h-28 sm:h-24 rounded-xl overflow-hidden shrink-0 border transition-all duration-200 group/photo ${
               viatura.foto_veiculo_url 
-                ? 'cursor-zoom-in hover:ring-2 hover:ring-red-500/80' 
+                ? 'cursor-zoom-in hover:ring-2 hover:ring-[#68D346]/80' 
                 : 'cursor-pointer'
             } ${
-              isDark ? 'bg-zinc-950 border-zinc-800' : 'bg-slate-200 border-slate-300'
+              isDark ? 'bg-[#1E2024] border-[#3C3F45]' : 'bg-slate-200 border-slate-300'
             }`}
           >
             {viatura.foto_veiculo_url ? (
@@ -111,12 +111,12 @@ export const ViaturaCardTerminal: React.FC<ViaturaCardTerminalProps> = ({
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <h3 className={`text-base font-black font-mono tracking-tight uppercase truncate ${
-                  isDark ? 'text-white group-hover:text-red-400' : 'text-slate-900 group-hover:text-red-600'
+                  isDark ? 'text-white group-hover:text-[#B7F365]' : 'text-slate-900 group-hover:text-[#1C4E26]'
                 } transition-colors`}>
                   {viatura.prefixo_frota}
                 </h3>
                 {viatura.modelo_plano_chave && (
-                  <span className="hidden sm:inline-flex text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 uppercase">
+                  <span className="hidden sm:inline-flex text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#1C4E26]/20 text-[#B7F365] border border-[#68D346]/30 uppercase">
                     PLANO FABRICANTE
                   </span>
                 )}
@@ -152,9 +152,9 @@ export const ViaturaCardTerminal: React.FC<ViaturaCardTerminalProps> = ({
             {/* Métricas: Hodômetro + Calibração TWI */}
             <div className="flex items-center gap-2 pt-1 flex-wrap text-[11px] font-mono">
               <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border ${
-                isDark ? 'bg-zinc-900/90 border-zinc-800 text-zinc-300' : 'bg-white border-slate-200 text-slate-700'
+                isDark ? 'bg-[#1E2024] border-[#3C3F45] text-zinc-300' : 'bg-white border-slate-200 text-slate-700'
               }`}>
-                <Gauge className="w-3 h-3 text-red-500" />
+                <Gauge className="w-3 h-3 text-[#68D346]" />
                 <span className="font-bold">{(viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</span>
               </div>
 
@@ -162,7 +162,7 @@ export const ViaturaCardTerminal: React.FC<ViaturaCardTerminalProps> = ({
               <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg border text-[10px] font-bold ${
                 statusPneu.bloqueioObrigatorio
                   ? 'bg-amber-500/10 text-amber-500 border-amber-500/30'
-                  : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+                  : 'bg-[#1C4E26]/30 text-[#B7F365] border-[#68D346]/50 shadow-xs'
               }`}>
                 <Disc className="w-3 h-3" />
                 <span>
@@ -174,8 +174,8 @@ export const ViaturaCardTerminal: React.FC<ViaturaCardTerminalProps> = ({
             </div>
           </div>
 
-          {/* Seta Indicativa à Direita */}
-          <div className="hidden sm:flex items-center justify-center text-zinc-500 group-hover:text-red-500 group-hover:translate-x-1 transition-all">
+          {/* Seta Indicativa à Direita com Realce Neon */}
+          <div className="hidden sm:flex items-center justify-center text-zinc-500 group-hover:text-[#68D346] group-hover:translate-x-1 transition-all">
             <ChevronRight className="w-5 h-5" />
           </div>
         </div>

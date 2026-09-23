@@ -1,5 +1,5 @@
 export const SYSTEM_VERSION = 'v2.11.0';
-export const COMPANY_NAME = 'Grupo OMG';
+export const COMPANY_NAME = 'JIMMP Info';
 export const COPYRIGHT_YEAR = '2026';
 
 export interface ChangelogRelease {

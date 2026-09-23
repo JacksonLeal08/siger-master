@@ -222,13 +222,18 @@ export function generateLaudoPneusPDF(
           transition: max-width 0.2s ease;
         }
         
-        /* Cabeçalho Oficial */
+        /* Cabeçalho Oficial JIMMP Info / SIGER Master */
         .header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          border-bottom: 3px solid #af101a;
-          padding-bottom: 10px;
+          padding-bottom: 8px;
+        }
+        .header-divider {
+          width: 100%;
+          height: 3px;
+          background: linear-gradient(to right, #3C3F45 0%, #68D346 45%, #B7F365 75%, transparent 100%);
+          border-radius: 2px;
           margin-bottom: 12px;
         }
         .header-logo {
@@ -236,17 +241,10 @@ export function generateLaudoPneusPDF(
           align-items: center;
           gap: 12px;
         }
-        .logo-box {
-          background-color: #af101a;
-          color: #ffffff;
-          padding: 6px 12px;
-          font-weight: 900;
-          font-size: 16px;
-          letter-spacing: 1.2px;
-          border-radius: 6px;
-          font-family: monospace;
-          line-height: 1.1;
-          text-align: center;
+        .header-logo-img {
+          height: 34px;
+          width: auto;
+          object-fit: contain;
         }
         .header-titles h1 {
           font-size: 14px;
@@ -540,14 +538,15 @@ export function generateLaudoPneusPDF(
           color: #ffffff;
         }
         .btn-orientacao.active {
-          background-color: #dc2626;
-          color: #ffffff;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          background-color: #1C4E26;
+          color: #B7F365;
+          border: 1px solid #68D346;
+          box-shadow: 0 1px 4px rgba(104,211,70,0.3);
         }
         .btn-print {
-          background-color: #dc2626;
-          color: #ffffff;
-          border: none;
+          background-color: #1C4E26;
+          color: #B7F365;
+          border: 1px solid #68D346;
           padding: 7px 16px;
           font-weight: bold;
           border-radius: 6px;
@@ -556,10 +555,12 @@ export function generateLaudoPneusPDF(
           display: flex;
           align-items: center;
           gap: 6px;
-          transition: background 0.15s ease;
+          transition: all 0.15s ease;
         }
         .btn-print:hover {
-          background-color: #b91c1c;
+          background-color: #68D346;
+          color: #0f172a;
+          box-shadow: 0 0 12px rgba(104,211,70,0.5);
         }
 
         @media print {
@@ -604,13 +605,13 @@ export function generateLaudoPneusPDF(
       </div>
 
       <div class="container" id="laudo-container">
-        <!-- Cabeçalho Oficial -->
+        <!-- Cabeçalho Oficial JIMMP Info -->
         <div class="header">
           <div class="header-logo">
-            <div class="logo-box">SIGER MASTER</div>
+            <img src="/assets/branding/logo-jimmp-info.png" alt="Logo JIMMP Info" class="header-logo-img" />
             <div class="header-titles">
               <h1>Laudo Técnico Pericial de Rodagem & Metrologia</h1>
-              <p>Auditoria de Conformidade Normativa • Resolução CONTRAN nº 558/80 • Art. 230 CTB • SIGER Master Gestão de Frotas</p>
+              <p>JIMMP Info • Auditoria de Conformidade Normativa • Resolução CONTRAN nº 558/80 • Art. 230 CTB • SIGER Master</p>
             </div>
           </div>
           <div class="header-protocol">
@@ -619,6 +620,8 @@ export function generateLaudoPneusPDF(
             <div><strong>Contrato:</strong> ${inspecao.contrato_id}</div>
           </div>
         </div>
+        <!-- Linha Divisória em Degradê Metálico-Neon -->
+        <div class="header-divider"></div>
 
         <!-- Ficha Técnica da Viatura (CRLV Oficial) -->
         <div class="card-veiculo">

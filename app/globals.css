@@ -4,6 +4,26 @@
 @theme {
   --color-red-650: #dc2626;
   --color-red-750: #b91c1c;
+
+  /* Família Glow / Neon Cibernético JIMMP */
+  --color-jimmp-glow-light: #B7F365;
+  --color-jimmp-glow: #68D346;
+  --color-jimmp-glow-dark: #1C4E26;
+
+  /* Família Metálica / Titânio & Aço Usinado JIMMP */
+  --color-jimmp-metal-light: #D5D9DC;
+  --color-jimmp-metal: #7E8289;
+  --color-jimmp-metal-dark: #3C3F45;
+
+  /* Família Superfícies & Canvas JIMMP */
+  --color-jimmp-surface: #282A2F;
+  --color-jimmp-surface-canvas: #1E2024;
+  --color-jimmp-surface-spotlight: #5B5E64;
+
+  /* Sombras Projetadas Cyber-Metálicas */
+  --shadow-glow-neon: 0 0 15px -2px rgba(104, 211, 70, 0.45);
+  --shadow-glow-neon-lg: 0 0 25px 2px rgba(183, 243, 101, 0.35);
+  --shadow-metal-bevel: inset 0 1px 1px 0 rgba(213, 217, 220, 0.3), 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 @layer base {
@@ -17,6 +37,21 @@
     --font-size-2xl: clamp(1.35rem, 1.2rem + 0.9vw, 1.5rem);
     --font-size-3xl: clamp(1.65rem, 1.45rem + 1.3vw, 1.875rem);
     --font-size-4xl: clamp(2rem, 1.7rem + 1.8vw, 2.25rem);
+
+    /* Família Glow / Neon Cibernético */
+    --jimmp-glow-light: #B7F365;
+    --jimmp-glow-primary: #68D346;
+    --jimmp-glow-dark: #1C4E26;
+
+    /* Família Metálica / Titânio & Aço Usinado */
+    --jimmp-metal-highlight: #D5D9DC;
+    --jimmp-metal-base: #7E8289;
+    --jimmp-metal-shadow: #3C3F45;
+
+    /* Família Superfícies & Canvas */
+    --jimmp-bg-surface: #282A2F;
+    --jimmp-bg-canvas: #1E2024;
+    --jimmp-bg-spotlight: #5B5E64;
   }
 
   body {
@@ -113,12 +148,17 @@ html.light {
   color-scheme: light;
 }
 
-/* Paleta de Cores Corporativa para Tema Escuro */
+html.light body {
+  background-color: #F1F3F5;
+  color: #1E2024;
+}
+
+/* Paleta de Cores Cyber-Metálica JIMMP para Tema Escuro */
 html.dark {
   color-scheme: dark;
 }
 
 html.dark body {
-  background-color: #0f172a;
-  color: #e2e8f0;
+  background-color: var(--jimmp-bg-canvas, #1E2024);
+  color: var(--jimmp-metal-highlight, #D5D9DC);
 }
