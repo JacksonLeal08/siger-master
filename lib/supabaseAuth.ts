@@ -159,7 +159,7 @@ export const signInWithEmailOrUsername = async (identifier: string, password: st
         document.cookie = `spci_session_token=${authData.session.access_token}; path=/; max-age=86400; SameSite=Lax${isSecure}`;
       }
       try {
-        await syncSessionCookieAction({ token: authData.session.access_token });
+        syncSessionCookieAction({ token: authData.session.access_token }).catch(() => {});
       } catch (cErr) {
         console.warn('[SupabaseAuth] Falha ao sincronizar cookie no servidor:', cErr);
       }

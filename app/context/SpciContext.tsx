@@ -1645,7 +1645,17 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const profileRole = userProfile?.role;
     if (profileRole !== 'Desenvolvedor' && profileRole !== 'Administrador') return;
 
+    // Desativa polling na tela de login, raiz ou logout
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname;
+      if (p === '/login' || p === '/' || p === '/logout') return;
+    }
+
     const pollLoginLogs = async () => {
+      if (typeof window !== 'undefined') {
+        const p = window.location.pathname;
+        if (p === '/login' || p === '/' || p === '/logout') return;
+      }
       try {
         const { data } = await supabase
           .from('logs_auditoria')
@@ -1702,7 +1712,7 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const interval = setInterval(pollLoginLogs, 30000);
     return () => clearInterval(interval);
-  }, [currentUser, userProfile, triggerSuccessNotification]);
+  }, [currentUser?.uid, userProfile?.role, triggerSuccessNotification]);
 
   const handleUpdateLogoAndProfile = useCallback(async (logoUrl: string, name: string) => {
     if (currentUser) {
@@ -2126,14 +2136,14 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        // Sincronização atômica de cookies no servidor HTTP (Next.js Set-Cookie)
+        // Sincronização de cookies no servidor HTTP (em background sem travar o redirecionamento)
         if (token) {
-          await syncSessionCookieAction({
+          syncSessionCookieAction({
             token,
             role: profile.role,
             expires: profile.dataExpiracao,
             provider: 'email'
-          }).catch(console.warn);
+          }).catch(() => {});
         }
 
         if (typeof window !== 'undefined') {

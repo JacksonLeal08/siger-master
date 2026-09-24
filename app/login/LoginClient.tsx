@@ -63,10 +63,10 @@ export default function LoginClient() {
           }
           redirectedRef.current = true;
           setIsRedirecting(true);
-          // Transição SPA suave e contínua via router.replace (mantém sessão e caches vivos)
+          // Transição direta e confiável via window.location (evita travamento de rotas e conexões RSC)
           setTimeout(() => {
-            router.replace('/dashboard');
-          }, 300);
+            window.location.href = '/dashboard';
+          }, 200);
         }
       }
     }
@@ -141,8 +141,8 @@ export default function LoginClient() {
         redirectedRef.current = true;
         setIsRedirecting(true);
         setTimeout(() => {
-          router.replace('/dashboard');
-        }, 250);
+          window.location.href = '/dashboard';
+        }, 200);
       } else {
         setLoading(false);
         setErrorMsg('Credenciais inválidas.');
