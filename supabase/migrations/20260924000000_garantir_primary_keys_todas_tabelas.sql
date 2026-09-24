@@ -1,9 +1,8 @@
 -- ==============================================================================
--- SIGER MASTER - ADIÇÃO E BLINDAGEM DE PRIMARY KEYS NO SUPABASE
--- Data Atualizada: 24/09/2026
--- Objetivo: Resolver mensagens do Supabase Studio sobre falta de Primary Key
--- e assegurar integridade referencial, upsert (ON CONFLICT) e Realtime.
--- Cole no SQL Editor do Supabase e clique em RUN.
+-- SIGER MASTER - GARANTIA DE PRIMARY KEYS EM TODAS AS TABELAS
+-- Data: 24/09/2026
+-- Objetivo: Garantir que nenhuma tabela do schema public fique sem PRIMARY KEY,
+-- assegurando compatibilidade com Supabase Realtime, Replicação e Integridade.
 -- ==============================================================================
 
 DO $$
@@ -51,27 +50,29 @@ BEGIN
         tbl := tabelas_pk[i][1];
         col := tabelas_pk[i][2];
         
-        -- Verifica se a tabela existe
+        -- Verifica se a tabela existe no schema public
         IF EXISTS (
             SELECT 1 FROM information_schema.tables 
             WHERE table_schema = 'public' AND table_name = tbl
         ) THEN
-            -- Se não tiver chave primária, adiciona
+            -- Verifica se a tabela já possui alguma chave primária definida
             IF NOT EXISTS (
                 SELECT 1 FROM information_schema.table_constraints 
                 WHERE table_schema = 'public' AND table_name = tbl AND constraint_type = 'PRIMARY KEY'
             ) THEN
+                -- Garante que a coluna não aceita nulos
                 EXECUTE format('ALTER TABLE public.%I ALTER COLUMN %I SET NOT NULL', tbl, col);
+                -- Adiciona a chave primária
                 EXECUTE format('ALTER TABLE public.%I ADD PRIMARY KEY (%I)', tbl, col);
-                RAISE NOTICE 'Chave primária adicionada com sucesso em public.% (coluna %)', tbl, col;
+                RAISE NOTICE 'Chave Primária adicionada com sucesso na tabela public.% (coluna %)', tbl, col;
             ELSE
-                RAISE NOTICE 'public.% já possui chave primária.', tbl;
+                RAISE NOTICE 'Tabela public.% já possui chave primária.', tbl;
             END IF;
         END IF;
     END LOOP;
 EXCEPTION
     WHEN duplicate_object OR duplicate_table THEN
-        RAISE NOTICE 'Chaves primárias já estão ativas.';
+        RAISE NOTICE 'Chaves primárias já existentes.';
     WHEN others THEN
-        RAISE NOTICE 'Aviso na verificação de chaves primárias: %', SQLERRM;
+        RAISE NOTICE 'Aviso na aplicação de chaves primárias: %', SQLERRM;
 END $$;

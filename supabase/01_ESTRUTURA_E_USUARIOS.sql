@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 );
 
 CREATE TABLE IF NOT EXISTS public.cadastro_extintores (
-    asset_id text NOT NULL,
+    asset_id text PRIMARY KEY,
     fabricante text NOT NULL,
     modelo text NOT NULL,
     peso_capacidade text NOT NULL,
@@ -316,7 +316,7 @@ CREATE TABLE IF NOT EXISTS public.permissoes_modulos (
 );
 
 CREATE TABLE IF NOT EXISTS public.profiles (
-    id text NOT NULL,
+    id text PRIMARY KEY,
     name text NOT NULL,
     email text NOT NULL,
     photo_url text,
@@ -988,6 +988,58 @@ CREATE OR REPLACE VIEW public.vw_kpi_distribuicao_extintores AS
     count(*) AS total_extintores
    FROM public.assets
   WHERE (category ~~* '%extintor%'::text);
+
+-- 4.1 GARANTIA DE CHAVES PRIMÁRIAS (PRIMARY KEYS)
+DO $$
+DECLARE
+    tabelas_pk text[][] := ARRAY[
+        ['assets', 'id'],
+        ['ativo_movimentacoes', 'id'],
+        ['ativos_extintores', 'id'],
+        ['cadastro_extintores', 'asset_id'],
+        ['checklists_ativos', 'id'],
+        ['inspecoes', 'id'],
+        ['inspecoes_realizadas', 'id'],
+        ['locais', 'id'],
+        ['locais_planta', 'id'],
+        ['sub_locais', 'id'],
+        ['modelos_extintores', 'id'],
+        ['usuarios', 'id'],
+        ['profiles', 'id'],
+        ['shared_sessions', 'id'],
+        ['audit_logs', 'id'],
+        ['logs_auditoria', 'id'],
+        ['contratos', 'id'],
+        ['fornecedores_manutencao', 'id'],
+        ['lotes_manutencao', 'id'],
+        ['itens_lote_manutencao', 'id'],
+        ['historico_movimentacoes_ativos', 'id'],
+        ['historico_localizacao_ativo', 'id'],
+        ['modulos', 'id'],
+        ['permissoes_modulos', 'id']
+    ];
+    i int;
+    tbl text;
+    col text;
+BEGIN
+    FOR i IN 1..array_length(tabelas_pk, 1) LOOP
+        tbl := tabelas_pk[i][1];
+        col := tabelas_pk[i][2];
+        
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = tbl) THEN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.table_constraints 
+                WHERE table_schema = 'public' AND table_name = tbl AND constraint_type = 'PRIMARY KEY'
+            ) THEN
+                EXECUTE format('ALTER TABLE public.%I ADD PRIMARY KEY (%I)', tbl, col);
+                RAISE NOTICE 'Chave Primária adicionada com sucesso em public.% (coluna %)', tbl, col;
+            END IF;
+        END IF;
+    END LOOP;
+EXCEPTION
+    WHEN others THEN
+        RAISE NOTICE 'Aviso na verificação de chaves primárias: %', SQLERRM;
+END $$;
 
 -- 5. ÍNDICES
 CREATE INDEX IF NOT EXISTS idx_assets_category ON public.assets USING btree (category);
