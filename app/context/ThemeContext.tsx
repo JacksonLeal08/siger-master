@@ -17,31 +17,39 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeMode>('light');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = (
+        localStorage.getItem('siger_theme') || 
+        localStorage.getItem('spci_theme') || 
+        localStorage.getItem('siger_theme_pref')
+      ) as ThemeMode | null;
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('spci_theme') as ThemeMode | null;
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      setThemeState(savedTheme);
-    } else {
-      setThemeState('light');
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        return savedTheme;
+      }
     }
-    setMounted(true);
-  }, []);
+    return 'light';
+  });
 
   useEffect(() => {
-    if (!mounted) return;
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.add('light');
       root.classList.remove('dark');
+      root.style.colorScheme = 'light';
     }
-    localStorage.setItem('spci_theme', theme);
-  }, [theme, mounted]);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('siger_theme', theme);
+      localStorage.setItem('spci_theme', theme);
+      localStorage.setItem('siger_theme_pref', theme);
+    }
+  }, [theme]);
 
   const toggleTheme = () => {
     setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));

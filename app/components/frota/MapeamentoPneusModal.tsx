@@ -23,6 +23,7 @@ import { soundNotificationService } from '@/lib/soundNotificationService';
 import { TwiEducationalCard } from './TwiEducationalCard';
 import { TireTypesGuideCard } from './TireTypesGuideCard';
 import { useTheme } from '@/app/context/ThemeContext';
+import { useModalDraft } from '@/hooks/useModalDraft';
 import { 
   Disc, 
   Gauge, 
@@ -189,6 +190,33 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
     }, 1600);
   };
 
+  const draftKey = `pneus_${currentViatura.id}`;
+  const currentDraftData = useMemo(() => ({
+    medicoes,
+    odometroInput,
+    houveCalibracao,
+    observacoesGerais
+  }), [medicoes, odometroInput, houveCalibracao, observacoesGerais]);
+
+  const { getSavedDraft, hasDraft, clearDraft } = useModalDraft({
+    draftKey,
+    isOpen,
+    currentData: currentDraftData,
+  });
+
+  // Restaura rascunho salvo se existir
+  useEffect(() => {
+    if (isOpen) {
+      const draft = getSavedDraft();
+      if (draft) {
+        if (draft.medicoes) setMedicoes(draft.medicoes);
+        if (draft.odometroInput) setOdometroInput(draft.odometroInput);
+        if (draft.houveCalibracao !== undefined) setHouveCalibracao(draft.houveCalibracao);
+        if (draft.observacoesGerais) setObservacoesGerais(draft.observacoesGerais);
+      }
+    }
+  }, [isOpen, getSavedDraft]);
+
   // Carregar catálogo oficial ao abrir
   useEffect(() => {
     if (isOpen) {
@@ -353,6 +381,7 @@ export const MapeamentoPneusModal: React.FC<MapeamentoPneusModalProps> = ({
       });
 
       if (res.success) {
+        clearDraft();
         if (onSuccess) onSuccess();
         onClose();
       } else {

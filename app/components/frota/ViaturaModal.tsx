@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { MaintenancePlanEngine } from '@/lib/maintenancePlanEngine';
 import { ViaturaHistoricoOSTab } from './ViaturaHistoricoOSTab';
+import { useModalDraft } from '@/hooks/useModalDraft';
 
 interface ViaturaModalProps {
   isOpen: boolean;
@@ -86,6 +87,78 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
   const [validadeGarantia, setValidadeGarantia] = useState('');
   const [limiteGarantiaKm, setLimiteGarantiaKm] = useState<string>('');
   const [observacoes, setObservacoes] = useState('');
+
+  const draftKey = viaturaToEdit ? `viatura_edit_${viaturaToEdit.id}` : 'viatura_new';
+
+  const currentFormData = React.useMemo(() => ({
+    prefixo,
+    placa,
+    chassi,
+    renavam,
+    tipoVeiculo,
+    marca,
+    modelo,
+    marcaModeloCrlv,
+    anoFabricacao,
+    tipoCombustivel,
+    odometro,
+    status,
+    dataUltimaCalibracao,
+    dataUltimaPreventiva,
+    odometroUltimaPreventiva,
+    intervaloRevisaoKm,
+    vencimentoCrlv,
+    seguradora,
+    apolice,
+    vencimentoSeguro,
+    validadeGarantia,
+    limiteGarantiaKm,
+    observacoes
+  }), [
+    prefixo, placa, chassi, renavam, tipoVeiculo, marca, modelo, marcaModeloCrlv,
+    anoFabricacao, tipoCombustivel, odometro, status, dataUltimaCalibracao,
+    dataUltimaPreventiva, odometroUltimaPreventiva, intervaloRevisaoKm,
+    vencimentoCrlv, seguradora, apolice, vencimentoSeguro, validadeGarantia,
+    limiteGarantiaKm, observacoes
+  ]);
+
+  const { getSavedDraft, hasDraft, clearDraft } = useModalDraft({
+    draftKey,
+    isOpen,
+    currentData: currentFormData,
+  });
+
+  // Restaura rascunho persistido contra F5 ou fechamento acidental
+  useEffect(() => {
+    if (isOpen && !viaturaToEdit) {
+      const draft = getSavedDraft();
+      if (draft) {
+        if (draft.prefixo) setPrefixo(draft.prefixo);
+        if (draft.placa) setPlaca(draft.placa);
+        if (draft.chassi) setChassi(draft.chassi);
+        if (draft.renavam) setRenavam(draft.renavam);
+        if (draft.tipoVeiculo) setTipoVeiculo(draft.tipoVeiculo as TipoVeiculo);
+        if (draft.marca) setMarca(draft.marca);
+        if (draft.modelo) setModelo(draft.modelo);
+        if (draft.marcaModeloCrlv) setMarcaModeloCrlv(draft.marcaModeloCrlv);
+        if (draft.anoFabricacao !== undefined) setAnoFabricacao(draft.anoFabricacao);
+        if (draft.tipoCombustivel) setTipoCombustivel(draft.tipoCombustivel as TipoCombustivel);
+        if (draft.odometro) setOdometro(draft.odometro);
+        if (draft.status) setStatus(draft.status as StatusOperacionalViatura);
+        if (draft.dataUltimaCalibracao) setDataUltimaCalibracao(draft.dataUltimaCalibracao);
+        if (draft.dataUltimaPreventiva) setDataUltimaPreventiva(draft.dataUltimaPreventiva);
+        if (draft.odometroUltimaPreventiva) setOdometroUltimaPreventiva(draft.odometroUltimaPreventiva);
+        if (draft.intervaloRevisaoKm) setIntervaloRevisaoKm(draft.intervaloRevisaoKm);
+        if (draft.vencimentoCrlv) setVencimentoCrlv(draft.vencimentoCrlv);
+        if (draft.seguradora) setSeguradora(draft.seguradora);
+        if (draft.apolice) setApolice(draft.apolice);
+        if (draft.vencimentoSeguro) setVencimentoSeguro(draft.vencimentoSeguro);
+        if (draft.validadeGarantia) setValidadeGarantia(draft.validadeGarantia);
+        if (draft.limiteGarantiaKm) setLimiteGarantiaKm(draft.limiteGarantiaKm);
+        if (draft.observacoes) setObservacoes(draft.observacoes);
+      }
+    }
+  }, [isOpen, viaturaToEdit, getSavedDraft]);
 
   useEffect(() => {
     if (viaturaToEdit) {
@@ -248,6 +321,7 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       const res = await saveViaturaAction(payload);
       if (res.success && res.data) {
         soundNotificationService.playSuccessSound();
+        clearDraft();
         onSuccess(res.data);
         onClose();
       } else {
@@ -266,15 +340,20 @@ export const ViaturaModal: React.FC<ViaturaModalProps> = ({
       onClose={onClose}
       modalId="modal-viatura-form"
       badgeSistema="SIGER FROTA OPERACIONAL"
-      badgeContrato={contratoId || 'ONÇA PUMA'}
+      badgeContrato={contratoId || ''}
       titulo={viaturaToEdit ? `EDITAR VIATURA • ${viaturaToEdit.prefixo_frota}` : 'CADASTRAR NOVA VIATURA'}
       subtitulo="Rastreabilidade veicular, conformidade de CRLV, seguro de frota e gestão de hodômetro"
       icon={Truck}
       maxWidthClass="max-w-4xl"
       footer={
         <div className="flex w-full items-center justify-between">
-          <div className="text-xs text-slate-500 font-sans">
-            Prefixo: <strong className="text-slate-800">{prefixo || 'Não informado'}</strong> | Placa: <strong className="text-slate-800">{placa || 'Não informada'}</strong>
+          <div className="text-xs text-slate-500 font-sans flex items-center gap-2">
+            <span>Prefixo: <strong className="text-slate-800 dark:text-slate-200">{prefixo || 'Não informado'}</strong> | Placa: <strong className="text-slate-800 dark:text-slate-200">{placa || 'Não informada'}</strong></span>
+            {hasDraft && !viaturaToEdit && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                📝 Rascunho salvo
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <button

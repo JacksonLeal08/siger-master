@@ -5,12 +5,16 @@ import { useState, useEffect, useCallback } from 'react';
 export type ThemePreference = 'light' | 'dark' | 'system';
 export type ResolvedTheme = 'light' | 'dark';
 
-const STORAGE_KEY = 'siger_theme_pref';
+const STORAGE_KEY = 'siger_theme';
 
 export function useThemePreference(defaultPref: ThemePreference = 'system') {
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY) as ThemePreference | null;
+      const saved = (
+        localStorage.getItem(STORAGE_KEY) || 
+        localStorage.getItem('spci_theme') || 
+        localStorage.getItem('siger_theme_pref')
+      ) as ThemePreference | null;
       if (saved && (saved === 'light' || saved === 'dark' || saved === 'system')) {
         return saved;
       }
@@ -22,7 +26,7 @@ export function useThemePreference(defaultPref: ThemePreference = 'system') {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
-    return true; // Default fallback para ambiente operacional
+    return false; // Light-first fallback
   });
 
   // Escuta alterações na preferência do sistema operacional
@@ -53,9 +57,11 @@ export function useThemePreference(defaultPref: ThemePreference = 'system') {
     const root = document.documentElement;
     if (resolvedTheme === 'dark') {
       root.classList.add('dark');
+      root.classList.remove('light');
       root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
+      root.classList.add('light');
       root.style.colorScheme = 'light';
     }
   }, [resolvedTheme]);
@@ -64,6 +70,8 @@ export function useThemePreference(defaultPref: ThemePreference = 'system') {
     setThemePreferenceState(newPref);
     if (typeof window !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, newPref);
+      localStorage.setItem('spci_theme', newPref);
+      localStorage.setItem('siger_theme_pref', newPref);
     }
   }, []);
 

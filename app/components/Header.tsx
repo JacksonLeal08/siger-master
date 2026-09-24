@@ -78,28 +78,30 @@ export const Header = ({ onScanClick, onProfileClick, onMenuClick, onGestaoAtivo
       <div className="flex items-center gap-3">
         {/* Indicador / Seletor de Contrato Ativo (Visível em Mobile e Desktop) */}
         {!isGlobalScope ? (
-          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 shadow-xs">
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 shadow-xs">
             <Building2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
-            <span className="text-[10px] uppercase text-slate-500 font-extrabold tracking-wider hidden sm:inline">Contrato:</span>
-            <span className="text-red-700 font-black tracking-wide text-[11px] sm:text-xs">{userProfile?.site || activeSite}</span>
+            <span className="text-[10px] uppercase text-slate-500 dark:text-slate-400 font-extrabold tracking-wider hidden sm:inline">Contrato:</span>
+            <span className="text-red-700 dark:text-red-400 font-black tracking-wide text-[11px] sm:text-xs">
+              {userProfile?.site || activeSite || 'CARREGANDO...'}
+            </span>
           </div>
         ) : (
-          <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xs">
             <Building2 className="w-3.5 h-3.5 text-red-600 shrink-0" />
-            <span className="text-[9px] uppercase text-slate-500 font-extrabold tracking-wider hidden md:inline">Contrato:</span>
+            <span className="text-[9px] uppercase text-slate-500 dark:text-slate-400 font-extrabold tracking-wider hidden md:inline">Contrato:</span>
             <select
               value={activeSite}
               onChange={(e) => setActiveSite(e.target.value)}
-              className="bg-transparent border-none text-[11px] sm:text-xs font-bold text-slate-800 focus:outline-none cursor-pointer py-1 pr-1"
+              className="bg-transparent border-none text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer py-1 pr-1"
               aria-label="Selecionar Contrato Ativo"
             >
-              <option value="TODOS OS SITES (Acesso Global)" className="text-slate-800 bg-white font-medium">
+              <option value="TODOS OS SITES (Acesso Global)" className="text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 font-medium">
                 🌐 TODOS OS SITES (Global - {contractAssetCounts?.total ?? 0} Ativos)
               </option>
-              <option value="SALOBO" className="text-slate-800 bg-white font-medium">
+              <option value="SALOBO" className="text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 font-medium">
                 🏢 SALOBO ({contractAssetCounts?.salobo ?? 0} Ativos)
               </option>
-              <option value="ONÇA PUMA" className="text-slate-800 bg-white font-medium">
+              <option value="ONÇA PUMA" className="text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 font-medium">
                 🏭 ONÇA PUMA ({contractAssetCounts?.oncaPuma ?? 0} Ativos)
               </option>
             </select>

@@ -34,7 +34,16 @@ export default function GestaoPneusPage() {
     if (activeSite && !activeSite.startsWith('TODOS') && activeSite !== 'GLOBAL') {
       return activeSite;
     }
-    return userProfile?.site && !userProfile.site.startsWith('TODOS') ? userProfile.site : 'ONÇA PUMA';
+    if (userProfile?.site && !userProfile.site.startsWith('TODOS')) {
+      return userProfile.site;
+    }
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('siger_active_contract') || localStorage.getItem('spci_active_contract');
+      if (cached && !cached.startsWith('TODOS') && cached !== 'GLOBAL') {
+        return cached;
+      }
+    }
+    return 'SALOBO';
   }, [activeSite, userProfile]);
 
   const [viaturas, setViaturas] = useState<Viatura[]>([]);

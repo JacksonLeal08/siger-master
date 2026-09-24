@@ -134,7 +134,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html 
       lang="pt-BR" 
       translate="no"
-      className={`light ${hankenGrotesk.variable} ${ibmPlexSans.variable} ${jetbrainsMono.variable} notranslate`}
+      suppressHydrationWarning
+      className={`${hankenGrotesk.variable} ${ibmPlexSans.variable} ${jetbrainsMono.variable} notranslate`}
     >
       <head>
         <meta name="google" content="notranslate" />
@@ -142,6 +143,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var saved = localStorage.getItem('siger_theme') || localStorage.getItem('spci_theme') || localStorage.getItem('siger_theme_pref');
+                  if (saved === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.style.colorScheme = 'dark';
+                  } else {
+                    document.documentElement.classList.add('light');
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.style.colorScheme = 'light';
+                  }
+                } catch(e) {}
+              })();
+            `
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}

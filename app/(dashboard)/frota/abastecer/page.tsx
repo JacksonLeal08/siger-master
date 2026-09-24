@@ -10,7 +10,7 @@ export default function AbastecerPage() {
     ? activeSite
     : (userProfile?.site && userProfile.site !== 'TODOS')
     ? userProfile.site
-    : 'ONÇA PUMA';
+    : (typeof window !== 'undefined' ? (localStorage.getItem('siger_active_contract') || localStorage.getItem('spci_active_contract')) : '') || 'SALOBO';
 
   return (
     <div className="min-h-screen bg-slate-100 py-6 px-3">

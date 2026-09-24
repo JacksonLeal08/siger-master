@@ -121,6 +121,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearTimeout(timer);
   }, [pathname]);
 
+  // Listener para restaurar janelas do Dock (ex: Cadastro de Ativo) mesmo após recarga
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem('siger_window_dock_windows');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed['modal-asset-add']?.state === 'minimized') {
+          setShowAddForm(true);
+        }
+      }
+    } catch (e) {}
+
+    const handleRestoreEvent = (e: any) => {
+      if (e?.detail?.id === 'modal-asset-add') {
+        setShowAddForm(true);
+      }
+    };
+    const handleCloseEvent = (e: any) => {
+      if (e?.detail?.id === 'modal-asset-add') {
+        setShowAddForm(false);
+      }
+    };
+
+    window.addEventListener('siger:restore_window', handleRestoreEvent);
+    window.addEventListener('siger:close_window', handleCloseEvent);
+    return () => {
+      window.removeEventListener('siger:restore_window', handleRestoreEvent);
+      window.removeEventListener('siger:close_window', handleCloseEvent);
+    };
+  }, [setShowAddForm]);
+
   // Alertas de saída do cockpit
   const [alertFormChannel, setAlertFormChannel] = useState<'whatsapp' | 'telegram' | 'email'>('whatsapp');
   const [alertTargetContact, setAlertTargetContact] = useState('');

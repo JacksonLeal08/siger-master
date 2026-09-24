@@ -24,6 +24,7 @@ import QrCameraScanner from './QrCameraScanner';
 import { parseInmetroCode } from '@/lib/utils';
 import { LocalizacoesService } from '@/lib/localizacoesService';
 import AppFooter from './AppFooter';
+import { useModalDraft } from '@/hooks/useModalDraft';
 
 interface AssetAddModalProps {
   isOpen: boolean;
@@ -110,6 +111,62 @@ export default function AssetAddModal({ isOpen, onClose }: AssetAddModalProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [compressionDetails, setCompressionDetails] = useState<{ original: string; compressed: string; reduction: number } | null>(null);
+
+  const draftKey = `asset_add_${newAssetType || 'general'}`;
+  const currentFormData = React.useMemo(() => ({
+    selectedSite,
+    formLocal,
+    newLocalName,
+    formSubLocal,
+    newSubLocalName,
+    formPatrimonio,
+    formModel,
+    formSelo,
+    formChassi,
+    formSystemType,
+    multiSelectModels,
+    formWeightCap,
+    formDataRecarga,
+    formValidadeRecargaMeses,
+    formAnoTesteHidro,
+    formDataPesagemCo2
+  }), [
+    selectedSite, formLocal, newLocalName, formSubLocal, newSubLocalName,
+    formPatrimonio, formModel, formSelo, formChassi, formSystemType,
+    multiSelectModels, formWeightCap, formDataRecarga, formValidadeRecargaMeses,
+    formAnoTesteHidro, formDataPesagemCo2
+  ]);
+
+  const { getSavedDraft, hasDraft, clearDraft } = useModalDraft({
+    draftKey,
+    isOpen,
+    currentData: currentFormData,
+  });
+
+  // Restaura rascunho persistido contra F5 ou fechamento acidental
+  useEffect(() => {
+    if (isOpen) {
+      const draft = getSavedDraft();
+      if (draft) {
+        if (draft.selectedSite) setSelectedSite(draft.selectedSite);
+        if (draft.formLocal) setFormLocal(draft.formLocal);
+        if (draft.newLocalName) setNewLocalName(draft.newLocalName);
+        if (draft.formSubLocal) setFormSubLocal(draft.formSubLocal);
+        if (draft.newSubLocalName) setNewSubLocalName(draft.newSubLocalName);
+        if (draft.formPatrimonio) setFormPatrimonio(draft.formPatrimonio);
+        if (draft.formModel) setFormModel(draft.formModel);
+        if (draft.formSelo) setFormSelo(draft.formSelo);
+        if (draft.formChassi) setFormChassi(draft.formChassi);
+        if (draft.formSystemType) setFormSystemType(draft.formSystemType);
+        if (draft.multiSelectModels) setMultiSelectModels(draft.multiSelectModels);
+        if (draft.formWeightCap) setFormWeightCap(draft.formWeightCap);
+        if (draft.formDataRecarga) setFormDataRecarga(draft.formDataRecarga);
+        if (draft.formValidadeRecargaMeses) setFormValidadeRecargaMeses(draft.formValidadeRecargaMeses);
+        if (draft.formAnoTesteHidro) setFormAnoTesteHidro(draft.formAnoTesteHidro);
+        if (draft.formDataPesagemCo2) setFormDataPesagemCo2(draft.formDataPesagemCo2);
+      }
+    }
+  }, [isOpen, getSavedDraft]);
 
   // Carregar dados de locais e modelos de extintor do banco
   useEffect(() => {
@@ -573,6 +630,7 @@ export default function AssetAddModal({ isOpen, onClose }: AssetAddModalProps) {
     setSelectedSubLocalId('');
     setNewSubLocalName('');
     setNewLocalName('');
+    clearDraft();
     onClose();
     triggerSuccessNotification('Equipamento Registrado!', `Ativo ${codePatrimonio} foi cadastrado no banco de dados SPCI.`);
   };

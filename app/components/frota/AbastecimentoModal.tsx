@@ -7,6 +7,7 @@ import { FuelAuditService } from '@/lib/fuelAuditService';
 import { FuelPricingService } from '@/lib/services/FuelPricingService';
 import { soundNotificationService } from '@/lib/soundNotificationService';
 import ModalBaseCorporativo from '@/app/components/ui/ModalBaseCorporativo';
+import { useModalDraft } from '@/hooks/useModalDraft';
 import { 
   Fuel, 
   AlertTriangle, 
@@ -61,6 +62,44 @@ export const AbastecimentoModal: React.FC<AbastecimentoModalProps> = ({
   const [houveCalibracao, setHouveCalibracao] = useState<boolean>(false);
   const [fotoCalibradorUrl, setFotoCalibradorUrl] = useState<string | null>(null);
   const [fotoCupomUrl, setFotoCupomUrl] = useState<string | null>(null);
+
+  const draftKey = `abastecimento_${viatura.id}`;
+
+  const currentFormData = React.useMemo(() => ({
+    posto,
+    tipoCombustivel,
+    litros,
+    valorLitro,
+    novoOdometro,
+    condutor,
+    houveCalibracao,
+    fotoCalibradorUrl,
+    fotoCupomUrl
+  }), [posto, tipoCombustivel, litros, valorLitro, novoOdometro, condutor, houveCalibracao, fotoCalibradorUrl, fotoCupomUrl]);
+
+  const { getSavedDraft, hasDraft, clearDraft } = useModalDraft({
+    draftKey,
+    isOpen,
+    currentData: currentFormData,
+  });
+
+  // Restaura rascunho persistido
+  useEffect(() => {
+    if (isOpen) {
+      const draft = getSavedDraft();
+      if (draft) {
+        if (draft.posto) setPosto(draft.posto);
+        if (draft.tipoCombustivel) setTipoCombustivel(draft.tipoCombustivel);
+        if (draft.litros) setLitros(draft.litros);
+        if (draft.valorLitro) setValorLitro(draft.valorLitro);
+        if (draft.novoOdometro) setNovoOdometro(draft.novoOdometro);
+        if (draft.condutor) setCondutor(draft.condutor);
+        if (draft.houveCalibracao !== undefined) setHouveCalibracao(draft.houveCalibracao);
+        if (draft.fotoCalibradorUrl) setFotoCalibradorUrl(draft.fotoCalibradorUrl);
+        if (draft.fotoCupomUrl) setFotoCupomUrl(draft.fotoCupomUrl);
+      }
+    }
+  }, [isOpen, getSavedDraft]);
 
   // Carrega histórico para cálculo de variação de preço e ranking de postos
   useEffect(() => {
@@ -210,6 +249,7 @@ export const AbastecimentoModal: React.FC<AbastecimentoModalProps> = ({
       );
 
       if (res.success && res.data) {
+        clearDraft();
         onSuccess(res.data);
         onClose();
       } else {
@@ -228,14 +268,14 @@ export const AbastecimentoModal: React.FC<AbastecimentoModalProps> = ({
       onClose={onClose}
       modalId="modal-frota-abastecimento"
       badgeSistema="TELEMETRIA SIGER & FROTA"
-      badgeContrato={contratoId || viatura.contrato_id || 'ONÇA PUMA'}
+      badgeContrato={contratoId || viatura.contrato_id || ''}
       titulo={`ABASTECIMENTO • ${viatura.prefixo_frota} (${viatura.placa})`}
       subtitulo="Rastreamento de preços médios, conformidade de consumo e trava de segurança quinzenal de pneus"
       icon={Fuel}
       maxWidthClass="max-w-4xl"
       footer={
         <div className="flex w-full items-center justify-between">
-          <div className="text-[11px] text-slate-500 font-sans">
+          <div className="text-[11px] text-slate-500 font-sans flex items-center gap-2">
             {isFormBloqueadoPorPneu ? (
               <span className="text-red-600 font-bold flex items-center gap-1">
                 <AlertTriangle className="w-3.5 h-3.5" /> Trava quinzenal de pneus ativa
@@ -243,6 +283,11 @@ export const AbastecimentoModal: React.FC<AbastecimentoModalProps> = ({
             ) : (
               <span className="text-emerald-600 font-semibold flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Calibração em conformidade
+              </span>
+            )}
+            {hasDraft && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                📝 Rascunho salvo
               </span>
             )}
           </div>

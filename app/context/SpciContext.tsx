@@ -327,14 +327,34 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Estado de Contrato / Site Ativo para Isolamento Multi-Tenant
   const [activeSite, setActiveSiteState] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('spci_active_contract');
+      const saved = localStorage.getItem('siger_active_contract') || localStorage.getItem('spci_active_contract');
       if (saved) return saved;
+
+      // Tenta recuperar do perfil salvo em cache para não vazar escopo global
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('siger_cached_profile_') || key.startsWith('spci_cached_profile_'))) {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed?.site && !parsed.site.startsWith('TODOS')) {
+                return parsed.site;
+              }
+            }
+          }
+        }
+      } catch {}
     }
-    return 'TODOS OS SITES (Acesso Global)';
+    return '';
   });
 
-  // Determina se o usuário possui permissão global (Desenvolvedor ou usuários com acesso explícito a Todos os Sites)
-  const isGlobalScope = !userProfile?.site || String(userProfile.site).toUpperCase().startsWith('TODOS') || userProfile.role === 'Desenvolvedor';
+  // Determina se o usuário possui permissão global
+  // CRÍTICO: Enquanto userProfile não carregou (authChecking), NÃO assume escopo global para evitar vazamento de dados!
+  const isGlobalScope = useMemo(() => {
+    if (!userProfile) return false;
+    return userProfile.role === 'Desenvolvedor' || (userProfile.site && String(userProfile.site).toUpperCase().startsWith('TODOS'));
+  }, [userProfile]);
 
   // Sincroniza activeSite com o contrato do usuário quando o perfil carrega
   useEffect(() => {
@@ -343,17 +363,19 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Usuário restrito a um contrato específico (ex: SALOBO): força estritamente o contrato dele
         setActiveSiteState(userProfile.site);
         if (typeof window !== 'undefined') {
+          localStorage.setItem('siger_active_contract', userProfile.site);
           localStorage.setItem('spci_active_contract', userProfile.site);
         }
       } else if (isGlobalScope) {
         // Perfil Desenvolvedor ou com escopo Global:
-        // Se for Desenvolvedor, garante visão de TODOS os ativos por padrão, evitando herdar restrições salvas
-        const devExplicitChoice = typeof window !== 'undefined' ? localStorage.getItem('spci_dev_contract_selected') : null;
-        const saved = typeof window !== 'undefined' ? localStorage.getItem('spci_active_contract') : null;
+        const devExplicitChoice = typeof window !== 'undefined' ? localStorage.getItem('siger_dev_contract_selected') || localStorage.getItem('spci_dev_contract_selected') : null;
+        const saved = typeof window !== 'undefined' ? (localStorage.getItem('siger_active_contract') || localStorage.getItem('spci_active_contract')) : null;
         if (userProfile.role === 'Desenvolvedor' && !devExplicitChoice) {
           setActiveSiteState('TODOS OS SITES (Acesso Global)');
         } else if (saved) {
           setActiveSiteState(saved);
+        } else {
+          setActiveSiteState('TODOS OS SITES (Acesso Global)');
         }
       }
     }
@@ -362,19 +384,31 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setActiveSite = useCallback((newSite: string) => {
     setActiveSiteState(newSite);
     if (typeof window !== 'undefined') {
+      localStorage.setItem('siger_active_contract', newSite);
       localStorage.setItem('spci_active_contract', newSite);
       if (userProfile?.role === 'Desenvolvedor') {
+        localStorage.setItem('siger_dev_contract_selected', 'true');
         localStorage.setItem('spci_dev_contract_selected', 'true');
       }
     }
   }, [userProfile?.role]);
 
-  // Helper unificado de correspondência de Site / Planta para isolamento de dados por contrato
+  // Helper unificado de correspondência de Site / Planta para isolamento estrito de dados por contrato
   const matchesUserSite = useCallback((item: any, site: string | null | undefined) => {
-    if (!site || site.startsWith('TODOS') || site === 'GLOBAL') {
-      return true;
+    // Determina o site operacional efetivo (resgatando do cache caso esteja hidratando)
+    const effectiveSite = site || (typeof window !== 'undefined' ? (localStorage.getItem('siger_active_contract') || localStorage.getItem('spci_active_contract')) : '') || userProfile?.site;
+
+    if (!effectiveSite) {
+      // Bloqueio de segurança: se não há contrato confirmado e o usuário não é global, bloqueia vazamento de dados
+      return userProfile?.role === 'Desenvolvedor' || isGlobalScope;
     }
-    const siteUpper = site.trim().toUpperCase();
+
+    if (effectiveSite.startsWith('TODOS') || effectiveSite === 'GLOBAL') {
+      // Somente Desenvolvedor ou escopo Global comprovado tem acesso a todos
+      return userProfile ? isGlobalScope : false;
+    }
+
+    const siteUpper = effectiveSite.trim().toUpperCase();
     const itemSite = String(item.site || item.details?.site || item.details?.contrato || item.details?.projeto || item.projeto || '').trim().toUpperCase();
     
     // Prioridade máxima para campo explícito de site/contrato
@@ -391,9 +425,8 @@ export const SpciProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
 
-    // Ativos legados sem marcação de planta pertencem à base original de ONÇA PUMA
-    return siteUpper === 'ONÇA PUMA' || siteUpper === 'ONCA PUMA';
-  }, []);
+    return false;
+  }, [userProfile, isGlobalScope]);
 
   // Quantitativo de ativos por contrato para os seletores com deduplicação atômica
   const contractAssetCounts = useMemo(() => {

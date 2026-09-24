@@ -26,7 +26,7 @@ export default function ModalBaseCorporativo({
   onClose,
   modalId,
   badgeSistema = 'SPCI GESTÃO DE FROTA',
-  badgeContrato = 'ONÇA PUMA',
+  badgeContrato = '',
   titulo,
   subtitulo,
   icon: IconComponent,

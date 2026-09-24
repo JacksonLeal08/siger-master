@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 export type WindowState = 'restored' | 'maximized' | 'minimized' | 'closed';
 
@@ -53,9 +53,75 @@ interface WindowModalContextType {
 const WindowModalContext = createContext<WindowModalContextType | undefined>(undefined);
 
 export function WindowModalProvider({ children }: { children: React.ReactNode }) {
-  const [windows, setWindows] = useState<Record<string, WindowItem>>({});
-  const [persistedStates, setPersistedStates] = useState<Record<string, WindowState>>({});
+  const STORAGE_WINDOWS = 'siger_window_dock_windows';
+  const STORAGE_STATES = 'siger_window_persisted_states';
+
+  // Carrega janelas minimizadas salvas do localStorage para persistir após F5
+  const [windows, setWindows] = useState<Record<string, WindowItem>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(STORAGE_WINDOWS);
+        if (saved) {
+          const parsed = JSON.parse(saved) as Record<string, WindowItem>;
+          // Manter apenas as que estavam minimizadas para o dock
+          const minimizedOnly: Record<string, WindowItem> = {};
+          for (const [k, v] of Object.entries(parsed)) {
+            if (v.state === 'minimized') {
+              minimizedOnly[k] = v;
+            }
+          }
+          return minimizedOnly;
+        }
+      } catch (e) {
+        console.warn('[WindowModalContext] Erro ao carregar janelas do cache:', e);
+      }
+    }
+    return {};
+  });
+
+  const [persistedStates, setPersistedStates] = useState<Record<string, WindowState>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem(STORAGE_STATES);
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (e) {}
+    }
+    return {};
+  });
+
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
+
+  // Sincroniza janelas minimizadas no localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const toSave: Record<string, any> = {};
+      for (const [k, v] of Object.entries(windows)) {
+        if (v.state === 'minimized') {
+          toSave[k] = {
+            id: v.id,
+            title: v.title,
+            subtitle: v.subtitle,
+            iconName: v.iconName,
+            badgeStatus: v.badgeStatus,
+            state: v.state,
+            lastActiveAt: v.lastActiveAt,
+          };
+        }
+      }
+      localStorage.setItem(STORAGE_WINDOWS, JSON.stringify(toSave));
+    } catch (e) {}
+  }, [windows]);
+
+  // Sincroniza persistedStates no localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(STORAGE_STATES, JSON.stringify(persistedStates));
+    } catch (e) {}
+  }, [persistedStates]);
 
   const registerWindow = useCallback(
     (
@@ -71,7 +137,7 @@ export function WindowModalProvider({ children }: { children: React.ReactNode })
     ) => {
       setWindows((prev) => {
         const existing = prev[id];
-        // Preserva o estado ativo anterior (inclusive maximized) mesmo em re-registro
+        // Preserva o estado ativo anterior (inclusive maximized e minimized)
         const resolvedState = existing
           ? existing.state
           : (persistedStates[id] && persistedStates[id] !== 'closed' ? persistedStates[id] : 'restored');
@@ -86,8 +152,8 @@ export function WindowModalProvider({ children }: { children: React.ReactNode })
             badgeStatus: data.badgeStatus,
             state: resolvedState,
             lastActiveAt: Date.now(),
-            onRestore: data.onRestore,
-            onClose: data.onClose,
+            onRestore: data.onRestore || existing?.onRestore,
+            onClose: data.onClose || existing?.onClose,
           },
         };
       });
@@ -126,6 +192,10 @@ export function WindowModalProvider({ children }: { children: React.ReactNode })
 
   const unregisterWindow = useCallback((id: string) => {
     setWindows((prev) => {
+      // Se a janela estiver minimizada, PRESERVA na bandeja mesmo que o componente desmonte temporariamente
+      if (prev[id]?.state === 'minimized') {
+        return prev;
+      }
       const next = { ...prev };
       delete next[id];
       return next;
@@ -176,6 +246,9 @@ export function WindowModalProvider({ children }: { children: React.ReactNode })
       if (item?.onRestore) {
         item.onRestore();
       }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('siger:restore_window', { detail: { id, item } }));
+      }
     },
     [setWindowState, windows]
   );
@@ -192,9 +265,17 @@ export function WindowModalProvider({ children }: { children: React.ReactNode })
         delete next[id];
         return next;
       });
-      unregisterWindow(id);
+      setWindows((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('siger:close_window', { detail: { id } }));
+      }
+      setActiveWindowId((prev) => (prev === id ? null : prev));
     },
-    [setWindowState, unregisterWindow, windows]
+    [setWindowState, windows]
   );
 
   const bringToFront = useCallback((id: string) => {

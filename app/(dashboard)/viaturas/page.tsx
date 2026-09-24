@@ -82,12 +82,21 @@ export default function ViaturasPage() {
   const router = useRouter();
   const { activeSite, userProfile, triggerSuccessNotification } = useSpci();
 
-  // Contrato operacional efetivo
+  // Contrato operacional efetivo com isolamento estrito
   const currentContratoId = useMemo(() => {
     if (activeSite && !activeSite.startsWith('TODOS') && activeSite !== 'GLOBAL') {
       return activeSite;
     }
-    return userProfile?.site && !userProfile.site.startsWith('TODOS') ? userProfile.site : 'ONÇA PUMA';
+    if (userProfile?.site && !userProfile.site.startsWith('TODOS')) {
+      return userProfile.site;
+    }
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('siger_active_contract') || localStorage.getItem('spci_active_contract');
+      if (cached && !cached.startsWith('TODOS') && cached !== 'GLOBAL') {
+        return cached;
+      }
+    }
+    return 'SALOBO';
   }, [activeSite, userProfile]);
 
   // Aba Ativa Principal
@@ -128,8 +137,26 @@ export default function ViaturasPage() {
   // Modal Terminal Mobile (QR Code Share)
   const [isTerminalShareOpen, setIsTerminalShareOpen] = useState(false);
 
-  // Dock Bar (Janelas Minimizadas)
-  const [minimizedWindows, setMinimizedWindows] = useState<MinimizedWindow[]>([]);
+  // Dock Bar (Janelas Minimizadas com persistência contra F5)
+  const [minimizedWindows, setMinimizedWindows] = useState<MinimizedWindow[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('siger_viaturas_dock');
+        return saved ? JSON.parse(saved) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('siger_viaturas_dock', JSON.stringify(minimizedWindows));
+      } catch (e) {}
+    }
+  }, [minimizedWindows]);
 
   // Carga dos Dados
   const loadData = async () => {
