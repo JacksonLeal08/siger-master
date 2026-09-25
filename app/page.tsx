@@ -4,15 +4,15 @@ import QuietLuxuryHome from './components/QuietLuxuryHome';
 
 export const metadata: Metadata = {
   title: {
-    absolute: 'SIGER Master | Gestão Integrada de Emergência & Resgate • JIMMP Info',
+    absolute: 'SIGER Master | Comando Unificado de Emergência, Resgate e Prontidão • JIMMP Info',
   },
-  description: 'Plataforma integrada para rastreabilidade de Ativos SIGER, telemetria de frotas operacionais e emissão de laudos técnicos em tempo real.',
+  description: 'Do gerenciamento preventivo de ativos críticos ao despacho tático de ambulâncias e viaturas 4x4. Plataforma com telemetria metrológica, comando CECOM e prontuário pré-hospitalar vivo.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'SIGER Master | Gestão Integrada de Emergência, Resgate e Frotas • JIMMP Info',
-    description: 'Centralização de laudos técnicos NBR, telemetria operacional de frotas e governança contínua.',
+    title: 'SIGER Master | Comando Unificado de Emergência, Resgate e Frotas • JIMMP Info',
+    description: 'Plataforma integrada de missão crítica: Ativos SPCI, Gestão de Frotas de Emergência, Central de Despacho CAD/CECOM e Prontuário APH Vivo.',
     url: SITE_URL,
     type: 'website',
     images: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SIGER Master | Gestão Integrada de Emergência & Resgate • JIMMP Info',
+    title: 'SIGER Master | Comando Unificado de Emergência, Resgate e Frotas • JIMMP Info',
     description: 'Centralização de laudos técnicos NBR, telemetria operacional de frotas e governança contínua.',
     images: ['/assets/branding/logo-jimmp-info.png'],
   },
@@ -39,26 +39,26 @@ const homeFaqJsonLd = {
   mainEntity: [
     {
       '@type': 'Question',
-      name: 'Qual é a periodicidade da inspeção de extintores segundo a NBR 12962?',
+      name: 'Como o SIGER Master unifica combate a incêndio, frota e atendimento pré-hospitalar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'A inspeção de nível 1 (visual e operacional) deve ser realizada mensalmente, a manutenção de nível 2 (recarga) anualmente e o ensaio hidrostático (nível 3) a cada 5 anos conforme as normas ABNT NBR 12962 e regulamentações do Inmetro.',
+        text: 'A plataforma opera com arquitetura modular integrada: enquanto a engenharia monitora ativos fixos (extintores, hidrantes e bombas), o módulo de frota acompanha a prontidão metrológica de ambulâncias e 4x4, conectando-se ao CAD/CECOM para despacho georreferenciado e ao Prontuário APH Vivo para registro clínico simultâneo.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Como funciona a vistoria técnica offline-first no SISTEMA SIGER?',
+      name: 'Como funciona a auditoria de frotas e telemetria metrológica de pneus (TWI)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'O técnico de campo realiza todo o checklist normativo no smartphone mesmo sem sinal de internet. Ao restabelecer a conexão, os dados e fotos são sincronizados automaticamente com a nuvem em conformidade com o AVCB e NBRs.',
+        text: 'O sistema realiza o mapeamento digital dos sulcos dos pneus em milímetros com base no catálogo de fábrica de cada chassi homologado. Alertas visuais e sonoros indicam limites de desgaste e necessidade de rodízio ou substituição perante a resolução CONTRAN 558/80.',
       },
     },
     {
       '@type': 'Question',
-      name: 'Quais itens são vistoriados na rede de hidrantes NBR 13714?',
+      name: 'A operação de campo e vistorias funciona sem conexão com a internet (Offline-First)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'São auditados o estado das mangueiras de incêndio, acoplamentos Storz, esguichos reguláveis, chaves de mangueira, abrigo, desobstrução física e verificação de pressão residual estática e dinâmica da casa de bombas.',
+        text: 'Sim. Os brigadistas e condutores realizam checklists normativos, laudos fotográficos e prontuários clínicos diretamente em smartphones mesmo sem sinal de internet. Os dados são salvos em banco local criptografado e sincronizados atomicamente com a nuvem assim que a rede for restabelecida.',
       },
     },
   ],

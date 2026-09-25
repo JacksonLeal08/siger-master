@@ -8,23 +8,22 @@ import {
   Flame, 
   ShieldCheck, 
   Smartphone, 
-  Bot, 
-  Droplets, 
-  Sliders, 
   ArrowRight, 
   CheckCircle2, 
   FileText, 
-  Award, 
   Activity,
-  ChevronRight,
   ChevronDown,
   HelpCircle,
   Calendar,
-  Sparkles,
-  Lock,
-  Layers
+  Radio,
+  Truck,
+  HeartPulse,
+  Compass,
+  Layers,
+  Zap,
+  Lock
 } from 'lucide-react';
-import AppFooter from './AppFooter';
+import Footer from './common/Footer';
 import ThemeToggle from './ThemeToggle';
 import { SYSTEM_VERSION, COMPANY_NAME } from '@/config/version';
 
@@ -33,104 +32,112 @@ export default function QuietLuxuryHome() {
 
   const faqItems = [
     {
-      q: 'Qual é a periodicidade da inspeção de extintores segundo a NBR 12962?',
-      a: 'A inspeção de nível 1 (visual e operacional) deve ser realizada mensalmente, a manutenção de nível 2 (recarga) anualmente e o ensaio hidrostático (nível 3) a cada 5 anos conforme as normas ABNT NBR 12962 e regulamentações do Inmetro.'
+      q: 'Como o SIGER Master unifica combate a incêndio, frota e atendimento pré-hospitalar?',
+      a: 'A plataforma opera com arquitetura modular integrada: enquanto a engenharia monitora ativos fixos (extintores, hidrantes e bombas), o módulo de frota acompanha a prontidão metrológica de ambulâncias e 4x4, conectando-se ao CAD/CECOM para despacho georreferenciado e ao Prontuário APH Vivo para registro clínico simultâneo.'
     },
     {
-      q: 'Como funciona a vistoria técnica offline-first no SISTEMA SIGER?',
-      a: 'O técnico de campo realiza todo o checklist normativo no smartphone mesmo sem sinal de internet. Ao restabelecer a conexão, os dados e fotos são sincronizados automaticamente com a nuvem em conformidade com o AVCB e NBRs.'
+      q: 'Como funciona a auditoria de frotas e telemetria metrológica de pneus (TWI)?',
+      a: 'O sistema realiza o mapeamento digital dos sulcos dos pneus em milímetros com base no catálogo de fábrica de cada chassi homologado. Alertas visuais e sonoros indicam limites de desgaste e necessidade de rodízio ou substituição, garantindo total conformidade com a resolução CONTRAN 558/80.'
     },
     {
-      q: 'Quais itens são vistoriados na rede de hidrantes NBR 13714?',
-      a: 'São auditados o estado das mangueiras de incêndio, acoplamentos Storz, esguichos reguláveis, chaves de mangueira, abrigo, desobstrução física e verificação de pressão residual estática e dinâmica da casa de bombas.'
+      q: 'A operação de campo e vistorias funciona sem conexão com a internet (Offline-First)?',
+      a: 'Sim. Os brigadistas, vistoriadores e condutores realizam checklists normativos, laudos fotográficos e prontuários clínicos diretamente em smartphones ou tablets mesmo em áreas de sombra ou subsolo. Os dados são salvos em banco local criptografado (IndexedDB) e sincronizados atomicamente com a nuvem assim que houver rede.'
+    },
+    {
+      q: 'Qual é o padrão de segurança e conformidade de dados (LGPD) adotado?',
+      a: 'Todos os registros de campo, telemetria veicular, dados sensíveis de pacientes (APH) e laudos de engenharia contam com criptografia TLS 1.3 em trânsito e AES-256 em repouso, com políticas RLS (Row Level Security) e trilhas de auditoria auditáveis imutáveis.'
     }
   ];
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-mono relative overflow-hidden select-none transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f1115] text-slate-900 dark:text-zinc-100 font-mono relative overflow-x-hidden select-none transition-colors duration-300">
       
       {/* 1. AMBIENT BACKGROUND GLOW & GEOMETRIC GRID */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-red-600/5 dark:bg-red-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1b1e24_1px,transparent_1px),linear-gradient(to_bottom,#1b1e24_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[450px] bg-[#68D346]/5 dark:bg-[#68D346]/10 blur-[130px] rounded-full pointer-events-none" />
 
-      {/* 2. NAVIGATION BAR (QUIET LUXURY TOP HEADER) */}
-      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors">
+      {/* 2. NAVIGATION BAR (CYBER-METALLIC TOP HEADER) */}
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-zinc-800/80 bg-white/85 dark:bg-[#121418]/85 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
-          {/* Logo & Brand Mark - Em Evidência Opção A */}
+          {/* Logo & Brand Mark */}
           <div className="flex items-center gap-4">
             <div className="relative py-1.5 px-3 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-200/60 dark:from-[#282A2F] dark:to-[#1E2024] border border-slate-300/70 dark:border-[#3C3F45] shadow-[0_0_15px_rgba(104,211,70,0.12)] hover:shadow-[0_0_22px_rgba(104,211,70,0.35)] transition-all duration-300 flex items-center justify-center">
               <Image 
                 src="/assets/branding/logo-jimmp-info.png" 
                 alt="Logo JIMMP Info" 
-                width={180}
-                height={50}
+                width={170}
+                height={48}
                 priority
-                className="h-11 sm:h-12 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(104,211,70,0.4)] transition-transform hover:scale-105" 
+                className="h-10 sm:h-11 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(104,211,70,0.4)] transition-transform hover:scale-105" 
               />
             </div>
-            <div className="border-l border-slate-200 dark:border-slate-800 pl-4 py-1 hidden sm:block">
+            <div className="border-l border-slate-200 dark:border-zinc-800 pl-4 py-1 hidden sm:block text-left">
               <span className="text-[9px] font-black text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA OFICIAL</span>
-              <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
+              <span className="text-sm font-black text-slate-900 dark:text-zinc-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
             </div>
           </div>
 
-          {/* Quick Actions & Navigation */}
+          {/* Quick Actions & Navigation Links */}
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-              <a href="#bento-servicos" className="hover:text-red-600 dark:hover:text-white transition-colors">Módulos NBR</a>
-              <a href="#metricas" className="hover:text-red-600 dark:hover:text-white transition-colors">Governança</a>
-              <a href="#prazos-normativos" className="hover:text-red-600 dark:hover:text-white transition-colors">Prazos ABNT</a>
-              <a href="#faq" className="hover:text-red-600 dark:hover:text-white transition-colors">FAQ</a>
+            <div className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400">
+              <a href="#pilares" className="hover:text-[#68D346] dark:hover:text-[#B7F365] transition-colors">Os 4 Pilares</a>
+              <a href="#metricas" className="hover:text-[#68D346] dark:hover:text-[#B7F365] transition-colors">Governança</a>
+              <a href="#normas" className="hover:text-[#68D346] dark:hover:text-[#B7F365] transition-colors">Normas Técnicas</a>
+              <a href="#faq" className="hover:text-[#68D346] dark:hover:text-[#B7F365] transition-colors">FAQ</a>
             </div>
 
             <ThemeToggle />
 
             <Link
               href="/dashboard"
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all duration-300 active:scale-95 flex items-center gap-2"
+              className="px-5 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 dark:from-[#282A2F] dark:to-[#1E2024] text-white font-black text-xs uppercase tracking-wider rounded-xl border border-transparent dark:border-[#3C3F45] hover:border-[#68D346] shadow-[0_0_12px_rgba(104,211,70,0.25)] hover:shadow-[0_0_20px_rgba(104,211,70,0.45)] transition-all duration-300 active:scale-95 flex items-center gap-2"
             >
               <span>Acessar Cockpit</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#68D346]" />
             </Link>
           </div>
         </div>
       </header>
 
-      {/* 3. HERO SECTION (MONUMENTAL TYPOGRAPHY & QUIET LUXURY) */}
-      <section className="relative pt-20 pb-16 md:pt-32 md:pb-24 px-6 max-w-7xl mx-auto">
-        <div className="text-center space-y-8 max-w-4xl mx-auto">
+      {/* 3. HERO SECTION (REESTRUTURAÇÃO NARRATIVA & COMANDO UNIFICADO) */}
+      <section className="relative pt-20 pb-16 md:pt-28 md:pb-24 px-6 max-w-7xl mx-auto">
+        <div className="text-center space-y-8 max-w-5xl mx-auto">
           
-          {/* Badge de Conformidade Superior */}
+          {/* Badge Superior Mandatório */}
           <motion.div 
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-400 text-xs font-bold uppercase tracking-widest backdrop-blur-sm"
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-900/90 border border-slate-300 dark:border-[#3C3F45] text-slate-800 dark:text-zinc-200 text-[11px] font-mono font-bold tracking-widest backdrop-blur-md shadow-sm"
           >
-            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-            <span>Engenharia de Segurança & Normas ABNT NBR 12962 / 13434 / 13714</span>
+            <span className="w-2 h-2 rounded-full bg-[#68D346] animate-pulse shadow-[0_0_8px_#68D346]" />
+            <span>[ 🛡️ ECOSSISTEMA OPERACIONAL INTEGRADO // VERSÃO 2.11 ]</span>
           </motion.div>
 
-          {/* Manchetismo Tipográfico Monumental */}
+          {/* Título Principal de Impacto */}
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-slate-50 uppercase leading-[1.05] font-['Hanken_Grotesk']"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 dark:text-white uppercase leading-[1.08] font-['Hanken_Grotesk']"
           >
-            Gestão & Governança de <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-rose-600 to-red-700">Combate a Incêndio</span>
+            COMANDO UNIFICADO DE EMERGÊNCIA, RESGATE E{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#68D346] via-[#85e865] to-[#B7F365] drop-shadow-[0_0_20px_rgba(104,211,70,0.3)]">
+              PRONTIDÃO OPERACIONAL
+            </span>
           </motion.h1>
 
-          {/* Subtítulo Executivo */}
+          {/* Subtítulo Institucional de Missão Crítica */}
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-sans max-w-2xl mx-auto leading-relaxed font-normal"
+            className="text-sm md:text-base text-slate-600 dark:text-zinc-300 font-sans max-w-3xl mx-auto leading-relaxed font-normal"
           >
-            Plataforma de alta precisão para rastreabilidade offline-first de ativos, emissão de laudos de vistoria técnica em tempo real e inteligência preditiva para plantas industriais e edifícios corporativos.
+            Do gerenciamento preventivo de ativos críticos ao despacho tático de ambulâncias e viaturas 4x4. Uma plataforma integrada com telemetria metrológica, comando CECOM em tempo real e prontuário pré-hospitalar vivo.
           </motion.p>
 
-          {/* Botões de Ação Principais */}
+          {/* Botões de Ação Principais com Brilho Neon */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -139,311 +146,335 @@ export default function QuietLuxuryHome() {
           >
             <Link
               href="/dashboard"
-              className="px-8 py-4 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-red-950/20 transition-all duration-300 active:scale-95 flex items-center gap-3 border-none cursor-pointer"
+              className="px-8 py-4 bg-gradient-to-r from-[#1C4E26] via-[#246831] to-[#1C4E26] hover:from-[#246831] hover:to-[#2e7d3d] text-white font-black text-xs uppercase tracking-widest rounded-xl border border-[#68D346]/60 shadow-[0_0_25px_rgba(104,211,70,0.45)] hover:shadow-[0_0_35px_rgba(183,243,101,0.55)] transition-all duration-300 active:scale-95 flex items-center gap-3 cursor-pointer"
             >
-              <span>INICIAR VISTORIA DE CAMPO</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>ACESSAR COCKPIT OPERACIONAL</span>
+              <ArrowRight className="w-4 h-4 text-[#B7F365]" />
             </Link>
 
-            <a
-              href="#bento-servicos"
-              className="px-8 py-4 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-widest rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-300 cursor-pointer"
+            <Link
+              href="/ronda"
+              className="px-8 py-4 bg-white dark:bg-[#1E2024] hover:bg-slate-100 dark:hover:bg-[#282A2F] text-slate-800 dark:text-zinc-200 font-bold text-xs uppercase tracking-widest rounded-xl border border-slate-300 dark:border-[#3C3F45] hover:border-[#68D346] shadow-sm transition-all duration-300 active:scale-95 flex items-center gap-2.5 cursor-pointer"
             >
-              EXPLORAR SERVIÇOS BENTO
-            </a>
+              <span>TERMINAL MOBILE DE CONDUTORES 📱</span>
+            </Link>
           </motion.div>
+
+          {/* Ticker de Telemetria Operacional */}
+          <div className="pt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-[11px] font-mono text-slate-500 dark:text-zinc-400">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#68D346]" />
+              <span>SPCI 100% Auditado</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#68D346]" />
+              <span>Frotas 4x4 em Prontidão</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#68D346]" />
+              <span>Despacho CAD em Tempo Real</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#68D346]" />
+              <span>ePCR Prontuário Clínico</span>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      {/* 4. SEÇÃO BENTO GRID DE SERVIÇOS (QUIET LUXURY BENTO ARCHITECTURE) */}
-      <section id="bento-servicos" className="py-16 md:py-24 px-6 max-w-7xl mx-auto relative z-10">
+      {/* 4. OS 4 PILARES DO ECOSSISTEMA INTEGRADO (BENTO GRID 4 CARDS) */}
+      <section id="pilares" className="py-16 md:py-24 px-6 max-w-7xl mx-auto relative z-10">
         
         {/* Cabeçalho de Seção */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-slate-200 dark:border-slate-800 pb-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-slate-200 dark:border-zinc-800 pb-6 text-left">
           <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase text-red-600 dark:text-red-500 tracking-widest">
-              ARQUITETURA DE SERVIÇOS // BENTO MATRIX
+            <span className="text-[10px] font-black uppercase text-[#68D346] tracking-widest">
+              ARQUITETURA DE MISSÃO CRÍTICA // 4 PILARES
             </span>
-            <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight font-['Hanken_Grotesk']">
-              Módulos Integrados de Conformidade NBR
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-['Hanken_Grotesk']">
+              Pilares do Ecossistema Integrado SIGER Master
             </h2>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-sans max-w-md mt-2 md:mt-0">
-            Estrutura modular de gerenciamento de ativos de combate a incêndio com sincronia híbrida local e cloud.
+          <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans max-w-md mt-2 md:mt-0">
+            Superando a gestão pontual de extintores para entregar governança total de combate, frotas de resgate, despacho tático e suporte médico pré-hospitalar.
           </p>
         </div>
 
-        {/* BENTO GRID ASSIMÉTRICO 4 COLUNAS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        {/* BENTO GRID 4 CARDS INTERATIVOS (CYBER-METÁLICOS) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           
-          {/* CARD BENTO 1: HERO CARD (2 COLUNAS x 2 LINHAS) */}
+          {/* PILAR 1: ENGENHARIA DE PREVENÇÃO & ATIVOS (SPCI) */}
           <motion.div 
-            whileHover={{ y: -4 }}
-            className="lg:col-span-2 lg:row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 relative overflow-hidden flex flex-col justify-between group"
+            whileHover={{ y: -6 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 dark:bg-red-600/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
 
-            <div className="space-y-6 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/60 flex items-center justify-center text-red-600 dark:text-red-500 shadow-sm">
-                <FileText className="w-7 h-7" />
+            <div className="space-y-5 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-sm">
+                  <Flame className="w-7 h-7" />
+                </div>
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
+                  PILAR 01 // SPCI
+                </span>
               </div>
-              <div className="space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-widest text-red-600 dark:text-red-500">MÓDULO CENTRAL</span>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide font-['Hanken_Grotesk']">
-                  Automação de Laudos NBR 12962 & Checklist Dinâmico
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
+                  🧯 ENGENHARIA DE PREVENÇÃO & ATIVOS (SPCI)
                 </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-                  Inspeções de campo por item normativo com marcação individual de conformidade, registro de inconformidades com histórico temporal e upload duplo de evidências fotográficas diretamente da câmera.
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
+                  Gestão de extintores, hidrantes, bombas e sistemas fixos. Rastreabilidade com QR Code híbrido, rotinas NBR 12962 e histórico pericial de recargas.
                 </p>
               </div>
             </div>
 
-            {/* Numerais Tabulares e Indicadores de Alta Fidelidade */}
-            <div className="pt-8 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-2 gap-4 relative z-10">
-              <div className="space-y-1">
-                <span className="text-[9px] font-extrabold uppercase text-slate-400">Precisão dos Laudos</span>
-                <p className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">100.0%</p>
-              </div>
-              <div className="space-y-1">
-                <span className="text-[9px] font-extrabold uppercase text-slate-400">Evidências por Quesito</span>
-                <p className="text-2xl font-black text-red-600 dark:text-red-500 font-mono">02 Fotos</p>
-              </div>
+            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
+              <span className="font-bold text-[#68D346]">✓ ABNT NBR 12962 / 13714</span>
+              <span>• Rastreio 100% Inmetro</span>
+              <span>• Laudo Fotográfico Duplo</span>
             </div>
           </motion.div>
 
-          {/* CARD BENTO 2: GESTÃO DE EXTINTORES (1 COLUNA x 2 LINHAS) */}
+          {/* PILAR 2: FROTAS DE EMERGÊNCIA & TELEMETRIA METROLÓGICA */}
           <motion.div 
-            whileHover={{ y: -4 }}
-            className="lg:col-span-1 lg:row-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+            whileHover={{ y: -6 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
           >
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 flex items-center justify-center text-amber-600 dark:text-amber-500 shadow-sm">
-                <Flame className="w-6 h-6" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
+
+            <div className="space-y-5 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shadow-sm">
+                  <Truck className="w-7 h-7" />
+                </div>
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
+                  PILAR 02 // FROTA
+                </span>
               </div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 block">GESTÃO DE PARQUE</span>
-              <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide font-['Hanken_Grotesk']">
-                Parque de Extintores & Inmetro
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-                Rastreio completo de selos Inmetro, chassi, peso, agente extintor (AP, CO2, PQS), validade de recarga e vencimento quinquenal de teste hidrostático.
-              </p>
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
+                  🚑 FROTAS DE EMERGÊNCIA & TELEMETRIA METROLÓGICA
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
+                  Controle de prontidão de ambulâncias e caminhonetes 4x4. Telemetria antifraude de abastecimento, auditoria de pneus TWI com catálogo de fábrica e histórico de OS.
+                </p>
+              </div>
             </div>
 
-            <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-2 text-[10px] font-mono">
-              <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/60">
-                <span className="text-slate-500">AP / CO2 / PQS</span>
-                <span className="font-bold text-slate-900 dark:text-slate-100">Homologados</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-slate-500">Ciclo Recarga</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">12 Meses</span>
-              </div>
+            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
+              <span className="font-bold text-[#68D346]">✓ Resolução CONTRAN 558/80</span>
+              <span>• Auditoria TWI em mm</span>
+              <span>• Validação Antifraude</span>
             </div>
           </motion.div>
 
-          {/* CARD BENTO 3: RONDA DE CAMPO & PWA (1 COLUNA x 1 LINHA) */}
+          {/* PILAR 3: CENTRAL DE COMANDO & DESPACHO (CAD / CECOM) */}
           <motion.div 
-            whileHover={{ y: -4 }}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 space-y-4"
+            whileHover={{ y: -6 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
           >
-            <div className="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-900/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shadow-sm">
-              <Smartphone className="w-5 h-5" />
-            </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400 block">PWA OFFLINE</span>
-            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide font-['Hanken_Grotesk']">
-              Ronda de Campo Offline-First
-            </h3>
-            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-sans leading-normal">
-              Operação de campo sem internet no celular. Sincronia transparente com IndexedDB assim que a rede for restaurada.
-            </p>
-          </motion.div>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
 
-          {/* CARD BENTO 4: INTELIGÊNCIA ARTIFICIAL SPCI (1 COLUNA x 1 LINHA) */}
-          <motion.div 
-            whileHover={{ y: -4 }}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 space-y-4"
-          >
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
-              <Bot className="w-5 h-5" />
-            </div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 block">ASSISTENTE IA</span>
-            <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide font-['Hanken_Grotesk']">
-              SPCI Copilot Inteligente
-            </h3>
-            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-sans leading-normal">
-              Análise preventiva de vencimentos, consulta instantânea a exigências NBR e relatórios executivos gerados por IA.
-            </p>
-          </motion.div>
-
-          {/* CARD BENTO 5: HIDRANTES & ABRIGOS (2 COLUNAS x 1 LINHA) */}
-          <motion.div 
-            whileHover={{ y: -4 }}
-            className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-          >
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Droplets className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">REDE DE HIDRANTES</span>
+            <div className="space-y-5 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm">
+                  <Radio className="w-7 h-7" />
+                </div>
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
+                  PILAR 03 // CAD / CECOM
+                </span>
               </div>
-              <h3 className="text-base font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide font-['Hanken_Grotesk']">
-                Hidrantes, Mangueiras & Abrigos NBR 13714
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-sans max-w-md">
-                Vistoria técnica de acoplamentos, esguichos reguláveis, chaves Storz e estado das mangueiras de incêndio Tipo 1 a 5.
-              </p>
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
+                  🛰️ CENTRAL DE COMANDO & DESPACHO (CAD / CECOM)
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
+                  Mapa GIS com geolocalização e status operacional de viaturas em tempo real. Rastreamento da linha do tempo da ocorrência desde o acionamento até a chegada ao hospital.
+                </p>
+              </div>
             </div>
-            <div className="px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[10px] font-mono shrink-0">
-              <span className="block text-slate-400 font-bold">Pressão Residual</span>
-              <span className="text-sm font-extrabold text-blue-600 dark:text-blue-400">4.5 kgf/cm²</span>
+
+            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
+              <span className="font-bold text-[#68D346]">✓ Mapa Tático em Tempo Real</span>
+              <span>• Linha do Tempo Ocorrência</span>
+              <span>• SLA de Resposta</span>
             </div>
           </motion.div>
 
-          {/* CARD BENTO 6: CASA DE BOMBAS & SINALIZAÇÃO (2 COLUNAS x 1 LINHA) */}
+          {/* PILAR 4: PRONTUÁRIO APH VIVO (ePCR) */}
           <motion.div 
-            whileHover={{ y: -4 }}
-            className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+            whileHover={{ y: -6 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
           >
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">SISTEMAS ESPECIAIS</span>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
+
+            <div className="space-y-5 relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm">
+                  <HeartPulse className="w-7 h-7" />
+                </div>
+                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
+                  PILAR 04 // APH VIVO
+                </span>
               </div>
-              <h3 className="text-base font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide font-['Hanken_Grotesk']">
-                Casa de Bombas, Sinalização NBR & Iluminação
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-sans max-w-md">
-                Monitoramento de motobombas (Jockey, Elétrica e Diesel), placas fotoluminescentes e blocos autônomos de emergência.
-              </p>
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
+                  🩺 PRONTUÁRIO APH VIVO (ePCR)
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
+                  Ficha de atendimento pré-hospitalar digital atualizada em tempo real pela brigada na cena. Registro dinâmico de sinais vitais, protocolos clínicos e consumo de insumos médicos.
+                </p>
+              </div>
             </div>
-            <div className="px-4 py-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-[10px] font-mono shrink-0">
-              <span className="block text-slate-400 font-bold">Modo de Operação</span>
-              <span className="text-sm font-extrabold text-purple-600 dark:text-purple-400">Automático 🟢</span>
+
+            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
+              <span className="font-bold text-[#68D346]">✓ ePCR de Cena Digital</span>
+              <span>• Monitor de Sinais Vitais</span>
+              <span>• Rastreio de Farmácia & Medicamentos</span>
             </div>
           </motion.div>
 
         </div>
       </section>
 
-      {/* 5. SEÇÃO DE MÉTRICAS & GOVERNANÇA (HIGH-FIDELITY TYPOGRAPHY) */}
-      <section id="metricas" className="py-16 bg-white dark:bg-slate-900 border-y border-slate-200 dark:border-slate-800 transition-colors">
+      {/* 5. SEÇÃO DE MÉTRICAS & GOVERNANÇA (METÁLICO / CYBER INDUSTRIAL) */}
+      <section id="metricas" className="py-16 bg-white dark:bg-[#14161a] border-y border-slate-200 dark:border-zinc-800 transition-colors">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div className="space-y-2">
-            <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight">100%</p>
-            <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">Conformidade ABNT</span>
+            <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white font-mono tracking-tight">100%</p>
+            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 tracking-wider block">
+              Conformidade ABNT & CONTRAN
+            </span>
           </div>
           <div className="space-y-2">
-            <p className="text-3xl md:text-4xl font-black text-red-600 dark:text-red-500 font-mono tracking-tight">Offline</p>
-            <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">Operação Sem Internet</span>
+            <p className="text-3xl md:text-4xl font-black text-[#68D346] font-mono tracking-tight">Zero-Lag</p>
+            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 tracking-wider block">
+              Telemetria & Despacho em Campo
+            </span>
           </div>
           <div className="space-y-2">
-            <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight">&lt; 2s</p>
-            <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">Emissão de Laudo</span>
+            <p className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white font-mono tracking-tight">&lt; 2s</p>
+            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 tracking-wider block">
+              Emissão de Laudos & ePCR
+            </span>
           </div>
           <div className="space-y-2">
-            <p className="text-3xl md:text-4xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">256-Bit</p>
-            <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block">Criptografia RLS / Banco de Dados</span>
+            <p className="text-3xl md:text-4xl font-black text-[#B7F365] font-mono tracking-tight">256-Bit</p>
+            <span className="text-[10px] font-bold uppercase text-slate-500 dark:text-zinc-400 tracking-wider block">
+              Criptografia RLS / Governança LGPD
+            </span>
           </div>
         </div>
       </section>
 
-      {/* 5.5 SEÇÃO DE TABELA NORMATIVA NBR (GEO / CITATION ENGINE OPTIMIZATION) */}
-      <section id="prazos-normativos" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 border-b border-slate-200 dark:border-slate-800 pb-6">
+      {/* 6. TABELA NORMATIVA & CONFORMIDADE REGULATÓRIA */}
+      <section id="normas" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 border-b border-slate-200 dark:border-zinc-800 pb-6 text-left">
           <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase text-red-600 dark:text-red-500 tracking-widest flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5" /> CONFORMIDADE REGULATÓRIA // ABNT & INMETRO
+            <span className="text-[10px] font-black uppercase text-[#68D346] tracking-widest flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5" /> DIRETRIZES TÉCNICAS E LEGISLAÇÃO
             </span>
-            <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight font-['Hanken_Grotesk']">
-              Prazos e Ciclos Normativos de Inspeção SPCI
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-['Hanken_Grotesk']">
+              Padrões Técnicos Unificados do SIGER Master
             </h2>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-sans max-w-md mt-2 md:mt-0">
-            Regras de periodicidade técnica padronizadas segundo as normas oficiais brasileiras e portarias de segurança contra incêndio.
+          <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans max-w-md mt-2 md:mt-0">
+            Governança rigorosa alinhada às normativas nacionais de combate a incêndio, trânsito e socorro de emergência.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-3">
-            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/60">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+          <div className="p-6 bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm space-y-3">
+            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-red-50 dark:bg-red-950/60 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/60 font-mono">
               Mensal // Nível 1
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-slate-100 font-['Hanken_Grotesk'] uppercase">
+            <h3 className="text-base font-black text-slate-900 dark:text-white font-['Hanken_Grotesk'] uppercase">
               Inspeção Visual NBR 12962
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-              Exame visual e operacional do extintor: verificação de lacre, trava, manômetro na faixa verde, desobstrução do acesso e integridade do selo Inmetro.
+            <p className="text-xs text-slate-600 dark:text-zinc-400 font-sans leading-relaxed">
+              Exame visual e operacional do extintor: verificação de lacre, trava, manômetro na faixa verde, desobstrução e integridade do selo Inmetro.
             </p>
           </div>
 
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-3">
-            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60">
+          <div className="p-6 bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm space-y-3">
+            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-900/60 font-mono">
+              Semanal // Frota
+            </div>
+            <h3 className="text-base font-black text-slate-900 dark:text-white font-['Hanken_Grotesk'] uppercase">
+              Telemetria TWI CONTRAN 558
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-zinc-400 font-sans leading-relaxed">
+              Medição micrométrica de profundidade de sulco de pneus, calibração dinâmica e auditoria de checklist veicular obrigatório.
+            </p>
+          </div>
+
+          <div className="p-6 bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm space-y-3">
+            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/60 font-mono">
               Anual // Nível 2
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-slate-100 font-['Hanken_Grotesk'] uppercase">
-              Manutenção e Recarga
+            <h3 className="text-base font-black text-slate-900 dark:text-white font-['Hanken_Grotesk'] uppercase">
+              Recarga & Hidrantes NBR 13714
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-              Desmontagem em oficina credenciada pelo Inmetro: troca ou pesagem da carga extintora (PQS, CO2, Água), substituição de componentes e novo anel de identificação.
+            <p className="text-xs text-slate-600 dark:text-zinc-400 font-sans leading-relaxed">
+              Desmontagem e recarga de cilindros, auditoria de mangueiras tipo 1 a 5, esguichos reguláveis e ensaios hidrostáticos periódicos.
             </p>
           </div>
 
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-3">
-            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900/60">
-              5 Anos // Nível 3
+          <div className="p-6 bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-sm space-y-3">
+            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-[#1C4E26]/40 text-[#B7F365] border border-[#68D346]/40 font-mono">
+              Contínuo // Tempo Real
             </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-slate-100 font-['Hanken_Grotesk'] uppercase">
-              Teste Hidrostático
+            <h3 className="text-base font-black text-slate-900 dark:text-white font-['Hanken_Grotesk'] uppercase">
+              Prontuário APH & CAD CECOM
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-              Ensaio de pressão hidrostática máxima de prova no cilindro para atestar a resistência mecânica e evitar riscos de ruptura estrutural.
-            </p>
-          </div>
-
-          <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm space-y-3">
-            <div className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-900/60">
-              Semestral // NBR 13714
-            </div>
-            <h3 className="text-base font-black text-slate-900 dark:text-slate-100 font-['Hanken_Grotesk'] uppercase">
-              Rede de Hidrantes
-            </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-              Auditoria de mangueiras tipo 1 a 5, teste de vedação de válvulas globo, integridade dos esguichos reguláveis e aferição de pressão dinâmica na casa de bombas.
+            <p className="text-xs text-slate-600 dark:text-zinc-400 font-sans leading-relaxed">
+              Monitoramento ininterrupto de despachos táticos, registro digital de sinais vitais e prontuário de atendimento de emergência na cena.
             </p>
           </div>
         </div>
       </section>
 
-      {/* 5.6 SEÇÃO VISÍVEL DE PERGUNTAS FREQUENTES (FAQ) - COMPLIANCE GOOGLE RICH RESULTS */}
+      {/* 7. PERGUNTAS FREQUENTES (FAQ TÉCNICO) */}
       <section id="faq" className="py-16 md:py-20 px-6 max-w-4xl mx-auto">
         <div className="text-center space-y-3 mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-400 text-[10px] uppercase font-bold tracking-widest rounded-full">
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>BASE DE CONHECIMENTO // FAQ TÉCNICO</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 text-[10px] uppercase font-bold tracking-widest rounded-full">
+            <HelpCircle className="w-3.5 h-3.5 text-[#68D346]" />
+            <span>BASE DE CONHECIMENTO // FAQ OPERACIONAL</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight font-['Hanken_Grotesk']">
-            Perguntas Frequentes sobre Governança SPCI
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-['Hanken_Grotesk']">
+            Perguntas Frequentes sobre o SIGER Master
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-sans max-w-md mx-auto">
-            Respostas técnicas diretas sobre normas de combate a incêndio, laudos e vistorias digitais.
+          <p className="text-xs text-slate-500 dark:text-zinc-400 font-sans max-w-md mx-auto">
+            Respostas diretas sobre governança operacional, frotas de emergência e laudos normativos.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 text-left">
           {faqItems.map((item, idx) => {
             const isOpen = openFaqIndex === idx;
             return (
               <div 
                 key={idx}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm transition-all"
+                className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm transition-all"
               >
                 <button
                   onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                  className="w-full p-6 text-left flex items-center justify-between gap-4 cursor-pointer bg-transparent border-none text-slate-900 dark:text-slate-100"
+                  className="w-full p-6 text-left flex items-center justify-between gap-4 cursor-pointer bg-transparent border-none text-slate-900 dark:text-white"
                 >
                   <span className="font-bold text-sm md:text-base font-['Hanken_Grotesk'] leading-snug">
                     {item.q}
                   </span>
-                  <div className={`p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-red-600 dark:text-red-500' : ''}`}>
+                  <div className={`p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#68D346]' : ''}`}>
                     <ChevronDown className="w-4 h-4" />
                   </div>
                 </button>
@@ -457,7 +488,7 @@ export default function QuietLuxuryHome() {
                       transition={{ duration: 0.25 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-6 pb-6 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs md:text-sm text-slate-600 dark:text-slate-300 font-sans leading-relaxed">
+                      <div className="px-6 pb-6 pt-1 border-t border-slate-100 dark:border-zinc-800/80 text-xs md:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
                         {item.a}
                       </div>
                     </motion.div>
@@ -469,66 +500,30 @@ export default function QuietLuxuryHome() {
         </div>
       </section>
 
-      {/* 6. CALL TO ACTION FINAL */}
+      {/* 8. CHAMADA DE FECHAMENTO (BANNER PRÉ-FOOTER MANDATÓRIO) */}
       <section className="py-20 md:py-28 px-6 max-w-5xl mx-auto text-center space-y-8">
-        <div className="w-16 h-16 rounded-3xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/60 flex items-center justify-center text-red-600 dark:text-red-500 mx-auto shadow-md">
+        <div className="w-16 h-16 rounded-3xl bg-[#1C4E26]/30 border border-[#68D346]/50 flex items-center justify-center text-[#68D346] mx-auto shadow-[0_0_25px_rgba(104,211,70,0.3)]">
           <ShieldCheck className="w-8 h-8" />
         </div>
-        <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight font-['Hanken_Grotesk']">
-          Pronto para Elevar a Segurança da sua Planta?
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-['Hanken_Grotesk'] max-w-3xl mx-auto">
+          PRONTO PARA ELEVAR O PADRÃO DE RESPOSTA A EMERGÊNCIAS DA SUA PLANTA?
         </h2>
-        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 font-sans max-w-xl mx-auto leading-relaxed">
-          Acesse o Cockpit SIGER Master com suas credenciais corporativas e gerencie todo o parque de emergência, combate e frota com alto padrão de governança.
+        <p className="text-xs md:text-sm text-slate-600 dark:text-zinc-300 font-sans max-w-2xl mx-auto leading-relaxed">
+          Acesse o Cockpit SIGER Master com suas credenciais corporativas e gerencie todo o ecossistema de segurança, frota tática e atendimento pré-hospitalar com governança absoluta.
         </p>
-        <div>
+        <div className="pt-2">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#282A2F] to-[#1E2024] hover:from-[#3C3F45] hover:to-[#282A2F] text-white border border-[#68D346]/40 hover:border-[#68D346] font-black text-xs uppercase tracking-widest rounded-xl shadow-[0_0_15px_rgba(104,211,70,0.2)] hover:shadow-[0_0_25px_rgba(104,211,70,0.4)] transition-all duration-300 active:scale-95"
+            className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#1C4E26] via-[#246831] to-[#1C4E26] hover:from-[#246831] hover:to-[#2e7d3d] text-white border border-[#68D346]/60 font-black text-xs uppercase tracking-widest rounded-xl shadow-[0_0_25px_rgba(104,211,70,0.4)] hover:shadow-[0_0_35px_rgba(183,243,101,0.6)] transition-all duration-300 active:scale-95 cursor-pointer"
           >
-            <span className="text-[#68D346]">ENTRAR NO COCKPIT SIGER</span>
-            <ArrowRight className="w-4 h-4 text-[#68D346]" />
+            <span className="text-[#B7F365]">ENTRAR NO COCKPIT SIGER MASTER</span>
+            <ArrowRight className="w-4 h-4 text-[#B7F365]" />
           </Link>
         </div>
       </section>
 
-      {/* 7. RODAPÉ CORPORATIVO & E-E-A-T */}
-      <footer className="border-t border-slate-200/80 dark:border-slate-800/80 bg-white/40 dark:bg-slate-950/40 backdrop-blur-md pt-12 pb-8 px-6 mt-12">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
-          <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-black tracking-widest text-[#68D346] uppercase">SIGER MASTER</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[#68D346] border border-[#68D346]/30 font-mono">v2.5 • JIMMP Info</span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">
-              Plataforma de inteligência e governança operacional para Sistemas de Proteção Contra Incêndio, assegurando conformidade com normas técnicas e prontidão operacional contínua.
-            </p>
-            <p className="text-[11px] text-slate-600 dark:text-slate-400 font-mono">
-              Referência Normativa: ABNT NBR 12962 • NBR 13714 • NBR 10898 • ITs Corpos de Bombeiros
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Acesso Rápido</p>
-            <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-              <li><Link href="#prazos-normativos" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">Prazos e Normas Técnicas</Link></li>
-              <li><Link href="#faq" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">Perguntas Frequentes (FAQ)</Link></li>
-              <li><Link href="/consulta" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">Consulta Pública de Ativo</Link></li>
-              <li><Link href="/public/ativos" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">Catálogo de Equipamentos</Link></li>
-            </ul>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Segurança & Governança</p>
-            <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
-              <li><Link href="/login" className="hover:text-red-600 dark:hover:text-red-400 transition-colors">Cockpit Administrativo</Link></li>
-              <li className="text-[11px] text-slate-600 dark:text-slate-400">Auditoria & Rastreabilidade QR Code</li>
-              <li className="text-[11px] text-slate-600 dark:text-slate-400">Inspeções Nível 1, 2 e 3 (NBR 12962)</li>
-            </ul>
-          </div>
-        </div>
-
-        <AppFooter variant="flow" />
-      </footer>
+      {/* 9. RODAPÉ BENTO CORPORATIVO EXECUTIVO (COM REACT PORTAL LEGAL MODALS) */}
+      <Footer variant="full" />
 
     </div>
   );
