@@ -1,25 +1,39 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSpci } from '../context/SpciContext';
-import { Shield, Key, Mail, AlertTriangle, ArrowRight, Eye, EyeOff, CheckSquare, Square } from 'lucide-react';
-import AppFooter from '../components/AppFooter';
-import { SYSTEM_VERSION } from '../config/version';
+import { 
+  Key, 
+  Mail, 
+  AlertTriangle, 
+  ArrowRight, 
+  Eye, 
+  EyeOff, 
+  CheckSquare, 
+  Square,
+  ShieldCheck,
+  Flame,
+  Truck,
+  Radio,
+  HeartPulse
+} from 'lucide-react';
+import LegalPolicyModal, { PolicyModalType } from '../components/legal/LegalPolicyModal';
+import { SYSTEM_VERSION, COMPANY_NAME, COPYRIGHT_YEAR } from '../config/version';
 import { supabase } from '@/lib/supabaseClient';
 
-// Status messages for interactive loading
+// Mensagens dinâmicas de conexão segura
 const statusMessages = [
-  'Validando chaves criptográficas...',
-  'Resolvendo endpoint do Banco de Dados...',
+  'Validando chaves criptográficas TLS 1.3...',
+  'Resolvendo endpoint de banco de dados SIGER...',
   'Mapeando políticas de Row Level Security (RLS)...',
-  'Conectando chaves assimétricas...',
-  'Iniciando handshake seguro com servidor...',
-  'Sincronizando cache local IndexedDB...',
-  'Carregando credenciais corporativas...',
-  'Acesso concedido. Bem-vindo ao SIGER!'
+  'Autenticando credenciais no cofre de segurança...',
+  'Iniciando handshake seguro com o servidor...',
+  'Sincronizando cache local de prontidão...',
+  'Concedendo privilégios de acesso ao Cockpit...',
+  'Acesso autorizado. Bem-vindo ao SIGER Master!'
 ];
 
 export default function LoginClient() {
@@ -27,7 +41,6 @@ export default function LoginClient() {
   const { 
     currentUser, 
     userProfile,
-    authChecking, 
     handleCredentialsLogin,
     handleSystemLogout
   } = useSpci();
@@ -36,23 +49,29 @@ export default function LoginClient() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  
+  // Modal de Recuperação de Senha
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMsg, setForgotMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Estados de Operação e Feedback
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
   const [progress, setProgress] = useState(0);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  const redirectedRef = React.useRef(false);
+  const redirectedRef = useRef(false);
+
+  // Modal de Políticas Legais (Privacidade e Termos via React Portal)
+  const [legalModalType, setLegalModalType] = useState<PolicyModalType>(null);
 
   // Tratamento de parâmetros de sessão e prevenção de loops de redirecionamento
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('unauthorized') === '1') {
-        // Redirecionado pelo servidor por falta de sessão ativa: limpa cookies locais residuais
         if (typeof document !== 'undefined') {
           document.cookie = 'spci_session_token=; path=/; max-age=0';
           document.cookie = 'spci_user_role=; path=/; max-age=0';
@@ -67,11 +86,11 @@ export default function LoginClient() {
     if (typeof window !== 'undefined' && window.location.hash) {
       const hash = window.location.hash;
       if (hash.includes('error=') || hash.includes('otp_expired') || hash.includes('invalid')) {
-        setErrorMsg('⚠️ O link de e-mail expirou ou é inválido. Por favor, utilize suas credenciais corporativas de login.');
+        setErrorMsg('O link de e-mail expirou ou é inválido. Por favor, utilize suas credenciais corporativas.');
         window.history.replaceState(null, '', window.location.pathname);
       } else if (hash.includes('type=recovery')) {
         setShowForgotModal(true);
-        setForgotMsg({ type: 'success', text: 'Link de recuperação identificado! Digite seu e-mail para atualizar a nova senha.' });
+        setForgotMsg({ type: 'success', text: 'Link de recuperação identificado! Digite seu e-mail para definir a nova senha.' });
         window.history.replaceState(null, '', window.location.pathname);
       } else if (hash.includes('type=signup') || hash.includes('access_token')) {
         router.push('/dashboard' + hash);
@@ -79,37 +98,33 @@ export default function LoginClient() {
     }
   }, [router]);
 
-  // Loading animation simulation
+  // Simulação de progresso criptográfico de autenticação
   useEffect(() => {
     let progressInterval: NodeJS.Timeout;
     let messageInterval: NodeJS.Timeout;
 
     if (loading) {
-      setTimeout(() => {
-        setProgress(0);
-        setLoadingStatus(statusMessages[0]);
-      }, 0);
+      setProgress(0);
+      setLoadingStatus(statusMessages[0]);
 
-      // Progress bar animation
       progressInterval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
             clearInterval(progressInterval);
             return 100;
           }
-          const step = Math.floor(Math.random() * 8) + 4; // random increments
+          const step = Math.floor(Math.random() * 10) + 6;
           return Math.min(prev + step, 100);
         });
-      }, 150);
+      }, 140);
 
-      // Status text message rotation
       let currentMsgIndex = 0;
       messageInterval = setInterval(() => {
         if (currentMsgIndex < statusMessages.length - 1) {
           currentMsgIndex++;
           setLoadingStatus(statusMessages[currentMsgIndex]);
         }
-      }, 400);
+      }, 380);
 
       return () => {
         clearInterval(progressInterval);
@@ -132,10 +147,10 @@ export default function LoginClient() {
         setIsRedirecting(true);
         setTimeout(() => {
           window.location.href = '/dashboard';
-        }, 200);
+        }, 220);
       } else {
         setLoading(false);
-        setErrorMsg('Credenciais inválidas.');
+        setErrorMsg('Credenciais inválidas. Verifique seu usuário e senha corporativos.');
       }
     } catch (err: any) {
       setLoading(false);
@@ -146,9 +161,9 @@ export default function LoginClient() {
         raw.toLowerCase().includes('networkerror') ||
         raw.toLowerCase().includes('enotfound')
       ) {
-        setErrorMsg('Não foi possível conectar ao servidor Supabase. O banco de dados pode estar pausado por inatividade ou sem acesso à rede.');
+        setErrorMsg('Não foi possível conectar ao banco de dados Supabase. Verifique a conexão com a internet.');
       } else {
-        setErrorMsg(raw || 'Erro ao efetuar login.');
+        setErrorMsg(raw || 'Erro ao efetuar autenticação corporativa.');
       }
     }
   };
@@ -167,7 +182,7 @@ export default function LoginClient() {
       } else {
         setForgotMsg({ type: 'success', text: 'E-mail de redefinição enviado! Verifique sua caixa de entrada.' });
       }
-    } catch (err: any) {
+    } catch {
       setForgotMsg({ type: 'error', text: 'Ocorreu um erro ao processar a solicitação.' });
     } finally {
       setForgotLoading(false);
@@ -175,100 +190,135 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between font-mono relative overflow-hidden select-none">
-      
-      {/* Decorative absolute background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
+    <div 
+      translate="no"
+      className="relative min-h-screen w-full flex flex-col justify-between overflow-x-hidden bg-zinc-950 font-sans select-none"
+    >
+      {/* 1. PLANO DE FUNDO FOTOGRÁFICO REALISTA MULTIDOMÍNIO */}
+      <div 
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0 transform scale-[1.01] transition-transform duration-1000 ease-out"
+        style={{ backgroundImage: `url('/login-bg.png')` }}
+      />
 
-      {/* Main Container */}
-      <div className="flex-1 flex flex-col md:flex-row w-full min-h-screen z-10">
+      {/* Degradê de Vinheta & Proteção de Contraste Glass */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/70 to-zinc-950/85 pointer-events-none" />
+      <div className="fixed inset-0 z-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/60 pointer-events-none" />
+
+      {/* 2. CONTEÚDO PRINCIPAL (SPLIT DESKTOP / FLUIDO MOBILE) */}
+      <div className="relative z-10 flex-1 flex flex-col lg:flex-row w-full max-w-7xl mx-auto px-5 sm:px-8 py-8 sm:py-12 items-center justify-between gap-10 lg:gap-14">
         
-        {/* LEFT COLUMN: Industrial Conceptual & Compliance (Dominante 65%) */}
-        <div className="hidden md:flex md:w-[62%] lg:w-[65%] relative flex-col justify-between p-12 overflow-hidden border-r border-slate-200 dark:border-slate-900">
-          {/* Background image with high contrast brand gradient overlay */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105 filter brightness-[0.7] dark:brightness-[0.4] saturate-[0.8] transition-transform duration-10000 ease-out" 
-            style={{ backgroundImage: `url('/login-bg.png')` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-transparent dark:from-slate-950 dark:via-slate-950/80 dark:to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent dark:from-slate-950" />
-
-          {/* Logo Brand top - JIMMP Info */}
-          <div className="relative flex items-center gap-5">
-            <Image 
-              src="/assets/branding/logo-jimmp-info.png" 
-              alt="Logo JIMMP Info" 
-              width={180}
-              height={56}
-              priority
-              className="h-14 lg:h-16 w-auto object-contain brightness-110 drop-shadow-[0_4px_16px_rgba(104,211,70,0.45)] transition-transform hover:scale-105" 
-            />
-            <div>
-              <span className="text-[10px] text-[#68D346] font-bold tracking-[0.2em] block uppercase leading-none">PLATAFORMA</span>
-              <span className="text-base font-black text-white tracking-tight leading-none mt-1 block font-mono">SIGER MASTER</span>
-            </div>
-          </div>
-
-          {/* Title and Legal Compliance middle/bottom */}
-          <div className="relative space-y-6 max-w-xl mt-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#1C4E26]/40 border border-[#68D346]/50 text-[#B7F365] text-[10px] uppercase font-extrabold tracking-wider rounded-lg backdrop-blur-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#68D346] animate-pulse"></span>
-              Conformidade Legal NBR 12962 / 13434 / 13714
-            </div>
-            <div className="space-y-3">
-              <p className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tight leading-tight font-['Hanken_Grotesk']">
-                Gestão & Governança de Combate a Incêndio
-              </p>
-              <p className="text-xs text-slate-200 font-sans leading-relaxed">
-                Centralização de laudos técnicos, vistorias em tempo real, rastreabilidade offline-first de ativos e relatórios executivos para governança predial e industrial.
-              </p>
-            </div>
-          </div>
-
-          {/* Footer stats bottom */}
-          <div className="relative pt-6 border-t border-slate-800/80 flex items-center justify-start text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-12">
-            <span>SISTEMA INTEGRADO DE GESTÃO DE EMERGÊNCIA & RESGATE • JIMMP INFO</span>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: Light-First / Dual Theme Card (35%) */}
-        <div className="md:w-[38%] lg:w-[35%] flex-1 flex flex-col justify-between px-6 py-8 sm:px-10 bg-white/90 dark:bg-slate-950/65 backdrop-blur-xl border-l border-slate-200 dark:border-white/10 shadow-2xl relative z-20">
+        {/* LADO ESQUERDO: COMANDO UNIFICADO & NARRATIVA INSTITUCIONAL */}
+        <div className="w-full lg:w-[58%] flex flex-col justify-between space-y-8 text-left">
           
-          <div className="my-auto w-full max-w-sm mx-auto space-y-8">
-            {/* Header info for mobile (logo + branding) */}
-            <div className="md:hidden flex items-center gap-3 mb-6">
+          {/* Cabeçalho de Marca: Logo JIMMP Info + Identificação do Sistema */}
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="p-0 bg-transparent">
               <Image 
                 src="/assets/branding/logo-jimmp-info.png" 
                 alt="Logo JIMMP Info" 
-                width={120}
-                height={40}
-                className="h-10 w-auto object-contain drop-shadow-[0_2px_10px_rgba(104,211,70,0.35)]" 
+                width={200}
+                height={60}
+                priority
+                className="h-12 sm:h-14 md:h-16 w-auto object-contain brightness-110 drop-shadow-[0_4px_16px_rgba(104,211,70,0.35)] transition-transform hover:scale-105" 
               />
-              <div>
-                <span className="text-[8px] text-[#68D346] font-bold tracking-[0.2em] block uppercase leading-none">PLATAFORMA</span>
-                <span className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mt-1 block font-mono">SIGER MASTER</span>
-              </div>
+            </div>
+            <div className="border-l border-zinc-700/80 pl-4 py-1">
+              <span className="text-[10px] font-black text-[#68D346] tracking-[0.25em] block uppercase leading-none font-mono">
+                ECOSSISTEMA OFICIAL
+              </span>
+              <span className="text-sm sm:text-base font-black text-white tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">
+                SIGER MASTER
+              </span>
+            </div>
+          </div>
+
+          {/* Slogan & Comunicação Institucional (Idêntico à Home Page) */}
+          <div className="space-y-5 max-w-2xl">
+            {/* Tag de Missão Crítica */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900/80 border border-[#68D346]/40 text-[#B7F365] text-[10.5px] font-mono font-bold tracking-widest backdrop-blur-md shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#68D346] animate-pulse shadow-[0_0_8px_#68D346]" />
+              <span className="uppercase">SIGER MASTER • SISTEMA INTEGRADO DE GESTÃO DE EMERGÊNCIA & RESGATE</span>
             </div>
 
-            <div className="space-y-1 text-left">
-              <h1 className="text-xl font-bold uppercase text-slate-900 dark:text-slate-100 tracking-wider">Acessar Cockpit SIGER</h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-sans">Entre com suas credenciais corporativas SPCI.</p>
+            {/* Slogan Principal */}
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl font-black text-white uppercase tracking-tight leading-[1.12] font-['Hanken_Grotesk']">
+              COMANDO UNIFICADO DE EMERGÊNCIA, RESGATE E{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#68D346] via-[#85e865] to-[#B7F365] drop-shadow-[0_0_20px_rgba(104,211,70,0.35)]">
+                PRONTIDÃO OPERACIONAL
+              </span>
+            </h1>
+
+            {/* Subtítulo Institucional */}
+            <p className="text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
+              Plataforma integrada de inteligência e prontidão para Gestão de Ativos de Prevenção, Frotas Táticas, Central de Despacho (CAD) e Atendimento Pré-Hospitalar (APH).
+            </p>
+
+            {/* Chips dos 4 Pilares Operacionais */}
+            <div className="flex flex-wrap gap-2 pt-2 text-[11px] font-mono text-zinc-200">
+              <div className="px-3 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2">
+                <Flame className="w-3.5 h-3.5 text-[#68D346]" />
+                <span>SPCI 100% Auditado</span>
+              </div>
+              <div className="px-3 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2">
+                <Truck className="w-3.5 h-3.5 text-[#68D346]" />
+                <span>Frotas 4x4 em Prontidão</span>
+              </div>
+              <div className="px-3 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2">
+                <Radio className="w-3.5 h-3.5 text-[#68D346]" />
+                <span>Despacho CAD em Tempo Real</span>
+              </div>
+              <div className="px-3 py-1.5 rounded-lg bg-zinc-900/60 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2">
+                <HeartPulse className="w-3.5 h-3.5 text-[#68D346]" />
+                <span>ePCR Prontuário Clínico</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Assinatura Operacional no Rodapé do Painel Esquerdo */}
+          <div className="pt-2 text-[11px] font-mono text-zinc-400 tracking-wider">
+            BASE OPERACIONAL INTEGRADA // PARAUAPEBAS-PA • JIMMP INFO
+          </div>
+        </div>
+
+        {/* LADO DIREITO: CARD DE CREDENCIAIS EM DARK FROSTED GLASS */}
+        <div className="w-full lg:w-[42%] flex justify-center">
+          <div 
+            className="w-full max-w-md rounded-3xl p-7 sm:p-9 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85),0_0_25px_-5px_rgba(104,211,70,0.15)] relative z-20 backdrop-blur-2xl transition-all"
+            style={{
+              background: 'rgba(24, 24, 27, 0.65)',
+              backdropFilter: 'blur(20px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+              border: '1px solid rgba(255, 255, 255, 0.10)',
+              borderTop: '1px solid rgba(213, 217, 220, 0.28)',
+            }}
+          >
+            {/* Header interno do Card de Login */}
+            <div className="space-y-1.5 text-left mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-wide font-['Hanken_Grotesk']">
+                  Acessar Cockpit
+                </h2>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#68D346] shadow-[0_0_8px_#68D346] animate-pulse" />
+              </div>
+              <p className="text-xs text-zinc-400 font-sans">
+                Entre com suas credenciais corporativas do ecossistema SIGER.
+              </p>
             </div>
 
             {/* Card de Sessão Ativa / Troca Rápida de Conta */}
             {currentUser && (
-              <div className="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 p-4 rounded-2xl space-y-3 text-left shadow-sm">
+              <div className="mb-6 bg-zinc-900/80 border border-[#68D346]/40 p-4 rounded-2xl space-y-3 text-left shadow-sm backdrop-blur-md">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 text-xs font-bold font-['Hanken_Grotesk']">
-                    <span className={`w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 ${isRedirecting ? 'animate-ping' : 'animate-pulse'}`} />
+                  <div className="flex items-center gap-2 text-[#B7F365] text-xs font-bold font-mono">
+                    <span className={`w-2.5 h-2.5 rounded-full bg-[#68D346] shrink-0 ${isRedirecting ? 'animate-ping' : 'animate-pulse'}`} />
                     <span>{isRedirecting ? 'REDIRECIONANDO AO COCKPIT...' : 'SESSÃO ATIVA DETECTADA'}</span>
                   </div>
-                  <span className="text-[9px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-md">
+                  <span className="text-[9px] font-black uppercase bg-[#1C4E26] text-[#B7F365] border border-[#68D346]/40 px-2 py-0.5 rounded-md font-mono">
                     {userProfile?.role || 'Conectado'}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-700 dark:text-slate-300 font-sans leading-relaxed">
-                  Conectado como <strong className="font-mono text-slate-900 dark:text-white">{userProfile?.name || currentUser.displayName || currentUser.email}</strong> ({currentUser.email}).
+                <p className="text-[11px] text-zinc-300 font-sans leading-relaxed">
+                  Conectado como <strong className="font-mono text-white">{userProfile?.name || currentUser.displayName || currentUser.email}</strong> ({currentUser.email}).
                 </p>
                 <div className="flex gap-2 pt-1">
                   <button
@@ -278,9 +328,9 @@ export default function LoginClient() {
                       setIsRedirecting(true);
                       window.location.href = '/dashboard';
                     }}
-                    className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none shadow-md flex items-center justify-center gap-1.5 active:scale-95"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-[#1C4E26] to-[#246831] hover:from-[#246831] hover:to-[#2e7d3d] text-[#B7F365] border border-[#68D346]/50 font-black text-[10.5px] uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5 active:scale-95"
                   >
-                    <span>{isRedirecting ? 'Entrando...' : 'Ir ao Cockpit'}</span> <ArrowRight className="w-3.5 h-3.5" />
+                    <span>{isRedirecting ? 'Entrando...' : 'Ir ao Cockpit'}</span> <ArrowRight className="w-3.5 h-3.5 text-[#B7F365]" />
                   </button>
                   <button
                     type="button"
@@ -295,40 +345,44 @@ export default function LoginClient() {
                         window.history.replaceState(null, '', url.toString());
                       }
                     }}
-                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer border border-slate-200 dark:border-slate-700 active:scale-95"
+                    className="flex-1 py-2.5 bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 hover:text-white font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer border border-zinc-700 active:scale-95"
                   >
-                    Trocar de Conta 🔄
+                    Trocar Conta 🔄
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Error box */}
+            {/* Mensagem de Erro com Alto Contraste */}
             <AnimatePresence>
               {errorMsg && (
                 <motion.div 
                   initial={{ opacity: 0, y: -8 }} 
                   animate={{ opacity: 1, y: 0 }} 
                   exit={{ opacity: 0, y: -8 }}
-                  className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 p-4 flex gap-3 text-red-600 dark:text-red-400 rounded-xl"
+                  className="mb-5 bg-red-950/70 border border-red-500/60 p-3.5 flex gap-3 text-red-300 rounded-xl backdrop-blur-md text-left"
                 >
-                  <AlertTriangle className="w-5 h-5 shrink-0" />
+                  <AlertTriangle className="w-5 h-5 shrink-0 text-red-400 mt-0.5" />
                   <div className="text-[11px] font-bold leading-normal">
-                    <p className="uppercase">Erro de Acesso</p>
-                    <p className="font-sans font-medium mt-0.5">{errorMsg}</p>
+                    <p className="uppercase text-red-200">Falha de Autenticação</p>
+                    <p className="font-sans font-medium mt-0.5 text-zinc-300">{errorMsg}</p>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Formulário de Login */}
+            <form onSubmit={handleSubmit} className="space-y-5 text-left">
+              {/* Campo Usuário / E-mail */}
               <div className="space-y-1.5">
-                <label htmlFor="identifier" className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 tracking-wider">
+                <label 
+                  htmlFor="identifier" 
+                  className="block text-[11px] font-bold uppercase text-zinc-300 tracking-wider font-mono"
+                >
                   Usuário ou E-mail
                 </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-slate-500">
+                <div className="relative group/input">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400 group-focus-within/input:text-[#68D346] transition-colors">
                     <Mail className="w-4 h-4" />
                   </span>
                   <input
@@ -338,17 +392,21 @@ export default function LoginClient() {
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="usuario ou email@empresa.com"
-                    className="w-full bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 focus:border-red-600 focus:ring-2 focus:ring-red-600/30 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all duration-300 font-bold"
+                    className="w-full bg-zinc-900/80 border border-white/10 focus:border-[#68D346] focus:ring-2 focus:ring-[#68D346]/25 rounded-xl py-3 pl-10 pr-4 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all duration-300 font-bold"
                   />
                 </div>
               </div>
 
+              {/* Campo Senha */}
               <div className="space-y-1.5">
-                <label htmlFor="password" className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 tracking-wider">
-                  Senha Geral
+                <label 
+                  htmlFor="password" 
+                  className="block text-[11px] font-bold uppercase text-zinc-300 tracking-wider font-mono"
+                >
+                  Senha de Acesso
                 </label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-slate-500">
+                <div className="relative group/input">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400 group-focus-within/input:text-[#68D346] transition-colors">
                     <Key className="w-4 h-4" />
                   </span>
                   <input
@@ -358,25 +416,24 @@ export default function LoginClient() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 focus:border-red-600 focus:ring-2 focus:ring-red-600/30 rounded-xl py-3 pl-10 pr-10 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all duration-300 font-bold"
+                    className="w-full bg-zinc-900/80 border border-white/10 focus:border-[#68D346] focus:ring-2 focus:ring-[#68D346]/25 rounded-xl py-3 pl-10 pr-10 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all duration-300 font-bold"
                   />
-
                   {password.length > 0 && (
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors border-none bg-transparent cursor-pointer"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-[#68D346] transition-colors border-none bg-transparent cursor-pointer"
                       aria-label={showPassword ? "Ocultar senha" : "Exibir senha"}
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4 text-red-600 dark:text-red-500" /> : <Eye className="w-4 h-4 text-slate-400" />}
+                      {showPassword ? <EyeOff className="w-4 h-4 text-[#68D346]" /> : <Eye className="w-4 h-4 text-zinc-400" />}
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Opções Adicionais: Checkbox Permanecer Logado + Link Esqueci Minha Senha */}
-              <div className="flex items-center justify-between text-[11px] font-sans">
-                <label className="flex items-center gap-2 text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+              {/* Opções: Lembrar de mim & Esqueci a Senha */}
+              <div className="flex items-center justify-between text-[11.5px] font-sans">
+                <label className="flex items-center gap-2 text-zinc-300 hover:text-white cursor-pointer select-none transition-colors">
                   <input 
                     type="checkbox"
                     checked={rememberMe}
@@ -384,9 +441,9 @@ export default function LoginClient() {
                     className="sr-only"
                   />
                   {rememberMe ? (
-                    <CheckSquare className="w-4 h-4 text-red-600 dark:text-red-500" />
+                    <CheckSquare className="w-4 h-4 text-[#68D346]" />
                   ) : (
-                    <Square className="w-4 h-4 text-slate-400 dark:text-slate-600" />
+                    <Square className="w-4 h-4 text-zinc-500" />
                   )}
                   <span>Permanecer conectado</span>
                 </label>
@@ -398,149 +455,115 @@ export default function LoginClient() {
                     setForgotEmail(identifier.includes('@') ? identifier : '');
                     setShowForgotModal(true);
                   }}
-                  className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-colors border-none bg-transparent cursor-pointer"
+                  className="text-[#68D346] hover:text-[#B7F365] font-semibold transition-colors border-none bg-transparent cursor-pointer"
                 >
                   Esqueci minha senha
                 </button>
               </div>
 
+              {/* Botão de Submissão Principal (Paleta Cyber Verde JIMMP Info) */}
               <button
                 type="submit"
-                className="w-full py-3.5 bg-red-600 hover:bg-red-500 shadow-md text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 border-none rounded-xl active:scale-[0.98]"
+                className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-[#1C4E26] via-[#246831] to-[#1C4E26] hover:from-[#246831] hover:to-[#2e7d3d] text-white border border-[#68D346]/60 font-black text-xs uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(104,211,70,0.35)] hover:shadow-[0_0_30px_rgba(183,243,101,0.55)] transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
               >
-                ENTRAR NO SISTEMA <ArrowRight className="w-4 h-4" />
+                <span className="text-[#B7F365]">ENTRAR NO COCKPIT</span>
+                <ArrowRight className="w-4 h-4 text-[#B7F365]" />
               </button>
             </form>
           </div>
-
-          <div className="pt-4 mt-6 text-center">
-            <AppFooter variant="flow" className="py-0 text-[10px]" />
-          </div>
         </div>
-
       </div>
 
-      {/* INTERACTIVE LOADING OVERLAY */}
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-50/95 dark:bg-slate-950 z-50 flex flex-col items-center justify-center p-6 text-center select-none"
-          >
-            <div className="max-w-md w-full space-y-8 relative">
-              {/* Pulsating Center Shield */}
-              <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.08, 1],
-                    boxShadow: [
-                      '0 0 20px rgba(220,38,38,0.2), inset 0 0 15px rgba(220,38,38,0.2)',
-                      '0 0 35px rgba(220,38,38,0.5), inset 0 0 25px rgba(220,38,38,0.4)',
-                      '0 0 20px rgba(220,38,38,0.2), inset 0 0 15px rgba(220,38,38,0.2)'
-                    ]
-                  }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="w-20 h-20 bg-white dark:bg-slate-900 border-2 border-red-600 rounded-full flex items-center justify-center shadow-lg relative"
-                >
-                  <Shield className="w-9 h-9 text-red-600 dark:text-red-500 drop-shadow-[0_0_6px_rgba(220,38,38,0.6)]" />
-                </motion.div>
-              </div>
+      {/* 3. RODAPÉ EXECUTIVO & LINKS LEGAIS SEM ESTOURO DE PÁGINA */}
+      <footer className="relative z-10 w-full py-4 px-6 border-t border-white/10 bg-zinc-950/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] font-mono text-zinc-400">
+          {/* Direitos Autorais Oficiais */}
+          <div className="text-center sm:text-left">
+            <p className="tracking-wide">
+              © {COPYRIGHT_YEAR} - Todos os direitos reservados <span className="mx-1 text-[#68D346] font-bold">|</span>{' '}
+              <span className="font-bold text-zinc-200">{COMPANY_NAME}</span>
+            </p>
+          </div>
 
-              {/* Text indicator */}
-              <div className="space-y-2">
-                <h3 className="text-sm font-bold uppercase text-slate-900 dark:text-slate-100 tracking-widest">
-                  ESTABELECENDO ACESSO SEGURO
-                </h3>
-                {/* Dynamically changing message status */}
-                <div className="h-6 flex items-center justify-center">
-                  <AnimatePresence mode="wait">
-                    <motion.p
-                      key={loadingStatus}
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.15 }}
-                      className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-wider"
-                    >
-                      {loadingStatus}
-                    </motion.p>
-                  </AnimatePresence>
-                </div>
-              </div>
+          {/* Links Legais Desacoplados (Renderizados via React Portal) */}
+          <div className="flex items-center gap-3 text-[11px]">
+            <button
+              type="button"
+              onClick={() => setLegalModalType('privacy')}
+              className="text-zinc-400 hover:text-[#68D346] transition-colors cursor-pointer bg-transparent border-none p-0 focus:outline-none"
+            >
+              Privacidade
+            </button>
+            <span className="text-zinc-600">•</span>
+            <button
+              type="button"
+              onClick={() => setLegalModalType('terms')}
+              className="text-zinc-400 hover:text-[#68D346] transition-colors cursor-pointer bg-transparent border-none p-0 focus:outline-none"
+            >
+              Termos
+            </button>
+            <span className="text-zinc-600 hidden sm:inline">•</span>
+            <span className="text-[10px] text-zinc-500 hidden sm:inline font-mono">
+              {SYSTEM_VERSION}
+            </span>
+          </div>
+        </div>
+      </footer>
 
-              {/* Horizontal neon progress bar */}
-              <div className="w-full max-w-xs mx-auto">
-                <div className="h-1 bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 relative w-full overflow-hidden rounded-full">
-                  <motion.div 
-                    className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.8)]"
-                    animate={{ width: `${progress}%` }}
-                    transition={{ ease: "easeOut", duration: 0.2 }}
-                  />
-                </div>
-                <div className="flex justify-between items-center text-[9px] text-slate-500 font-bold uppercase mt-2 px-1">
-                  <span>SEGURANÇA SPCI</span>
-                  <span>{progress}%</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* MODAL DE RECUPERAÇÃO DE SENHA */}
+      {/* 4. MODAL DE RECUPERAÇÃO DE SENHA EM DARK GLASS */}
       <AnimatePresence>
         {showForgotModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950/80 backdrop-blur-md p-4"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl max-w-md w-full shadow-2xl relative space-y-5 text-slate-800 dark:text-slate-100"
+              className="w-full max-w-md rounded-2xl p-6 shadow-2xl relative space-y-5 text-white"
+              style={{
+                background: 'rgba(24, 24, 27, 0.92)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderTop: '1px solid rgba(213, 217, 220, 0.35)',
+              }}
             >
-              <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 className="text-sm font-bold uppercase text-slate-900 dark:text-slate-100 tracking-wider flex items-center gap-2">
-                  <Key className="w-4 h-4 text-red-600 dark:text-red-500" />
-                  Recuperar Acesso
+              <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
+                <h3 className="text-sm font-bold uppercase text-white tracking-wider flex items-center gap-2 font-mono">
+                  <Key className="w-4 h-4 text-[#68D346]" />
+                  Recuperar Acesso Corporativo
                 </h3>
                 <button
                   type="button"
                   onClick={() => setShowForgotModal(false)}
-                  className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs uppercase cursor-pointer border-none bg-transparent"
+                  className="text-zinc-400 hover:text-white text-sm cursor-pointer border-none bg-transparent"
                 >
                   ✕
                 </button>
               </div>
 
-              <p className="text-xs text-slate-600 dark:text-slate-300 font-sans leading-relaxed">
-                Informe o seu e-mail corporativo cadastrado para receber as instruções de redefinição de senha.
+              <p className="text-xs text-zinc-300 font-sans leading-relaxed text-left">
+                Informe o seu e-mail corporativo cadastrado para receber as instruções seguras de redefinição de senha.
               </p>
 
               {forgotMsg && (
                 <div
-                  className={`p-3 rounded-xl text-xs font-sans font-medium ${
+                  className={`p-3 rounded-xl text-xs font-sans font-medium text-left ${
                     forgotMsg.type === 'success'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400'
-                      : 'bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400'
+                      ? 'bg-emerald-950/60 border border-emerald-500/50 text-emerald-300'
+                      : 'bg-red-950/60 border border-red-500/50 text-red-300'
                   }`}
                 >
                   {forgotMsg.text}
                 </div>
               )}
 
-              <form onSubmit={handleResetPassword} className="space-y-4">
+              <form onSubmit={handleResetPassword} className="space-y-4 text-left">
                 <div className="space-y-1.5">
-                  <label htmlFor="forgot-email" className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 tracking-wider">
+                  <label htmlFor="forgot-email" className="block text-[10.5px] font-bold uppercase text-zinc-300 tracking-wider font-mono">
                     E-mail Cadastrado
                   </label>
                   <input
@@ -550,7 +573,7 @@ export default function LoginClient() {
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     placeholder="seu.email@empresa.com"
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 focus:border-red-600 focus:ring-2 focus:ring-red-600/30 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all font-bold"
+                    className="w-full bg-zinc-900 border border-white/15 focus:border-[#68D346] focus:ring-2 focus:ring-[#68D346]/25 rounded-xl py-2.5 px-3.5 text-xs text-white placeholder-zinc-500 focus:outline-none transition-all font-bold"
                   />
                 </div>
 
@@ -558,16 +581,16 @@ export default function LoginClient() {
                   <button
                     type="button"
                     onClick={() => setShowForgotModal(false)}
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-bold uppercase border border-slate-200 dark:border-slate-700 cursor-pointer"
+                    className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-xl text-xs font-bold uppercase border border-zinc-700 cursor-pointer"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={forgotLoading}
-                    className="px-5 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold uppercase border-none cursor-pointer transition-all shadow-md"
+                    className="px-5 py-2 bg-gradient-to-r from-[#1C4E26] to-[#246831] hover:from-[#246831] hover:to-[#2e7d3d] border border-[#68D346]/50 text-[#B7F365] rounded-xl text-xs font-bold uppercase cursor-pointer transition-all shadow-md disabled:opacity-50"
                   >
-                    {forgotLoading ? 'Enviando...' : 'Enviar E-mail'}
+                    {forgotLoading ? 'Enviando...' : 'Enviar Instruções'}
                   </button>
                 </div>
               </form>
@@ -575,6 +598,85 @@ export default function LoginClient() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 5. LOADING OVERLAY INTERATIVO (ESCUDO NEON VERDE JIMMP INFO) */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-zinc-950/95 z-[99999] flex flex-col items-center justify-center p-6 text-center select-none"
+          >
+            <div className="max-w-md w-full space-y-8 relative">
+              {/* Escudo Pulsante Neon */}
+              <div className="relative w-24 h-24 mx-auto flex items-center justify-center">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.08, 1],
+                    boxShadow: [
+                      '0 0 20px rgba(104,211,70,0.2), inset 0 0 15px rgba(104,211,70,0.2)',
+                      '0 0 35px rgba(104,211,70,0.5), inset 0 0 25px rgba(104,211,70,0.4)',
+                      '0 0 20px rgba(104,211,70,0.2), inset 0 0 15px rgba(104,211,70,0.2)'
+                    ]
+                  }}
+                  transition={{ 
+                    duration: 1.5, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="w-20 h-20 bg-zinc-900 border-2 border-[#68D346] rounded-full flex items-center justify-center shadow-lg relative"
+                >
+                  <ShieldCheck className="w-10 h-10 text-[#68D346] drop-shadow-[0_0_8px_rgba(104,211,70,0.6)]" />
+                </motion.div>
+              </div>
+
+              {/* Indicador de Status */}
+              <div className="space-y-2">
+                <h3 className="text-sm font-bold uppercase text-white tracking-widest font-mono">
+                  ESTABELECENDO ACESSO SEGURO
+                </h3>
+                <div className="h-6 flex items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    <motion.p
+                      key={loadingStatus}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="text-[11px] text-[#B7F365] font-mono font-bold uppercase tracking-wider"
+                    >
+                      {loadingStatus}
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Barra de Progresso Neon */}
+              <div className="w-full max-w-xs mx-auto">
+                <div className="h-1.5 bg-zinc-900 border border-zinc-800 relative w-full overflow-hidden rounded-full">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-[#1C4E26] via-[#68D346] to-[#B7F365] shadow-[0_0_10px_rgba(104,211,70,0.8)]"
+                    animate={{ width: `${progress}%` }}
+                    transition={{ ease: "easeOut", duration: 0.2 }}
+                  />
+                </div>
+                <div className="flex justify-between items-center text-[9.5px] font-mono text-zinc-400 font-bold uppercase mt-2 px-1">
+                  <span>SIGER MASTER PROTOCOL</span>
+                  <span className="text-[#68D346]">{progress}%</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 6. MODAL LEGAL DESACOPLADO VIA REACT PORTAL (PRIVACIDADE E TERMOS) */}
+      <LegalPolicyModal
+        isOpen={!!legalModalType}
+        type={legalModalType}
+        onClose={() => setLegalModalType(null)}
+      />
     </div>
   );
 }
