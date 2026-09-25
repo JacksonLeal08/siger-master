@@ -38,10 +38,8 @@ export const initAuth = (
         }
       }
     } else {
-      if (lastProcessedUserId !== null) {
-        lastProcessedUserId = null;
-        if (onAuthFailure) onAuthFailure();
-      }
+      lastProcessedUserId = null;
+      if (onAuthFailure) onAuthFailure();
     }
   };
 

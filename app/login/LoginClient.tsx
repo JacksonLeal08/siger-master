@@ -47,30 +47,20 @@ export default function LoginClient() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const redirectedRef = React.useRef(false);
 
-  // Redirecionamento automático quando já houver sessão ativa confirmada
-  // Aguarda currentUser + userProfile + authChecking=false para garantir que a sessão está 100% ativa
+  // Tratamento de parâmetros de sessão e prevenção de loops de redirecionamento
   useEffect(() => {
-    if (!authChecking && currentUser && userProfile && !redirectedRef.current) {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const isSwitch = params.get('switch') === 'true' || params.get('new_session') === 'true';
-        if (!isSwitch) {
-          // Verifica se o perfil possui status ativo antes de redirecionar
-          const statusClean = String(userProfile.status || '').toLowerCase();
-          if (statusClean !== 'active' && statusClean !== 'ativo') {
-            // Perfil pendente/suspenso: não redireciona
-            return;
-          }
-          redirectedRef.current = true;
-          setIsRedirecting(true);
-          // Transição direta e confiável via window.location (evita travamento de rotas e conexões RSC)
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 200);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('unauthorized') === '1') {
+        // Redirecionado pelo servidor por falta de sessão ativa: limpa cookies locais residuais
+        if (typeof document !== 'undefined') {
+          document.cookie = 'spci_session_token=; path=/; max-age=0';
+          document.cookie = 'spci_user_role=; path=/; max-age=0';
+          document.cookie = 'spci_user_expires=; path=/; max-age=0';
         }
       }
     }
-  }, [authChecking, currentUser, userProfile, router]);
+  }, []);
 
   // Capturar e tratar erros de links de e-mail expirados / hash de autenticação
   useEffect(() => {
@@ -286,7 +276,7 @@ export default function LoginClient() {
                     onClick={() => {
                       redirectedRef.current = true;
                       setIsRedirecting(true);
-                      router.replace('/dashboard');
+                      window.location.href = '/dashboard';
                     }}
                     className="flex-1 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none shadow-md flex items-center justify-center gap-1.5 active:scale-95"
                   >

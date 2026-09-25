@@ -27,8 +27,7 @@ export default function ErrorPage({
   const isChunkOrCallError = 
     error?.message?.includes("Cannot read properties of undefined (reading 'call')") ||
     error?.message?.includes('Loading chunk') ||
-    error?.name === 'ChunkLoadError' ||
-    error?.message?.includes('is not a function');
+    error?.name === 'ChunkLoadError';
 
   const purgeCachesAndReload = () => {
     if (typeof window === 'undefined') return;

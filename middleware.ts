@@ -110,7 +110,12 @@ export async function middleware(request: NextRequest) {
   // 5. Verificação para rotas protegidas sem sessão ativa
   if (!sessionToken && isProtectedRoute) {
     url.pathname = '/login';
-    return NextResponse.redirect(url);
+    url.searchParams.set('unauthorized', '1');
+    const response = NextResponse.redirect(url);
+    response.cookies.delete('spci_session_token');
+    response.cookies.delete('spci_user_role');
+    response.cookies.delete('spci_user_expires');
+    return response;
   }
 
   // 6. Validação de Expiração de Acesso (ABAC Temporal)
