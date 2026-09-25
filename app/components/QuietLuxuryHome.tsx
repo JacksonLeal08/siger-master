@@ -27,6 +27,7 @@ import Footer from './common/Footer';
 import ThemeToggle from './ThemeToggle';
 import PillarCard3D from './home/PillarCard3D';
 import PillarDetailModal from './home/PillarDetailModal';
+import SystemOverviewModal from './home/SystemOverviewModal';
 import { PILLARS_DATA, PillarData } from '@/app/data/pillarsData';
 import { SYSTEM_VERSION, COMPANY_NAME } from '@/config/version';
 
@@ -34,11 +35,16 @@ export default function QuietLuxuryHome() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [selectedPillar, setSelectedPillar] = useState<PillarData | null>(null);
   const [isPillarModalOpen, setIsPillarModalOpen] = useState(false);
+  const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false);
 
-  // Listener para restaurar a ficha técnica do pilar a partir do Dock
+  // Listener para restaurar a ficha técnica do pilar ou modal institucional a partir do Dock
   useEffect(() => {
     const handleRestorePillar = (e: Event) => {
       const customEvent = e as CustomEvent<{ pillar?: PillarData; id?: string }>;
+      if (customEvent.detail?.id === 'system-overview-siger') {
+        setIsOverviewModalOpen(true);
+        return;
+      }
       if (customEvent.detail?.pillar) {
         setSelectedPillar(customEvent.detail.pillar);
         setIsPillarModalOpen(true);
@@ -51,12 +57,18 @@ export default function QuietLuxuryHome() {
       }
     };
 
+    const handleRestoreOverview = () => {
+      setIsOverviewModalOpen(true);
+    };
+
     window.addEventListener('siger:restore_pillar_detail', handleRestorePillar);
     window.addEventListener('siger:restore_window', handleRestorePillar);
+    window.addEventListener('siger:restore_system_overview', handleRestoreOverview);
 
     return () => {
       window.removeEventListener('siger:restore_pillar_detail', handleRestorePillar);
       window.removeEventListener('siger:restore_window', handleRestorePillar);
+      window.removeEventListener('siger:restore_system_overview', handleRestoreOverview);
     };
   }, []);
 
@@ -106,10 +118,25 @@ export default function QuietLuxuryHome() {
                 className="h-13 sm:h-15 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_2px_12px_rgba(104,211,70,0.3)]" 
               />
             </Link>
-            <div className="border-l border-slate-300 dark:border-zinc-800 pl-4 py-1.5 hidden sm:block text-left">
-              <span className="text-[10px] font-black text-[#1C4E26] dark:text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA OFICIAL</span>
-              <span className="text-sm sm:text-base font-black text-slate-900 dark:text-zinc-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
-            </div>
+            {/* Identidade do Sistema com Interação ao Clicar */}
+            <button
+              type="button"
+              onClick={() => setIsOverviewModalOpen(true)}
+              className="border-l border-slate-300 dark:border-zinc-800 pl-4 py-1 hidden sm:flex flex-col text-left group/brand cursor-pointer hover:bg-slate-100/60 dark:hover:bg-zinc-900/60 rounded-r-xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[#68D346]"
+              title="Clique para saber mais sobre o SIGER - Sistema Integrado de Gestão de Emergência e Resposta"
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black text-[#1C4E26] dark:text-[#68D346] tracking-[0.25em] block uppercase leading-none group-hover/brand:text-[#257335] dark:group-hover/brand:text-[#85e865] transition-colors">
+                  ECOSSISTEMA OFICIAL
+                </span>
+                <span className="inline-flex items-center text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full bg-[#1C4E26]/10 dark:bg-[#68D346]/15 text-[#1C4E26] dark:text-[#68D346] border border-[#1C4E26]/20 dark:border-[#68D346]/30 group-hover/brand:scale-105 transition-transform">
+                  SOBRE ℹ️
+                </span>
+              </div>
+              <span className="text-sm sm:text-base font-black text-slate-900 dark:text-zinc-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block group-hover/brand:text-[#1C4E26] dark:group-hover/brand:text-[#68D346] transition-colors">
+                SIGER MASTER
+              </span>
+            </button>
           </div>
 
           {/* Quick Actions & Navigation Links */}
@@ -135,18 +162,8 @@ export default function QuietLuxuryHome() {
       </header>
 
       {/* 3. HERO SECTION (REESTRUTURAÇÃO NARRATIVA & COMANDO UNIFICADO) */}
-      <section className="relative pt-20 pb-16 md:pt-28 md:pb-24 px-6 max-w-7xl mx-auto">
+      <section className="relative pt-16 pb-16 md:pt-24 md:pb-24 px-6 max-w-7xl mx-auto">
         <div className="text-center space-y-8 max-w-5xl mx-auto">
-          
-          {/* Badge Superior Mandatório */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-900/90 border border-slate-300 dark:border-[#3C3F45] text-slate-800 dark:text-zinc-200 text-[11px] font-mono font-bold tracking-widest backdrop-blur-md shadow-sm"
-          >
-            <span className="w-2 h-2 rounded-full bg-[#68D346] animate-pulse shadow-[0_0_8px_#68D346]" />
-            <span>[ 🛡️ ECOSSISTEMA OPERACIONAL INTEGRADO // VERSÃO 2.11 ]</span>
-          </motion.div>
 
           {/* Título Principal de Impacto */}
           <motion.h1 
@@ -431,6 +448,13 @@ export default function QuietLuxuryHome() {
         isOpen={isPillarModalOpen}
         onClose={() => setIsPillarModalOpen(false)}
         onMinimize={() => setIsPillarModalOpen(false)}
+      />
+
+      {/* 9.1 MODAL INSTITUCIONAL DO SISTEMA SIGER (SOBRE / ATRIBUIÇÕES / ROADMAP) */}
+      <SystemOverviewModal
+        isOpen={isOverviewModalOpen}
+        onClose={() => setIsOverviewModalOpen(false)}
+        onMinimize={() => setIsOverviewModalOpen(false)}
       />
 
       {/* 10. RODAPÉ BENTO CORPORATIVO EXECUTIVO (COM REACT PORTAL LEGAL MODALS) */}
