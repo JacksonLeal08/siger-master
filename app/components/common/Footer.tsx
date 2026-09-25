@@ -26,25 +26,29 @@ export default function Footer({ className = '', variant = 'full' }: FooterProps
               
               {/* Coluna 1 & 2: Identidade JIMMP Info & SIGER Master */}
               <div className="lg:col-span-5 space-y-4 text-left">
-                <div className="flex items-center gap-4">
-                  <div className="relative py-1.5 px-3 rounded-2xl bg-gradient-to-r from-zinc-900 to-[#1E2024] border border-[#3C3F45] shadow-[0_0_15px_rgba(104,211,70,0.12)] flex items-center justify-center">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                  <Link 
+                    href="/" 
+                    className="inline-block p-0 bg-transparent border-none outline-none group cursor-pointer shrink-0"
+                    title="SIGER Master - JIMMP Info"
+                  >
                     <Image 
                       src="/assets/branding/logo-jimmp-info.png" 
                       alt="Logo JIMMP Info" 
-                      width={160}
-                      height={46}
+                      width={320}
+                      height={92}
                       priority
-                      className="h-10 sm:h-11 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(104,211,70,0.35)]" 
+                      className="h-16 sm:h-20 md:h-[84px] w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_4px_20px_rgba(104,211,70,0.35)]" 
                     />
-                  </div>
-                  <div>
+                  </Link>
+                  <div className="sm:border-l sm:border-zinc-800/90 sm:pl-5 space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-black text-[#68D346] tracking-[0.2em] block uppercase">SIGER MASTER</span>
+                      <span className="text-xs sm:text-sm font-black text-[#68D346] tracking-[0.2em] block uppercase">SIGER MASTER</span>
                       <span className="text-[9px] px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800 font-mono font-bold">
                         v2.11 • INDUSTRIAL DEFENSE
                       </span>
                     </div>
-                    <span className="text-xs font-black text-white tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">
+                    <span className="text-xs sm:text-sm font-black text-white tracking-wider leading-none font-['Hanken_Grotesk'] block">
                       COMANDO DE MISSÃO CRÍTICA
                     </span>
                   </div>

@@ -91,20 +91,24 @@ export default function QuietLuxuryHome() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
           {/* Logo & Brand Mark */}
-          <div className="flex items-center gap-4">
-            <div className="relative py-1.5 px-3 rounded-2xl bg-gradient-to-r from-slate-100 to-slate-200/60 dark:from-[#282A2F] dark:to-[#1E2024] border border-slate-300/70 dark:border-[#3C3F45] shadow-[0_0_15px_rgba(104,211,70,0.12)] hover:shadow-[0_0_22px_rgba(104,211,70,0.35)] transition-all duration-300 flex items-center justify-center">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <Link 
+              href="/"
+              className="flex items-center justify-center p-0 bg-transparent border-none outline-none group cursor-pointer"
+              title="SIGER Master - JIMMP Info"
+            >
               <Image 
                 src="/assets/branding/logo-jimmp-info.png" 
                 alt="Logo JIMMP Info" 
-                width={170}
-                height={48}
+                width={260}
+                height={75}
                 priority
-                className="h-10 sm:h-11 w-auto object-contain filter drop-shadow-[0_0_8px_rgba(104,211,70,0.4)] transition-transform hover:scale-105" 
+                className="h-13 sm:h-15 md:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_2px_12px_rgba(104,211,70,0.3)]" 
               />
-            </div>
-            <div className="border-l border-slate-200 dark:border-zinc-800 pl-4 py-1 hidden sm:block text-left">
-              <span className="text-[9px] font-black text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA OFICIAL</span>
-              <span className="text-sm font-black text-slate-900 dark:text-zinc-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
+            </Link>
+            <div className="border-l border-slate-300 dark:border-zinc-800 pl-4 py-1.5 hidden sm:block text-left">
+              <span className="text-[10px] font-black text-[#1C4E26] dark:text-[#68D346] tracking-[0.25em] block uppercase leading-none">ECOSSISTEMA OFICIAL</span>
+              <span className="text-sm sm:text-base font-black text-slate-900 dark:text-zinc-100 tracking-wider leading-none mt-1 font-['Hanken_Grotesk'] block">SIGER MASTER</span>
             </div>
           </div>
 
