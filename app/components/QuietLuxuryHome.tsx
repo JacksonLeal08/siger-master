@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
@@ -25,10 +25,40 @@ import {
 } from 'lucide-react';
 import Footer from './common/Footer';
 import ThemeToggle from './ThemeToggle';
+import PillarCard3D from './home/PillarCard3D';
+import PillarDetailModal from './home/PillarDetailModal';
+import { PILLARS_DATA, PillarData } from '@/app/data/pillarsData';
 import { SYSTEM_VERSION, COMPANY_NAME } from '@/config/version';
 
 export default function QuietLuxuryHome() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [selectedPillar, setSelectedPillar] = useState<PillarData | null>(null);
+  const [isPillarModalOpen, setIsPillarModalOpen] = useState(false);
+
+  // Listener para restaurar a ficha técnica do pilar a partir do Dock
+  useEffect(() => {
+    const handleRestorePillar = (e: Event) => {
+      const customEvent = e as CustomEvent<{ pillar?: PillarData; id?: string }>;
+      if (customEvent.detail?.pillar) {
+        setSelectedPillar(customEvent.detail.pillar);
+        setIsPillarModalOpen(true);
+      } else if (customEvent.detail?.id && customEvent.detail.id.startsWith('pillar-')) {
+        const pId = customEvent.detail.id.replace('pillar-', '');
+        if (PILLARS_DATA[pId]) {
+          setSelectedPillar(PILLARS_DATA[pId]);
+          setIsPillarModalOpen(true);
+        }
+      }
+    };
+
+    window.addEventListener('siger:restore_pillar_detail', handleRestorePillar);
+    window.addEventListener('siger:restore_window', handleRestorePillar);
+
+    return () => {
+      window.removeEventListener('siger:restore_pillar_detail', handleRestorePillar);
+      window.removeEventListener('siger:restore_window', handleRestorePillar);
+    };
+  }, []);
 
   const faqItems = [
     {
@@ -201,149 +231,18 @@ export default function QuietLuxuryHome() {
           </p>
         </div>
 
-        {/* BENTO GRID 4 CARDS INTERATIVOS (CYBER-METÁLICOS) */}
+        {/* BENTO GRID 4 CARDS INTERATIVOS (3D TILT + SMART TOOLTIP) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          
-          {/* PILAR 1: ENGENHARIA DE PREVENÇÃO & ATIVOS (SPCI) */}
-          <motion.div 
-            whileHover={{ y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
-
-            <div className="space-y-5 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-sm">
-                  <Flame className="w-7 h-7" />
-                </div>
-                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
-                  PILAR 01 // SPCI
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
-                  🧯 ENGENHARIA DE PREVENÇÃO & ATIVOS (SPCI)
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
-                  Gestão de extintores, hidrantes, bombas e sistemas fixos. Rastreabilidade com QR Code híbrido, rotinas NBR 12962 e histórico pericial de recargas.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
-              <span className="font-bold text-[#68D346]">✓ ABNT NBR 12962 / 13714</span>
-              <span>• Rastreio 100% Inmetro</span>
-              <span>• Laudo Fotográfico Duplo</span>
-            </div>
-          </motion.div>
-
-          {/* PILAR 2: FROTAS DE EMERGÊNCIA & TELEMETRIA METROLÓGICA */}
-          <motion.div 
-            whileHover={{ y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
-
-            <div className="space-y-5 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shadow-sm">
-                  <Truck className="w-7 h-7" />
-                </div>
-                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
-                  PILAR 02 // FROTA
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
-                  🚑 FROTAS DE EMERGÊNCIA & TELEMETRIA METROLÓGICA
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
-                  Controle de prontidão de ambulâncias e caminhonetes 4x4. Telemetria antifraude de abastecimento, auditoria de pneus TWI com catálogo de fábrica e histórico de OS.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
-              <span className="font-bold text-[#68D346]">✓ Resolução CONTRAN 558/80</span>
-              <span>• Auditoria TWI em mm</span>
-              <span>• Validação Antifraude</span>
-            </div>
-          </motion.div>
-
-          {/* PILAR 3: CENTRAL DE COMANDO & DESPACHO (CAD / CECOM) */}
-          <motion.div 
-            whileHover={{ y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
-
-            <div className="space-y-5 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm">
-                  <Radio className="w-7 h-7" />
-                </div>
-                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
-                  PILAR 03 // CAD / CECOM
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
-                  🛰️ CENTRAL DE COMANDO & DESPACHO (CAD / CECOM)
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
-                  Mapa GIS com geolocalização e status operacional de viaturas em tempo real. Rastreamento da linha do tempo da ocorrência desde o acionamento até a chegada ao hospital.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
-              <span className="font-bold text-[#68D346]">✓ Mapa Tático em Tempo Real</span>
-              <span>• Linha do Tempo Ocorrência</span>
-              <span>• SLA de Resposta</span>
-            </div>
-          </motion.div>
-
-          {/* PILAR 4: PRONTUÁRIO APH VIVO (ePCR) */}
-          <motion.div 
-            whileHover={{ y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-[#181A1F] border border-slate-200 dark:border-[#2D3036] hover:border-[#68D346]/60 rounded-3xl p-8 shadow-sm hover:shadow-[0_10px_30px_rgba(104,211,70,0.15)] transition-all duration-300 relative overflow-hidden flex flex-col justify-between group text-left"
-          >
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#68D346]/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500 pointer-events-none" />
-
-            <div className="space-y-5 relative z-10">
-              <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm">
-                  <HeartPulse className="w-7 h-7" />
-                </div>
-                <span className="px-3 py-1 rounded-full bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-[10px] font-bold font-mono text-[#68D346]">
-                  PILAR 04 // APH VIVO
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide font-['Hanken_Grotesk']">
-                  🩺 PRONTUÁRIO APH VIVO (ePCR)
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans leading-relaxed">
-                  Ficha de atendimento pré-hospitalar digital atualizada em tempo real pela brigada na cena. Registro dinâmico de sinais vitais, protocolos clínicos e consumo de insumos médicos.
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-6 mt-6 border-t border-slate-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono relative z-10 text-slate-500 dark:text-zinc-400">
-              <span className="font-bold text-[#68D346]">✓ ePCR de Cena Digital</span>
-              <span>• Monitor de Sinais Vitais</span>
-              <span>• Rastreio de Farmácia & Medicamentos</span>
-            </div>
-          </motion.div>
-
+          {Object.values(PILLARS_DATA).map((pillar) => (
+            <PillarCard3D
+              key={pillar.id}
+              pillar={pillar}
+              onOpenDetail={(p) => {
+                setSelectedPillar(p);
+                setIsPillarModalOpen(true);
+              }}
+            />
+          ))}
         </div>
       </section>
 
@@ -522,7 +421,15 @@ export default function QuietLuxuryHome() {
         </div>
       </section>
 
-      {/* 9. RODAPÉ BENTO CORPORATIVO EXECUTIVO (COM REACT PORTAL LEGAL MODALS) */}
+      {/* 9. MODAL EXECUTIVO DE FICHA TÉCNICA DO PILAR (REACT PORTAL + DOCK) */}
+      <PillarDetailModal
+        pillar={selectedPillar}
+        isOpen={isPillarModalOpen}
+        onClose={() => setIsPillarModalOpen(false)}
+        onMinimize={() => setIsPillarModalOpen(false)}
+      />
+
+      {/* 10. RODAPÉ BENTO CORPORATIVO EXECUTIVO (COM REACT PORTAL LEGAL MODALS) */}
       <Footer variant="full" />
 
     </div>

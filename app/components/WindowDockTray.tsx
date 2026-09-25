@@ -16,7 +16,9 @@ import {
   FileText,
   History,
   SlidersHorizontal,
-  Wrench
+  Wrench,
+  Radio,
+  HeartPulse
 } from 'lucide-react';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -24,13 +26,16 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   truck: <Truck className="w-3.5 h-3.5 text-blue-500" />,
   swap: <ArrowLeftRight className="w-3.5 h-3.5 text-emerald-500" />,
   ArrowLeftRight: <ArrowLeftRight className="w-3.5 h-3.5 text-emerald-500" />,
-  flame: <Flame className="w-3.5 h-3.5 text-red-500" />,
+  flame: <Flame className="w-3.5 h-3.5 text-amber-500" />,
   shield: <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />,
-  clipboard: <ClipboardList className="w-3.5 h-3.5 text-slate-400" />,
+  clipboard: <ClipboardList className="w-3.5 h-3.5 text-rose-400" />,
   file: <FileText className="w-3.5 h-3.5 text-blue-400" />,
   history: <History className="w-3.5 h-3.5 text-blue-400" />,
   sliders: <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />,
   wrench: <Wrench className="w-3.5 h-3.5 text-emerald-400" />,
+  radio: <Radio className="w-3.5 h-3.5 text-indigo-400" />,
+  heart: <HeartPulse className="w-3.5 h-3.5 text-rose-500" />,
+  HeartPulse: <HeartPulse className="w-3.5 h-3.5 text-rose-500" />,
 };
 
 export default function WindowDockTray() {

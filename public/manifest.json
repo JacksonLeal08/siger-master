@@ -1,28 +1,43 @@
 {
-  "name": "SIGER Master - JIMMP Info",
+  "name": "SIGER Master • Gestão de Emergência & Resgate",
   "short_name": "SIGER Master",
-  "description": "Sistema Integrado de Gestão de Emergência & Resgate • JIMMP Info",
-  "start_url": "/",
+  "description": "Comando Unificado de Prevenção, Frotas Táticas, Central CAD e Prontuário APH Vivo",
+  "start_url": "/terminal/frota",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1E2024",
   "theme_color": "#1E2024",
-  "orientation": "portrait",
-  "scope": "/",
+  "orientation": "portrait-primary",
   "lang": "pt-BR",
   "dir": "ltr",
-  "categories": ["business", "utilities", "productivity"],
+  "categories": [
+    "business",
+    "utilities",
+    "productivity"
+  ],
   "icons": [
     {
-      "src": "/assets/branding/icon-jimmp.png",
-      "type": "image/png",
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/assets/branding/logo-jimmp-info.png",
-      "type": "image/png",
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ]
 }
