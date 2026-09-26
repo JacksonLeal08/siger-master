@@ -42,8 +42,15 @@ export class OSNotificationDispatcher {
     const alcadaMax = Number(aprovador.valor_maximo || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
     const linkAprovacao = `${baseUrl}/frota/os?id=${os.id}&action=approve`;
+    const linkRomaneio = `${baseUrl}/frota/os?id=${os.id}&view=romaneio`;
 
     const naturezatxt = os.tipo_manutencao || os.natureza_manutencao || 'CORRETIVA';
+    const oficinaNome = os.oficina?.nome_fantasia || os.oficina?.razao_social || (os.tipo_os === 'INTERNA' ? 'Oficina Interna Base SIGER' : 'Oficina Credenciada Homologada');
+    const oficinaFone = os.oficina?.telefone || '(94) 99100-0000';
+    const emitenteNome = os.responsavel_abertura || 'Inspetor Operacional de Frotas';
+
+    // Protocolo Rastreável do Romaneio
+    const protoRomaneio = `ROM-OS-${new Date().getFullYear().toString().slice(-2)}${String(new Date().getMonth() + 1).padStart(2, '0')}-${(os.id || os.numero_os || '000000').replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase()}`;
 
     // Monta o bloco anatômico
     let resumoCompTxt = '';
@@ -56,30 +63,34 @@ export class OSNotificationDispatcher {
     }
 
     const message = 
-`${emojiPrioridade} *SIGER MASTER • ALERTA DE ORDEM DE SERVIÇO [PRIORIDADE: ${tagPrioridade}]* ${emojiPrioridade}
+`${emojiPrioridade} *SIGER MASTER • ROMANEIO EXECUTIVO & ALERTA DE O.S. [${tagPrioridade}]* ${emojiPrioridade}
 
-Olá, *${aprovador.nome_aprovador}*, uma Ordem de Serviço foi aberta e aguarda sua aprovação:
+Prezado(a) *${aprovador.nome_aprovador}*, segue a cópia do *ROMANEIO OFICIAL* da Ordem de Serviço #${os.numero_os || 'OS-PENDENTE'}:
 
-📋 *Número da OS:* #${os.numero_os || 'OS-PENDENTE'}
-🛠️ *Natureza:* Manutenção ${naturezatxt.toUpperCase()}
+📑 *Protocolo do Romaneio:* ${protoRomaneio}
+🏢 *Oficina Credenciada:* ${oficinaNome} (${oficinaFone})
+🛠️ *Natureza da Manutenção:* ${naturezatxt.toUpperCase()} (${os.tipo_os || 'EXTERNA'})
 📅 *Data/Hora de Abertura:* ${dataAberturaFormatada}
+👤 *Emitente / Solicitante:* ${emitenteNome}
 ${prioridade === 'EMERGENCIA' ? '🔴' : prioridade === 'URGENTE' ? '🟠' : '🟢'} *Classificação de Risco:* *${prioridade}*
-🔄 *Status Atual:* ${os.status_os || os.status || 'AGUARDANDO APROVAÇÃO'}
-📍 *Etapa do Fluxo:* Etapa ${os.numero_etapa || 3}/6 — ${os.etapa_atual || '3_AGUARDANDO_APROVACAO'}
+🔄 *Status da Ordem:* ${os.status_os || os.status || 'AGUARDANDO APROVAÇÃO'} (Etapa ${os.numero_etapa || 3}/6)
 
 🚓 *DADOS DO VEÍCULO:*
 • *Viatura:* ${viatura.prefixo_frota} — ${viatura.marca} ${viatura.modelo}
-• *Placa:* ${viatura.placa} | *Odômetro:* ${viatura.odometro_atual_km || 0} km
-• *Unidade/Base:* ${viatura.contrato_id || os.contrato_id || 'PARAUAPEBAS'}
+• *Placa:* ${viatura.placa} | *Odômetro:* ${Number(os.odometro_km || viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km
+• *Base Operacional:* ${viatura.contrato_id || os.contrato_id || 'PARAUAPEBAS'}
 
-🔩 *COMPONENTES & SUBCOMPONENTES FLEGADOS:*
+🔩 *COMPONENTES & SERVIÇOS A MANUTENIR (ROMANEIO):*
 ${resumoCompTxt}
 
-💰 *Valor Total Estimado:* ${valorEst}
-⚖️ *Sua Alçada Configurada:* ${alcadaMin} até ${alcadaMax}
+💰 *Estimativa de Custos:* ${valorEst}
+⚖️ *Sua Alçada:* ${alcadaMin} até ${alcadaMax}
 
-👉 *Acesse o Cockpit SIGER Master para Aprovar ou Analisar:*
-${linkAprovacao}`;
+📄 *ABRIR VIA OFICIAL DO ROMANEIO (PDF / IMPRESSÃO):*
+👉 ${linkRomaneio}
+
+✅ *APROVAR OU GERENCIAR NO COCKPIT SIGER:*
+👉 ${linkAprovacao}`;
 
     const recipientNumber = this.cleanPhoneNumber(aprovador.whatsapp);
     const url = `https://api.whatsapp.com/send?phone=${recipientNumber}&text=${encodeURIComponent(message)}`;
@@ -105,9 +116,9 @@ ${linkAprovacao}`;
       ? '🚨 ALERTA CRÍTICO: VIATURA BAIXADA / INTERDITADA' 
       : isUrgente 
         ? '⚠️ ALERTA DE ALTA PRIORIDADE (SLA 2H)' 
-        : '📋 NOTIFICAÇÃO DE APROVAÇÃO DE SERVIÇO';
+        : '📋 ROMANEIO DE ENCAMINHAMENTO & APROVAÇÃO';
 
-    const subject = `[${isEmergencia ? 'EMERGÊNCIA' : isUrgente ? 'URGENTE' : 'SIGER'}] OS #${os.numero_os} • Viatura ${viatura.prefixo_frota} (${viatura.placa})`;
+    const subject = `[ROMANEIO ${isEmergencia ? 'EMERGÊNCIA' : isUrgente ? 'URGENTE' : 'O.S.'}] #${os.numero_os} • Viatura ${viatura.prefixo_frota} (${viatura.placa})`;
 
     const valorEst = Number(os.valor_estimado || os.custo_total || 0).toLocaleString('pt-BR', {
       style: 'currency',
@@ -116,6 +127,11 @@ ${linkAprovacao}`;
 
     const linkApprove = `${baseUrl}/frota/os?id=${os.id}&action=approve`;
     const linkReview = `${baseUrl}/frota/os?id=${os.id}&action=review`;
+    const linkRomaneio = `${baseUrl}/frota/os?id=${os.id}&view=romaneio`;
+
+    const protoRomaneio = `ROM-OS-${new Date().getFullYear().toString().slice(-2)}${String(new Date().getMonth() + 1).padStart(2, '0')}-${(os.id || os.numero_os || '000000').replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase()}`;
+    const oficinaNome = os.oficina?.nome_fantasia || os.oficina?.razao_social || (os.tipo_os === 'INTERNA' ? 'Oficina Interna da Base SIGER' : 'Oficina Homologada Externa');
+    const emitenteNome = os.responsavel_abertura || 'Inspetor de Frotas SPCI';
 
     const html = `
 <!DOCTYPE html>
@@ -125,22 +141,24 @@ ${linkAprovacao}`;
   <title>${subject}</title>
   <style>
     body { margin: 0; padding: 0; background-color: #121418; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #f4f4f5; }
-    .container { max-width: 650px; margin: 30px auto; background-color: #1E2024; border-radius: 16px; border: 1px solid #3C3F45; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-    .header { background: linear-gradient(135deg, #1C4E26 0%, #121820 100%); padding: 30px; text-align: left; border-bottom: 2px solid ${corDestaque}; }
-    .badge { display: inline-block; padding: 6px 12px; font-size: 11px; font-weight: 800; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px; color: ${corDestaque}; background-color: rgba(0,0,0,0.4); border: 1px solid ${corDestaque}; }
-    .title { font-size: 24px; font-weight: 900; margin: 12px 0 4px 0; color: #ffffff; letter-spacing: -0.5px; }
-    .subtitle { font-size: 13px; color: #a1a1aa; margin: 0; }
-    .content { padding: 30px; }
-    .card { background-color: #282A2F; border-radius: 12px; border: 1px solid #3C3F45; padding: 20px; margin-bottom: 20px; }
-    .table-data { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-    .table-data td { padding: 8px 0; border-bottom: 1px solid #3C3F45; }
-    .table-data td.label { color: #a1a1aa; width: 35%; font-family: monospace; text-transform: uppercase; font-size: 11px; }
+    .container { max-width: 680px; margin: 25px auto; background-color: #1E2024; border-radius: 16px; border: 1px solid #3C3F45; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+    .header { background: linear-gradient(135deg, #1C4E26 0%, #121820 100%); padding: 25px 30px; text-align: left; border-bottom: 2.5px solid ${corDestaque}; }
+    .badge { display: inline-block; padding: 5px 12px; font-size: 11px; font-weight: 800; border-radius: 6px; text-transform: uppercase; letter-spacing: 1px; color: ${corDestaque}; background-color: rgba(0,0,0,0.4); border: 1px solid ${corDestaque}; }
+    .title { font-size: 22px; font-weight: 900; margin: 10px 0 4px 0; color: #ffffff; letter-spacing: -0.5px; }
+    .subtitle { font-size: 12px; color: #a1a1aa; margin: 0; }
+    .content { padding: 25px 30px; }
+    .card { background-color: #282A2F; border-radius: 12px; border: 1px solid #3C3F45; padding: 18px; margin-bottom: 18px; }
+    .card-title { margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; font-family: monospace; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
+    .table-data { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .table-data td { padding: 6px 0; border-bottom: 1px solid #3C3F45; }
+    .table-data td.label { color: #a1a1aa; width: 38%; font-family: monospace; text-transform: uppercase; font-size: 11px; }
     .table-data td.val { color: #f4f4f5; font-weight: 700; text-align: right; }
-    .desc-box { background-color: #18191c; border-left: 4px solid ${corDestaque}; padding: 15px; border-radius: 6px; font-size: 13px; color: #e4e4e7; line-height: 1.5; margin: 15px 0; }
-    .cta-container { text-align: center; margin: 30px 0 10px 0; }
-    .btn-approve { display: inline-block; padding: 14px 28px; background: linear-gradient(135deg, #1C4E26 0%, #68D346 100%); color: #ffffff; font-weight: 900; text-decoration: none; border-radius: 10px; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(104,211,70,0.3); }
-    .btn-review { display: inline-block; margin-left: 10px; padding: 14px 24px; background-color: #282A2F; color: #d4d4d8; font-weight: 700; text-decoration: none; border-radius: 10px; font-size: 13px; border: 1px solid #52525b; }
-    .footer { padding: 20px 30px; background-color: #16171a; border-top: 1px solid #282A2F; text-align: center; font-size: 11px; color: #71717a; font-family: monospace; }
+    .desc-box { background-color: #18191c; border-left: 4px solid ${corDestaque}; padding: 12px 15px; border-radius: 6px; font-size: 12px; color: #e4e4e7; line-height: 1.5; margin: 10px 0; font-family: monospace; white-space: pre-line; }
+    .cta-container { text-align: center; margin: 25px 0 10px 0; }
+    .btn-approve { display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #1C4E26 0%, #68D346 100%); color: #ffffff; font-weight: 900; text-decoration: none; border-radius: 10px; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(104,211,70,0.3); }
+    .btn-romaneio { display: inline-block; margin-left: 8px; padding: 12px 20px; background-color: #af101a; color: #ffffff; font-weight: 800; text-decoration: none; border-radius: 10px; font-size: 12px; }
+    .btn-review { display: inline-block; margin-left: 8px; padding: 12px 18px; background-color: #282A2F; color: #d4d4d8; font-weight: 700; text-decoration: none; border-radius: 10px; font-size: 12px; border: 1px solid #52525b; }
+    .footer { padding: 18px 30px; background-color: #16171a; border-top: 1px solid #282A2F; text-align: center; font-size: 11px; color: #71717a; font-family: monospace; }
   </style>
 </head>
 <body>
@@ -148,24 +166,26 @@ ${linkAprovacao}`;
     <div class="header">
       <div class="badge">${tagBanner}</div>
       <div class="title">Ordem de Serviço #${os.numero_os || 'OS-000'}</div>
-      <p class="subtitle">Cockpit Operacional SIGER Master • Complexo Operacional ${viatura.contrato_id || 'PARAUAPEBAS'}</p>
+      <p class="subtitle">Romaneio Oficial: <strong>${protoRomaneio}</strong> • Complexo ${viatura.contrato_id || 'PARAUAPEBAS'}</p>
     </div>
 
     <div class="content">
-      <p style="font-size: 14px; margin-top: 0; color: #d4d4d8;">
+      <p style="font-size: 13.5px; margin-top: 0; color: #d4d4d8;">
         Prezado(a) <strong>${aprovador.nome_aprovador}</strong> (${aprovador.cargo}),
       </p>
-      <p style="font-size: 13px; color: #a1a1aa; line-height: 1.5;">
-        Uma nova Ordem de Serviço foi protocolada no sistema e alocada sob sua alçada operacional (Nível ${aprovador.nivel_alcada}) requerendo validação.
+      <p style="font-size: 12.5px; color: #a1a1aa; line-height: 1.5;">
+        Segue o <strong>Romaneio Técnico de Encaminhamento</strong> emitido por <em>${emitenteNome}</em> para a viatura abaixo discriminada, aguardando validação de sua alçada operacional.
       </p>
 
+      <!-- Dados Bilaterais: Veículo e Oficina -->
       <div class="card">
-        <h4 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; color: #B7F365; font-family: monospace; letter-spacing: 1px;">
-          Especificações da Viatura & Operação
+        <h4 class="card-title" style="color: #B7F365;">
+          <span>🚓 1. Viatura Operacional</span>
+          <span style="color: ${corDestaque}; font-size: 10px;">${prioridade}</span>
         </h4>
         <table class="table-data">
           <tr>
-            <td class="label">Viatura:</td>
+            <td class="label">Viatura / Prefixo:</td>
             <td class="val">${viatura.prefixo_frota} • ${viatura.marca} ${viatura.modelo}</td>
           </tr>
           <tr>
@@ -173,47 +193,55 @@ ${linkAprovacao}`;
             <td class="val">${viatura.placa}</td>
           </tr>
           <tr>
-            <td class="label">Odômetro Atual:</td>
-            <td class="val">${Number(viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</td>
+            <td class="label">Odômetro Registrado:</td>
+            <td class="val">${Number(os.odometro_km || viatura.odometro_atual_km || 0).toLocaleString('pt-BR')} km</td>
           </tr>
           <tr>
-            <td class="label">Severidade / SLA:</td>
-            <td class="val" style="color: ${corDestaque};">${prioridade}</td>
+            <td class="label">Oficina Destino:</td>
+            <td class="val" style="color: #60a5fa;">${oficinaNome}</td>
           </tr>
           <tr>
-            <td class="label">Valor Estimado:</td>
-            <td class="val" style="color: #68D346; font-size: 16px;">${valorEst}</td>
+            <td class="label">Status Atual da O.S.:</td>
+            <td class="val" style="color: #B7F365;">${os.status_os || os.status || 'AGUARDANDO APROVAÇÃO'}</td>
+          </tr>
+          <tr>
+            <td class="label">Valor Total Estimado:</td>
+            <td class="val" style="color: #68D346; font-size: 15px;">${valorEst}</td>
           </tr>
         </table>
       </div>
 
+      <!-- Componentes e Subcomponentes do Romaneio -->
       <div class="card">
-        <h4 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; color: #68D346; font-family: monospace; letter-spacing: 1px;">
-          🔩 Componentes & Subcomponentes Flegados
-        </h4>
-        <div style="background-color: #18191c; border-left: 4px solid #68D346; padding: 15px; border-radius: 6px; font-size: 12px; color: #e4e4e7; line-height: 1.6; white-space: pre-line; font-family: monospace;">
-${os.resumo_anatomico || os.descricao_motivo || os.descricao_servico || 'Nenhum detalhamento anatômico informado.'}
-        </div>
-      </div>
-
-      <div class="card">
-        <h4 style="margin: 0 0 5px 0; font-size: 12px; text-transform: uppercase; color: #a1a1aa; font-family: monospace;">
-          Descrição do Diagnóstico / Defeito:
+        <h4 class="card-title" style="color: #68D346;">
+          <span>🔩 2. Componentes Flegados a Manutenir (Romaneio)</span>
         </h4>
         <div class="desc-box">
-          "${os.descricao_motivo || os.descricao_servico || 'Manutenção veicular necessária'}"
+${os.resumo_anatomico || os.descricao_motivo || os.descricao_servico || 'Nenhum detalhamento individual registrado.'}
         </div>
       </div>
 
+      <!-- Diagnóstico do Solicitante -->
+      <div class="card">
+        <h4 class="card-title" style="color: #a1a1aa;">
+          <span>📝 3. Diagnóstico / Relato Inicial do Solicitante</span>
+        </h4>
+        <div style="font-size: 12px; color: #d4d4d8; line-height: 1.5; font-style: italic;">
+          "${os.descricao_motivo || os.descricao_servico || 'Manutenção programada'}"
+        </div>
+      </div>
+
+      <!-- Botões de Ação -->
       <div class="cta-container">
-        <a href="${linkApprove}" class="btn-approve" target="_blank">Aprovar Ordem de Serviço</a>
+        <a href="${linkApprove}" class="btn-approve" target="_blank">Aprovar O.S.</a>
+        <a href="${linkRomaneio}" class="btn-romaneio" target="_blank">📄 Visualizar Romaneio (PDF)</a>
         <a href="${linkReview}" class="btn-review" target="_blank">Solicitar Revisão</a>
       </div>
     </div>
 
     <div class="footer">
       SIGER Master • Sistema Integrado de Gestão de Emergência e Resgate<br>
-      Este é um e-mail transacional automatizado da central de frotas e auditoria SPCI.
+      Romaneio oficial emitido sob governança do Complexo Carajás / SPCI.
     </div>
   </div>
 </body>

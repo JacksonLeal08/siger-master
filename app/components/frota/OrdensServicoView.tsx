@@ -20,9 +20,11 @@ import {
 import { 
   quickApproveOSAction 
 } from '@/app/actions/osWorkflowActions';
+import { useSearchParams } from 'next/navigation';
 import { useSpci } from '@/app/context/SpciContext';
 import { OSDetailModal } from './OSDetailModal';
 import { OrdemServicoModal } from './OrdemServicoModal';
+import { OSRomaneioModal } from './OSRomaneioModal';
 import { DockMinimizados, MinimizedWindow } from './DockMinimizados';
 import { 
   Wrench, 
@@ -46,7 +48,8 @@ import {
   ChevronRight,
   Disc,
   Fuel,
-  Building2
+  Building2,
+  Printer
 } from 'lucide-react';
 
 export const OrdensServicoView: React.FC = () => {
@@ -67,11 +70,19 @@ export const OrdensServicoView: React.FC = () => {
   // Modais
   const [selectedOSForDetail, setSelectedOSForDetail] = useState<OrdemServicoFrota | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
+  const [selectedOSForRomaneio, setSelectedOSForRomaneio] = useState<OrdemServicoFrota | null>(null);
+  const [isRomaneioOpen, setIsRomaneioOpen] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [approvingId, setApprovingId] = useState<string | null>(null);
 
   // Janelas minimizadas no Dock
   const [minimizedWindows, setMinimizedWindows] = useState<MinimizedWindow[]>([]);
+
+  // Leitura de Parâmetros de URL (compartilhamento WhatsApp / E-mail)
+  const searchParams = useSearchParams();
+  const targetId = searchParams ? searchParams.get('id') : null;
+  const targetView = searchParams ? searchParams.get('view') : null;
+  const targetAction = searchParams ? searchParams.get('action') : null;
 
   const loadData = async () => {
     setLoading(true);
@@ -95,6 +106,22 @@ export const OrdensServicoView: React.FC = () => {
   useEffect(() => {
     loadData();
   }, [activeSite]);
+
+  // Deep-link do WhatsApp ou E-mail
+  useEffect(() => {
+    if (targetId && ordens.length > 0) {
+      const found = ordens.find(o => o.id === targetId || o.numero_os === targetId);
+      if (found) {
+        if (targetView === 'romaneio') {
+          setSelectedOSForRomaneio(found);
+          setIsRomaneioOpen(true);
+        } else {
+          setSelectedOSForDetail(found);
+          setIsDetailOpen(true);
+        }
+      }
+    }
+  }, [targetId, targetView, targetAction, ordens]);
 
   // Filtros combinados
   const filteredOrdens = useMemo(() => {
@@ -461,20 +488,35 @@ export const OrdensServicoView: React.FC = () => {
                               {valor}
                             </span>
 
-                            {col.etapa === '3_AGUARDANDO_APROVACAO' ? (
+                            <div className="flex items-center gap-1.5">
                               <button
                                 type="button"
-                                disabled={approvingId === os.id}
-                                onClick={(e) => handleQuickApprove(e, os)}
-                                className="px-2 py-1 rounded-lg bg-gradient-to-r from-[#1C4E26] to-[#68D346] hover:brightness-110 active:scale-95 text-white font-mono font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-xs border-none cursor-pointer disabled:opacity-50"
-                                title="Aprovar em 1 clique"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedOSForRomaneio(os);
+                                  setIsRomaneioOpen(true);
+                                }}
+                                className="p-1 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#3C3F45] transition cursor-pointer border-none bg-transparent"
+                                title="Visualizar / Imprimir Romaneio Oficial"
                               >
-                                <Check className="w-3 h-3" />
-                                <span>{approvingId === os.id ? '...' : 'Aprovar'}</span>
+                                <Printer className="w-3.5 h-3.5 text-red-500" />
                               </button>
-                            ) : (
-                              <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                            )}
+
+                              {col.etapa === '3_AGUARDANDO_APROVACAO' ? (
+                                <button
+                                  type="button"
+                                  disabled={approvingId === os.id}
+                                  onClick={(e) => handleQuickApprove(e, os)}
+                                  className="px-2 py-1 rounded-lg bg-gradient-to-r from-[#1C4E26] to-[#68D346] hover:brightness-110 active:scale-95 text-white font-mono font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-xs border-none cursor-pointer disabled:opacity-50"
+                                  title="Aprovar em 1 clique"
+                                >
+                                  <Check className="w-3 h-3" />
+                                  <span>{approvingId === os.id ? '...' : 'Aprovar'}</span>
+                                </button>
+                              ) : (
+                                <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -548,18 +590,34 @@ export const OrdensServicoView: React.FC = () => {
                       </td>
 
                       <td className="p-3.5 pr-5 text-right">
-                        {os.etapa_atual === '3_AGUARDANDO_APROVACAO' ? (
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             type="button"
-                            disabled={approvingId === os.id}
-                            onClick={(e) => handleQuickApprove(e, os)}
-                            className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#1C4E26] to-[#68D346] text-white font-mono font-bold text-[10px] uppercase cursor-pointer border-none shadow-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedOSForRomaneio(os);
+                              setIsRomaneioOpen(true);
+                            }}
+                            className="p-1 px-2 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#3C3F45] transition cursor-pointer border border-slate-300 dark:border-[#3C3F45] bg-transparent flex items-center gap-1 text-[10px] font-mono"
+                            title="Visualizar e Imprimir Romaneio"
                           >
-                            Aprovar
+                            <Printer className="w-3 h-3 text-red-500" />
+                            <span className="hidden sm:inline">Romaneio</span>
                           </button>
-                        ) : (
-                          <span className="text-[10px] text-slate-400 font-mono">Inspecionar</span>
-                        )}
+
+                          {os.etapa_atual === '3_AGUARDANDO_APROVACAO' ? (
+                            <button
+                              type="button"
+                              disabled={approvingId === os.id}
+                              onClick={(e) => handleQuickApprove(e, os)}
+                              className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#1C4E26] to-[#68D346] text-white font-mono font-bold text-[10px] uppercase cursor-pointer border-none shadow-xs"
+                            >
+                              Aprovar
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-slate-400 font-mono">Inspecionar</span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -594,6 +652,17 @@ export const OrdensServicoView: React.FC = () => {
           setIsCreateModalOpen(false);
           triggerSuccessNotification('Nova OS Cadastrada!', `OS #${saved.numero_os} aberta com sucesso.`);
         }}
+      />
+
+      {/* MODAL DE ROMANEIO TÉCNICO SPCI */}
+      <OSRomaneioModal
+        isOpen={isRomaneioOpen}
+        onClose={() => setIsRomaneioOpen(false)}
+        os={selectedOSForRomaneio}
+        viatura={selectedOSForRomaneio?.viatura || viaturas.find(v => v.id === selectedOSForRomaneio?.viatura_id) || null}
+        oficina={selectedOSForRomaneio?.oficina || oficinas.find(o => o.id === selectedOSForRomaneio?.oficina_id) || null}
+        emitenteNome={selectedOSForRomaneio?.responsavel_abertura || 'Inspetor de Frotas SPCI'}
+        aprovadorNome={userProfile?.name || currentUser?.displayName || 'Gestor Responsável SPCI'}
       />
 
       <DockMinimizados

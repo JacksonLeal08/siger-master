@@ -15,7 +15,8 @@ import {
   Gauge, 
   FileText,
   Clock,
-  Car
+  Car,
+  Calendar
 } from 'lucide-react';
 import { compressImageToCanvas } from './DualPhotoCapture';
 import { VehicleAnatomySelector } from './VehicleAnatomySelector';
@@ -39,6 +40,7 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
 }) => {
   const isDark = theme === 'dark';
 
+  const [dataAbertura, setDataAbertura] = useState<string>(() => new Date().toISOString().slice(0, 16));
   const [tipoOs, setTipoOs] = useState<'INTERNA' | 'EXTERNA'>('INTERNA');
   const [natureza, setNatureza] = useState<'PREVENTIVA' | 'CORRETIVA'>('CORRETIVA');
   const [prioridade, setPrioridade] = useState<CriticidadeOS>('NORMAL');
@@ -119,11 +121,12 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
         custo_total: valorEstimado,
         odometro_km: parseFloat(odometro) || 0,
         descricao_servico: `[Abertura Mobile via Terminal] Solicitante: ${solicitanteNome.trim() || 'Motorista Operacional'}\nRelato: ${descricao.trim()}`,
+        responsavel_abertura: solicitanteNome.trim() || 'Motorista Operacional',
         status: 'ABERTA',
         status_os: 'ABERTA',
         oficina_id: tipoOs === 'EXTERNA' ? oficinaId : null,
         comprovantes_urls: fotoEvidencia ? [fotoEvidencia] : [],
-        data_abertura: new Date().toISOString()
+        data_abertura: dataAbertura ? new Date(dataAbertura).toISOString() : new Date().toISOString()
       };
 
       const res = await saveOrdemServicoAction(payload);
@@ -178,6 +181,113 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
             <span>{erroMsg}</span>
           </div>
         )}
+
+        {/* ==================================================================== */}
+        {/* PAINEL EXPLÍCITO NO TOPO: DATA DE ABERTURA & TIPO DA ORDEM */}
+        {/* ==================================================================== */}
+        <div className={`p-4 rounded-2xl border space-y-3.5 ${
+          isDark ? 'bg-zinc-900 border-zinc-800 shadow-md' : 'bg-white border-slate-300 shadow-sm'
+        }`}>
+          <div className="flex items-center justify-between border-b pb-2 border-zinc-800 dark:border-zinc-800">
+            <span className="text-[11px] font-black uppercase tracking-wider text-amber-500 font-mono flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5" />
+              Identificação & Governança da O.S.
+            </span>
+            <span className="text-[10px] font-mono text-zinc-400">
+              Viatura: {viatura.prefixo_frota}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* Campo 1: Data e Hora de Abertura */}
+            <div>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1 ${
+                isDark ? 'text-zinc-300' : 'text-slate-700'
+              }`}>
+                <Clock className="w-3 h-3 text-zinc-400" />
+                Data e Hora de Abertura *
+              </label>
+              <input
+                type="datetime-local"
+                value={dataAbertura}
+                onChange={(e) => setDataAbertura(e.target.value)}
+                className={`w-full p-2.5 rounded-xl border text-xs font-mono font-bold outline-none transition ${
+                  isDark
+                    ? 'bg-zinc-950 border-zinc-700 text-zinc-100 focus:border-amber-500'
+                    : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-amber-600'
+                }`}
+                required
+              />
+              <span className="text-[9px] text-zinc-500 mt-1 block">
+                Permite registro retroativo ou horário oficial da triagem.
+              </span>
+            </div>
+
+            {/* Campo 2: Classificação de Criticidade / Tipo da Ordem */}
+            <div>
+              <label className={`block text-[10px] font-bold uppercase tracking-wider mb-1 flex items-center justify-between ${
+                isDark ? 'text-zinc-300' : 'text-slate-700'
+              }`}>
+                <span className="flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3 text-amber-500" />
+                  Tipo da Ordem / Criticidade *
+                </span>
+                <span className="text-[9px] font-mono text-zinc-500">
+                  {subcomponentes.some(s => s.criticidade === 'EMERGENCIA') ? '⚡ Emergência' : 'Manual'}
+                </span>
+              </label>
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPrioridade('NORMAL')}
+                  className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase font-mono border flex flex-col items-center justify-center transition-all cursor-pointer ${
+                    prioridade === 'NORMAL'
+                      ? 'bg-[#1C4E26] text-[#B7F365] border-[#68D346] shadow-xs'
+                      : isDark
+                        ? 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                        : 'bg-slate-50 border-slate-300 text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="text-[10px]">🟢 NORMAL</span>
+                  <span className="text-[7px] opacity-80">Rotina</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPrioridade('URGENTE')}
+                  className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase font-mono border flex flex-col items-center justify-center transition-all cursor-pointer ${
+                    prioridade === 'URGENTE'
+                      ? 'bg-amber-500 text-zinc-950 border-amber-600 shadow-xs font-black'
+                      : isDark
+                        ? 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                        : 'bg-slate-50 border-slate-300 text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="text-[10px]">🟠 URGENTE</span>
+                  <span className="text-[7px] opacity-90">SLA 2h</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPrioridade('EMERGENCIA')}
+                  className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase font-mono border flex flex-col items-center justify-center transition-all cursor-pointer ${
+                    prioridade === 'EMERGENCIA'
+                      ? 'bg-red-600 text-white border-red-700 shadow-md font-black animate-pulse'
+                      : isDark
+                        ? 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                        : 'bg-slate-50 border-slate-300 text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span className="text-[10px]">🔴 EMERGÊNCIA</span>
+                  <span className="text-[7px] opacity-90">Interdição</span>
+                </button>
+              </div>
+              <span className="text-[9px] text-zinc-500 mt-1 block">
+                Define a alçada de aprovação e aciona a Matriz de Notificações.
+              </span>
+            </div>
+          </div>
+        </div>
 
         {/* Natureza da Manutenção */}
         <div className={`p-4 rounded-2xl border space-y-3 ${

@@ -41,11 +41,15 @@ import {
   Camera,
   Sparkles,
   Paperclip,
-  Layers
+  Layers,
+  Calendar,
+  AlertTriangle
 } from 'lucide-react';
 import { VehicleAnatomySelector } from './VehicleAnatomySelector';
 import { SubcomponenteSelecionado, formatarResumoAnatomico } from '@/lib/types/vehicleAnatomy';
 import { CriticidadeOS } from '@/lib/types/osWorkflow';
+import { OSRomaneioModal } from './OSRomaneioModal';
+import { useSpci } from '@/app/context/SpciContext';
 
 interface OrdemServicoModalProps {
   isOpen: boolean;
@@ -76,6 +80,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
   onMinimize,
   onSuccess
 }) => {
+  const { userProfile, currentUser } = useSpci();
   const [isMaximized, setIsMaximized] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [oficinas, setOficinas] = useState<OficinaPrestador[]>([]);
@@ -86,6 +91,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
 
   // Form states
   const [numeroOs, setNumeroOs] = useState(`OS-${Date.now().toString().slice(-6)}`);
+  const [dataAbertura, setDataAbertura] = useState<string>(() => new Date().toISOString().slice(0, 16));
   const [tipoOs, setTipoOs] = useState<TipoOrdemServico>('EXTERNA');
   const [oficinaId, setOficinaId] = useState<string>('');
   const [natureza, setNatureza] = useState<NaturezaManutencao>('PREVENTIVA');
@@ -97,6 +103,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
   const [prioridade, setPrioridade] = useState<CriticidadeOS>('NORMAL');
   const [subcomponentes, setSubcomponentes] = useState<SubcomponenteSelecionado[]>([]);
   const [resumoAnatomico, setResumoAnatomico] = useState<string>('');
+  const [isRomaneioOpen, setIsRomaneioOpen] = useState<boolean>(false);
 
   // Rateio de Custos
   const [custoPecas, setCustoPecas] = useState<string>('0');
@@ -148,6 +155,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
   useEffect(() => {
     if (osToEdit) {
       setNumeroOs(osToEdit.numero_os);
+      setDataAbertura(osToEdit.data_abertura ? new Date(osToEdit.data_abertura).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16));
       setSelectedViaturaId(osToEdit.viatura_id);
       setTipoOs(osToEdit.tipo_os || 'EXTERNA');
       setOficinaId(osToEdit.oficina_id || '');
@@ -169,6 +177,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
       setComprovantesUrls(osToEdit.comprovantes_urls || []);
     } else {
       setNumeroOs(`OS-${Date.now().toString().slice(-6)}`);
+      setDataAbertura(new Date().toISOString().slice(0, 16));
       setSelectedViaturaId(viatura?.id || (viaturas.length > 0 ? viaturas[0].id : ''));
       setTipoOs('EXTERNA');
       setNatureza('PREVENTIVA');
@@ -325,7 +334,7 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
   };
 
   const handlePrintRomaneio = () => {
-    window.print();
+    setIsRomaneioOpen(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -387,7 +396,8 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
         orcamentos_json: orcamentos,
         notas_fiscais_json: notasFiscais,
         comprovantes_urls: comprovantesUrls,
-        data_abertura: osToEdit?.data_abertura || new Date().toISOString(),
+        responsavel_abertura: osToEdit?.responsavel_abertura || userProfile?.name || currentUser?.displayName || 'Inspetor de Frotas',
+        data_abertura: dataAbertura ? new Date(dataAbertura).toISOString() : (osToEdit?.data_abertura || new Date().toISOString()),
         data_conclusao: status === 'CONCLUIDA' ? (osToEdit?.data_conclusao || new Date().toISOString()) : null
       });
 
@@ -579,6 +589,97 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
           {/* ================= ABA 1: DADOS GERAIS & ESCOPO ================= */}
           {modalTab === 'DADOS' && (
             <div className="space-y-4">
+              {/* ==================================================================== */}
+              {/* PAINEL EXPLÍCITO NO TOPO: DATA DE ABERTURA & TIPO DA ORDEM */}
+              {/* ==================================================================== */}
+              <div className="bg-slate-50 dark:bg-[#181A1E] border border-slate-200 dark:border-[#282A2F] rounded-2xl p-4 space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between border-b border-slate-200/70 dark:border-[#282A2F] pb-2.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-red-600 dark:text-red-400 font-mono flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    Identificação & Governança da O.S.
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    Protocolo: #{numeroOs}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Campo 1: Data e Hora de Abertura */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-slate-400" />
+                      Data e Hora de Abertura da O.S. *
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={dataAbertura}
+                      onChange={(e) => setDataAbertura(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 rounded-xl p-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition"
+                      required
+                    />
+                    <span className="text-[9px] text-slate-400 mt-1 block">
+                      Permite registro retroativo ou horário oficial da triagem.
+                    </span>
+                  </div>
+
+                  {/* Campo 2: Classificação de Criticidade / Tipo da Ordem */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-slate-600 dark:text-slate-400 mb-1 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3 text-amber-500" />
+                        Tipo da Ordem / Criticidade *
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400">
+                        {subcomponentes.some(s => s.criticidade === 'EMERGENCIA') ? '⚡ Emergência detectada' : 'Manual / Automático'}
+                      </span>
+                    </label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setPrioridade('NORMAL')}
+                        className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase font-mono border flex flex-col items-center justify-center transition-all cursor-pointer ${
+                          prioridade === 'NORMAL'
+                            ? 'bg-[#1C4E26] text-[#B7F365] border-[#68D346] shadow-xs ring-1 ring-[#68D346]'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                      >
+                        <span className="text-[10.5px]">🟢 NORMAL</span>
+                        <span className="text-[7.5px] opacity-80 font-normal">SLA Rotina</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPrioridade('URGENTE')}
+                        className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase font-mono border flex flex-col items-center justify-center transition-all cursor-pointer ${
+                          prioridade === 'URGENTE'
+                            ? 'bg-amber-500 text-white border-amber-600 shadow-xs ring-1 ring-amber-400'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                      >
+                        <span className="text-[10.5px]">🟠 URGENTE</span>
+                        <span className="text-[7.5px] opacity-90 font-normal">SLA 2 Horas</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setPrioridade('EMERGENCIA')}
+                        className={`py-2 px-1 rounded-xl text-[10px] font-bold uppercase font-mono border flex flex-col items-center justify-center transition-all cursor-pointer ${
+                          prioridade === 'EMERGENCIA'
+                            ? 'bg-red-600 text-white border-red-700 shadow-md ring-1 ring-red-400 animate-pulse'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                      >
+                        <span className="text-[10.5px]">🔴 EMERGÊNCIA</span>
+                        <span className="text-[7.5px] opacity-90 font-normal">Interdição</span>
+                      </button>
+                    </div>
+                    <span className="text-[9px] text-slate-400 mt-1 block">
+                      Define a alçada de aprovação e aciona a Matriz de Notificações.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Seleção de Viatura (se não pré-fixada) */}
               {!viatura && (
                 <div>
@@ -1213,6 +1314,39 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
           </div>
         </form>
       </motion.div>
+
+      {/* MODAL DE ROMANEIO CORPORATIVO SPCI */}
+      <OSRomaneioModal
+        isOpen={isRomaneioOpen}
+        onClose={() => setIsRomaneioOpen(false)}
+        os={{
+          ...(osToEdit || {}),
+          id: osToEdit?.id || 'temp-preview',
+          numero_os: numeroOs,
+          data_abertura: dataAbertura ? new Date(dataAbertura).toISOString() : new Date().toISOString(),
+          prioridade: prioridade,
+          tipo_os: tipoOs,
+          natureza_manutencao: natureza,
+          tipo_manutencao: natureza === 'PREVENTIVA' ? 'PREVENTIVA' : 'CORRETIVA',
+          status: status,
+          status_os: status,
+          odometro_km: parseFloat(odometro) || 0,
+          descricao_servico: descricao,
+          custo_pecas: parseFloat(custoPecas) || 0,
+          custo_mao_de_obra: parseFloat(custoMaoObra) || 0,
+          custo_pneus: parseFloat(custoPneus) || 0,
+          custo_total: parseFloat(custoTotal) || 0,
+          valor_estimado: parseFloat(custoTotal) || 0,
+          resumo_anatomico: resumoAnatomico,
+          itens_componentes_json: subcomponentes as any,
+          contrato_id: contratoId || activeViatura?.contrato_id || 'PARAUAPEBAS',
+          viatura_id: activeViatura?.id || selectedViaturaId,
+          responsavel_abertura: osToEdit?.responsavel_abertura || userProfile?.name || currentUser?.displayName || 'Inspetor de Frotas SPCI'
+        } as any}
+        viatura={activeViatura}
+        oficina={oficinas.find(o => o.id === oficinaId) || null}
+        emitenteNome={userProfile?.name || currentUser?.displayName || 'Inspetor de Frotas SPCI'}
+      />
     </div>
   );
 };
