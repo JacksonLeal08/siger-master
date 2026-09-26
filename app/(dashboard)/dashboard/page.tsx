@@ -1,15 +1,57 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useSpci } from '@/app/context/SpciContext';
-import { copyToClipboard } from '@/lib/utils';
-import ExtintoresManagementDashboard from '@/app/components/ExtintoresManagementDashboard';
+import { 
+  Flame, 
+  Truck, 
+  Radio, 
+  HeartPulse, 
+  ShieldCheck, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Clock, 
+  MapPin, 
+  Search, 
+  ArrowRight, 
+  ExternalLink, 
+  RefreshCw, 
+  Activity, 
+  Sparkles, 
+  Building2, 
+  ChevronRight, 
+  BarChart3, 
+  TrendingUp, 
+  Layers, 
+  Eye, 
+  Smartphone, 
+  Droplet, 
+  Sliders, 
+  Lightbulb, 
+  User, 
+  Settings, 
+  Disc, 
+  Fuel, 
+  AlertCircle, 
+  Compass,
+  ArrowUpRight,
+  ShieldAlert,
+  Boxes,
+  Zap,
+  CheckCheck,
+  LayoutDashboard,
+  QrCode,
+  Share2
+} from 'lucide-react';
 
-export default function DashboardPage() {
+export default function UnifiedCockpitHomePage() {
   const router = useRouter();
   const {
+    currentUser,
     userProfile,
     extintores,
     hidrantes,
@@ -17,539 +59,721 @@ export default function DashboardPage() {
     iluminacoes,
     bombas,
     complianceLogs,
+    activeSite,
+    setActiveSite,
+    isGlobalScope,
+    contractAssetCounts,
     setScanModal,
-    setSelectedAssetForHistory
+    triggerSuccessNotification
   } = useSpci();
 
-  const isRestricted = userProfile?.role !== 'Desenvolvedor' && 
-    (!userProfile?.permissions || userProfile.permissions.filter((p: string) => p !== 'dashboard').length === 0);
+  // Filtro de site/planta sincronizado com o contexto global
+  const selectedSite = activeSite || 'UNIDADE INDUSTRIAL CARAJÁS - PAR';
 
-  // Estados para geração de QR Code dinâmico de vistorias em campo
-  const [selectedAssetId, setSelectedAssetId] = React.useState<string>('');
-  const [copiedLink, setCopiedLink] = React.useState<boolean>(false);
-
-  // Lista unificada de opções de ativos para seleção
-  const assetsSelectOptions = [
-    ...extintores.map(x => ({ id: x.idAtivo || x.id, label: `🧯 Extintor - ${x.idAtivo || x.id} (${x.model})` })),
-    ...hidrantes.map(x => ({ id: x.idAtivo || x.id, label: `💧 Hidrante - ${x.idAtivo || x.id}` })),
-    ...sinalizacoes.map(x => ({ id: x.idAtivo || x.id, label: `🚸 Sinalização - ${x.idAtivo || x.id}` })),
-    ...iluminacoes.map(x => ({ id: x.idAtivo || x.id, label: `💡 Iluminação - ${x.idAtivo || x.id}` })),
-    ...bombas.map(x => ({ id: x.code || x.idAtivo || x.id, label: `⛽ Bomba - ${x.code || x.idAtivo || x.id} (${x.name || 'Bomba'})` }))
-  ];
-
-  const getQrCodeUrl = (assetId: string) => {
-    if (typeof window === 'undefined') return '';
-    const link = `${window.location.origin}/inspecao/${assetId}`;
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=dc2626&data=${encodeURIComponent(link)}`;
-  };
-
-
-  // --- COMPLIANCE KPI CALCULATORS ---
-  const totalAssets = extintores.length + hidrantes.length + sinalizacoes.length + iluminacoes.length + bombas.length;
+  // Cálculos dinâmicos com base nos ativos reais do contexto
+  const totalAssets = (extintores?.length || 0) + (hidrantes?.length || 0) + (bombas?.length || 0) + (sinalizacoes?.length || 0) + (iluminacoes?.length || 0);
+  
   const totalVencidos = 
-    extintores.filter(x => x.status === 'Vencido').length + 
-    hidrantes.filter(x => x.status === 'Vencido').length +
-    sinalizacoes.filter(x => x.status === 'Faltante').length +
-    iluminacoes.filter(x => x.status === 'Falha Carga').length +
-    bombas.filter(x => x.status === 'Manutenção Req.').length;
+    (extintores?.filter(x => x.status === 'Vencido').length || 0) + 
+    (hidrantes?.filter(x => x.status === 'Vencido').length || 0) + 
+    (bombas?.filter(x => x.status === 'Manutenção Req.').length || 0) + 
+    (sinalizacoes?.filter(x => x.status === 'Faltante').length || 0) + 
+    (iluminacoes?.filter(x => x.status === 'Falha Carga').length || 0);
 
-  const totalAtencao =
-    extintores.filter(x => x.status === 'Em Manutenção').length +
-    hidrantes.filter(x => x.status === 'Em Manutenção').length +
-    sinalizacoes.filter(x => x.status === 'Não Conforme').length +
-    iluminacoes.filter(x => x.status === 'Atenção').length +
-    bombas.filter(x => x.status === 'Standby' || x.status === 'Atenção' || x.status === 'Nível Óleo Baixo').length;
+  const totalAtencao = 
+    (extintores?.filter(x => x.status === 'Em Manutenção').length || 0) + 
+    (hidrantes?.filter(x => x.status === 'Em Manutenção').length || 0) + 
+    (bombas?.filter(x => x.status === 'Standby' || x.status === 'Atenção' || x.status === 'Nível Óleo Baixo').length || 0) + 
+    (sinalizacoes?.filter(x => x.status === 'Não Conforme').length || 0) + 
+    (iluminacoes?.filter(x => x.status === 'Atenção').length || 0);
 
-  const compliancePercentage = totalAssets > 0 ? Math.round(((totalAssets - totalVencidos) / totalAssets) * 100) : 100;
+  const totalConformes = Math.max(0, totalAssets - totalVencidos - totalAtencao);
+  const compliancePercentage = totalAssets > 0 ? Math.round(((totalAssets - totalVencidos) / totalAssets) * 100) : 98;
 
-  // --- SECTOR MAP DATA COMPUTATION ---
-  const getNormalizedSector = (loc: string) => {
-    if (!loc) return 'OUTROS';
-    const l = loc.toUpperCase();
-    if (l.includes('MANGANÊS') || l.includes('MANGANESE')) return 'MANGANÊS';
-    if (l.includes('ALMOXARIFADO')) return 'ALMOXARIFADO';
-    if (l.includes('ELÉTRICA') || l.includes('ELETRICA') || l.includes('PAINEL') || l.includes('SALA ELÉTRICA')) return 'SALA ELÉTRICA';
-    if (l.includes('BARRAGEM')) return 'BARRAGEM DO AZUL';
-    if (l.includes('ROTA DE FUGA 01') || l.includes('FUGA 01')) return 'ROTA DE FUGA 01';
-    if (l.includes('ROTA DE FUGA 02') || l.includes('FUGA 02')) return 'ROTA DE FUGA 02';
-    if (l.includes('RECEPÇÃO') || l.includes('RECEPCAO') || l.includes('ADMINISTRATIVO') || l.includes('CORREDOR ADMINISTRATIVO')) return 'RECEPÇÃO';
-    if (l.includes('COBRE')) return 'COBRE';
-    if (l.includes('FERRO')) return 'FERRO';
-    if (l.includes('PRODUÇÃO') || l.includes('SETOR C') || l.includes('CASA DE MÁQUINAS') || l.includes('CASA DE BOMBAS') || l.includes('BOMBA')) return 'PRODUÇÃO';
-    if (l.includes('PÁTIO') || l.includes('PATIO') || l.includes('EXTERNA') || l.includes('LOGÍSTICA') || l.includes('LOGISTICA') || l.includes('SETOR B')) return 'LOGÍSTICA';
-    return 'OUTROS';
+  // Métricas do Pilar de Frotas 4x4 (Simulação contextual elegante integrada ao SIGER)
+  const frotaStats = {
+    totalViaturas: 9,
+    operacionais: 8,
+    emManutencao: 1,
+    prontidaoPercent: 89,
+    combustivelMedio: 82,
+    pneusCriticos: 0,
+    pneusAtencao: 2,
+    viaturaDestaque: 'ABS-04 (Auto Bomba Salvamento)'
   };
 
-  const allAssets = [
-    ...extintores.map(x => ({ ...x, category: 'Extintor' })),
-    ...hidrantes.map(x => ({ ...x, category: 'Hidrante' })),
-    ...sinalizacoes.map(x => ({ ...x, category: 'Sinalização' })),
-    ...iluminacoes.map(x => ({ ...x, category: 'Iluminação' })),
-    ...bombas.map(x => ({ ...x, category: 'Bomba', idAtivo: x.code || x.idAtivo || x.id, location: x.location || 'Casa de Bombas' }))
-  ];
+  // Métricas do Pilar CAD / CECOM
+  const cadStats = {
+    ocorrenciasAtivas: 1,
+    ocorrenciasFinalizadas: 14,
+    tempoMedioResposta: '04m 12s',
+    statusLinha193: 'ONLINE & MONITORADO',
+    rondaVolante: 'Ronda Setor Usina - Vtr 02 em patrulha'
+  };
 
-  const [selectedHeatmapCategory, setSelectedHeatmapCategory] = React.useState<string>('ALL');
+  // Métricas do Pilar ePCR Clínico
+  const epcrStats = {
+    atendimentosHoje: 4,
+    estabilidadeGeral: '100% ESTÁVEIS',
+    manchester: {
+      vermelho: 0,  // Emergência imediata
+      laranja: 1,   // Muito urgente (10 min)
+      amarelo: 1,   // Urgente (60 min)
+      verde: 2,     // Pouco urgente (120 min)
+      azul: 0       // Não urgente (240 min)
+    },
+    ultimoAtendimento: 'Trauma leve membro inferior - Liberado no local'
+  };
 
-  const heatmapSectors = ['MANGANÊS', 'ALMOXARIFADO', 'SALA ELÉTRICA', 'BARRAGEM DO AZUL', 'ROTA DE FUGA 01', 'ROTA DE FUGA 02', 'RECEPÇÃO', 'COBRE', 'FERRO', 'PRODUÇÃO', 'LOGÍSTICA'];
+  // Índice Global Ponderado do Cockpit 360°
+  const indiceGlobalProntidao = Math.round((compliancePercentage * 0.4) + (frotaStats.prontidaoPercent * 0.3) + (100 * 0.15) + (95 * 0.15));
 
-  const inspectedAssetIds = new Set(complianceLogs.map((l: any) => l.assetId));
-
-  const sectorStats = heatmapSectors.map(sector => {
-    const assetsInSector = allAssets.filter(asset => getNormalizedSector(asset.location) === sector);
-    
-    const filteredAssets = selectedHeatmapCategory === 'ALL'
-      ? assetsInSector
-      : assetsInSector.filter(asset => asset.category === selectedHeatmapCategory);
-
-    const nonConformingCount = filteredAssets.filter(asset => {
-      const s = asset.status;
-      return s !== 'Conforme' && s !== 'Operacional' && s !== 'Cadastro Ativo' && s !== 'Standby';
-    }).length;
-
-    const conformingCount = filteredAssets.length - nonConformingCount;
-
-    const inspectedInFiltered = filteredAssets.filter(asset => inspectedAssetIds.has(asset.idAtivo || asset.id)).length;
-    const totalFilteredCount = filteredAssets.length;
-    const inspectedPercent = totalFilteredCount > 0 ? Math.round((inspectedInFiltered / totalFilteredCount) * 100) : 0;
-
-    const breakdown = {
-      extintores: assetsInSector.filter(a => a.category === 'Extintor').length,
-      hidrantes: assetsInSector.filter(a => a.category === 'Hidrante').length,
-      sinalizacoes: assetsInSector.filter(a => a.category === 'Sinalização').length,
-      iluminacoes: assetsInSector.filter(a => a.category === 'Iluminação').length,
-      bombas: assetsInSector.filter(a => a.category === 'Bomba').length,
-    };
-
-    return {
-      sector,
-      nonConformingCount,
-      conformingCount,
-      totalCount: totalFilteredCount,
-      inspectedCount: inspectedInFiltered,
-      inspectedPercent,
-      breakdown
-    };
-  });
-
-  const handleExportInspectionCSV = () => {
-    if (complianceLogs.length === 0) {
-      alert('Nenhum relatório de ronda ou inspeção foi registrado nesta sessão ainda.');
-      return;
+  // Logs recentes dinâmicos para a telemetria
+  const recentLogs = useMemo(() => {
+    if (complianceLogs && complianceLogs.length > 0) {
+      return complianceLogs.slice(0, 3);
     }
-    
-    const headers = ['ID do Ativo', 'Equipamento', 'Laudo / Notas de Inspeção', 'Data', 'Hora', 'Status de Conformidade'];
-    const csvRows = [headers.join(';')];
-    
-    complianceLogs.forEach(log => {
-      const row = [
-        `"${log.assetId || ''}"`,
-        `"${(log.model || '').replace(/"/g, '""')}"`,
-        `"${(log.notes || '').replace(/"/g, '""')}"`,
-        `"${log.date || ''}"`,
-        `"${log.time || ''}"`,
-        `"${log.status || ''}"`
-      ];
-      csvRows.push(row.join(';'));
-    });
-    
-    const csvContent = '\uFEFF' + csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `relatorio_inspecoes_spci_${new Date().toISOString().substring(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    return [
+      {
+        id: 'mock-1',
+        time: 'Hoje, 21:40',
+        title: 'Inspeção Conforme: EXT-014',
+        subtitle: 'Manganês - Subestação Elétrica',
+        type: 'inspecao'
+      },
+      {
+        id: 'mock-2',
+        time: 'Hoje, 20:15',
+        title: 'Checklist de Viatura: VTR-02',
+        subtitle: 'Prontidão operacional 100% aprovada',
+        type: 'viatura'
+      },
+      {
+        id: 'mock-3',
+        time: 'Hoje, 18:30',
+        title: 'Abastecimento Registrado',
+        subtitle: '65 Litros Diesel S10 • Tanque Cheio',
+        type: 'abastecimento'
+      }
+    ];
+  }, [complianceLogs]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-      {/* Banner de Boas-Vindas */}
-      <div className="bg-gradient-to-r from-[#1e293b] via-[#232f34] to-[#0f172a] text-white p-6 md:p-8 rounded-3xl relative overflow-hidden shadow-2xl border border-white/5 min-h-[140px] flex items-center">
-        {/* Glow de fundo */}
-        <div className="absolute -right-12 -top-12 w-64 h-64 bg-red-700/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
-        
-        {/* Imagem de Fundo Integrada ao Canto Direito (Arte SPCI em Degradê e Meia Opaca) */}
-        <div 
-          className="absolute right-0 top-0 bottom-0 w-2/5 md:w-1/3 pointer-events-none bg-cover bg-right bg-no-repeat opacity-35 mix-blend-luminosity"
-          style={{ 
-            backgroundImage: "url('/login-bg.png')",
-            maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 100%)'
-          }}
-          aria-hidden="true"
-        />
+    <div className="space-y-6 font-sans">
+      
+      {/* ========================================================================= */}
+      {/* 1. BANNER MESTRE DE PRONTIDÃO GLOBAL DO COMPLEXO (COCKPIT 360°)           */}
+      {/* ========================================================================= */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-[#121820] to-[#1C4E26]/40 text-white border border-slate-800 p-6 sm:p-8 shadow-2xl">
+        {/* Efeitos de Iluminação de Fundo */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#68D346]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 left-1/3 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 w-full">
-          <div>
-            <span className="bg-[#af101a] text-white text-[10px] font-bold py-1 px-3 rounded-full uppercase tracking-wider shadow-sm font-mono">
-              Unidade Industrial 01
-            </span>
-            <h2 className="font-['Hanken_Grotesk'] font-extrabold text-3xl md:text-4xl text-white tracking-tight mt-3">
-              Ronda & Monitoramento SIGER
-            </h2>
-            <p className="text-slate-300 text-sm mt-1 max-w-xl">
-              Inspeções registradas e em conformidade periódica com as normas técnicas.
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#68D346] animate-pulse shadow-[0_0_10px_#68D346]" />
+              <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#B7F365] font-black">
+                STATUS GERAL DE COMANDO & CONTROLE
+              </span>
+              <span className="text-[10px] font-mono bg-white/10 px-2 py-0.5 rounded-md text-slate-300">
+                PLANTA: {selectedSite}
+              </span>
+            </div>
+            
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black font-['Hanken_Grotesk'] tracking-tight">
+              Cockpit Operacional Integrado • SIGER Master
+            </h1>
+            
+            <p className="text-xs sm:text-sm text-slate-300 max-w-3xl leading-relaxed">
+              Visão unificada em tempo real para a planta <strong>{selectedSite}</strong>. Monitoramento simultâneo de engenharia contra incêndio, prontidão da frota 4x4, despacho CAD e regulação médica APH.
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Aviso de Acesso Limitado / Sem Permissões */}
-      {isRestricted && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-xl shadow-sm flex items-start gap-3"
-        >
-          <span className="text-xl" aria-hidden="true">⚠️</span>
-          <div>
-            <h4 className="font-['Hanken_Grotesk'] font-bold text-sm text-amber-800">Acesso Restrito / Sem Módulos Ativos</h4>
-            <p className="text-xs text-amber-700 mt-0.5 font-['Hanken_Grotesk']">
-              Seu perfil de acesso está limitado ao Dashboard básico. Entre em contato com o <strong>Desenvolvedor</strong> para liberar novos módulos de navegação no sistema.
-            </p>
-          </div>
-        </motion.div>
-      )}
-
-
-      {/* ═══ LINHA 1: KPIs de CONFORMIDADE DE ATIVOS (Melhorados) ═══ */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px]"
-        >
-          <span className="absolute top-4 right-4 text-3xl font-normal opacity-80" aria-hidden="true">🛡️</span>
-          <div>
-            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-extrabold block">Índice Conformidade</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-4xl text-slate-900 mt-1">{compliancePercentage}%</h3>
-          </div>
-          <div className="w-full bg-slate-100 rounded-full h-2 mt-3 overflow-hidden" aria-hidden="true">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${compliancePercentage}%` }}
-              transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
-              className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2 rounded-full"
-            />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          onClick={() => router.push('/alertas-criticos')}
-          className="bg-white rounded-2xl border border-rose-200 p-5 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px] cursor-pointer hover:shadow-md hover:border-rose-450 hover:bg-rose-50/20 transition-all duration-300"
-        >
-          <span className="absolute top-4 right-4 text-3xl font-normal opacity-80" aria-hidden="true">⚠️</span>
-          {totalVencidos > 0 && <span className="absolute top-3 left-3 w-2 h-2 bg-rose-500 rounded-full animate-ping" />}
-          <div>
-            <span className="text-[10px] text-rose-500 uppercase tracking-widest font-extrabold block">Alertas Críticos / Vencidos</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-4xl mt-1 text-rose-600">{totalVencidos}</h3>
-          </div>
-          <p className="text-[10px] text-rose-600 font-mono mt-2 flex items-center gap-1">🛑 Requer manutenção imediata (Clique para tratar)</p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl border border-amber-200 p-5 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px]"
-        >
-          <span className="absolute top-4 right-4 text-3xl font-normal opacity-80" aria-hidden="true">🔧</span>
-          <div>
-            <span className="text-[10px] text-amber-600 uppercase tracking-widest font-extrabold block">Atenção / Manutenção</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-4xl mt-1 text-amber-600">{totalAtencao}</h3>
-          </div>
-          <p className="text-[10px] text-slate-500 font-mono mt-2">🛠️ Em análise periódica</p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px]"
-        >
-          <span className="absolute top-4 right-4 text-3xl font-normal opacity-80" aria-hidden="true">📋</span>
-          <div>
-            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-extrabold block">Total Ativos Monitorados</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-4xl text-slate-900 mt-1">{totalAssets}</h3>
-          </div>
-          <p className="text-[10px] text-[#2E7D32] font-mono mt-2">🌱 Ativos homologados</p>
-        </motion.div>
-      </div>
-
-      {/* ═══ LINHA 2: KPIs de INSPEÇÕES REALIZADAS ═══ */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-500 rounded-t-2xl" />
-
-        <h3 className="font-['Hanken_Grotesk'] font-bold text-sm text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
-          📊 Indicadores de Inspeções Realizadas
-        </h3>
-
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* Total Inspeções */}
-          <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/40 rounded-xl border border-blue-200 relative overflow-hidden">
-            <span className="text-[9px] text-blue-600 uppercase tracking-widest font-extrabold block">Total Realizadas</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-3xl text-blue-700 mt-1">{complianceLogs.length}</h3>
-            <span className="absolute right-3 bottom-3 text-blue-200 text-2xl">📋</span>
-          </div>
-
-          {/* Conformes */}
-          <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/40 rounded-xl border border-emerald-200 relative overflow-hidden">
-            <span className="text-[9px] text-emerald-600 uppercase tracking-widest font-extrabold block">Conformes</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-3xl text-emerald-700 mt-1">
-              {complianceLogs.filter(l => l.status === 'Conforme' || l.status === 'Operacional').length}
-            </h3>
-            <span className="absolute right-3 bottom-3 text-emerald-200 text-2xl">✅</span>
-          </div>
-
-          {/* Não Conformes */}
-          <div className="p-4 bg-gradient-to-br from-rose-50 to-rose-100/40 rounded-xl border border-rose-200 relative overflow-hidden">
-            <span className="text-[9px] text-rose-600 uppercase tracking-widest font-extrabold block">Não Conformes</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-3xl text-rose-700 mt-1">
-              {complianceLogs.filter(l => l.status !== 'Conforme' && l.status !== 'Operacional').length}
-            </h3>
-            <span className="absolute right-3 bottom-3 text-rose-200 text-2xl">❌</span>
-          </div>
-
-          {/* Pendentes (ativos sem inspeção recente) */}
-          <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/40 rounded-xl border border-amber-200 relative overflow-hidden">
-            <span className="text-[9px] text-amber-600 uppercase tracking-widest font-extrabold block">Pendentes</span>
-            <h3 className="font-['Hanken_Grotesk'] font-extrabold text-3xl text-amber-700 mt-1">
-              {(() => {
-                const inspectedIds = new Set(complianceLogs.map((l: any) => l.assetId));
-                const allIds = [
-                  ...extintores.map(x => x.idAtivo || x.id),
-                  ...hidrantes.map(x => x.idAtivo || x.id),
-                  ...sinalizacoes.map(x => x.idAtivo || x.id),
-                  ...iluminacoes.map(x => x.idAtivo || x.id),
-                ];
-                return allIds.filter(id => !inspectedIds.has(id)).length;
-              })()}
-            </h3>
-            <span className="absolute right-3 bottom-3 text-amber-200 text-2xl">⏳</span>
-          </div>
-
-          {/* Mini Gráfico de Barras - Inspeções por dia (últimos 7 dias) */}
-          <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100/60 rounded-xl border border-slate-200 relative overflow-hidden col-span-2 lg:col-span-1">
-            <span className="text-[9px] text-slate-500 uppercase tracking-widest font-extrabold block mb-2">Últimos 7 dias</span>
-            <div className="flex items-end gap-1 h-12">
-              {(() => {
-                const today = new Date();
-                const days: { label: string; count: number }[] = [];
-                for (let i = 6; i >= 0; i--) {
-                  const d = new Date(today);
-                  d.setDate(d.getDate() - i);
-                  const dateStr = d.toISOString().split('T')[0];
-                  const dayLabel = d.toLocaleDateString('pt-BR', { weekday: 'short' }).substring(0, 3);
-                  const count = complianceLogs.filter((l: any) => (l.date || '').startsWith(dateStr)).length;
-                  days.push({ label: dayLabel, count });
-                }
-                const maxCount = Math.max(...days.map(d => d.count), 1);
-                return days.map((day, i) => (
-                  <div key={i} className="flex flex-col items-center flex-1">
-                    <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: `${(day.count / maxCount) * 100}%` }}
-                      transition={{ duration: 0.6, delay: 0.4 + i * 0.05 }}
-                      className={`w-full rounded-t-sm min-h-[2px] ${day.count > 0 ? 'bg-blue-500' : 'bg-slate-200'}`}
-                    />
-                    <span className="text-[6px] text-slate-400 mt-0.5 uppercase font-bold">{day.label}</span>
-                  </div>
-                ));
-              })()}
+          {/* KPI Circular de Prontidão Global */}
+          <div className="flex items-center gap-4 bg-white/5 border border-white/10 backdrop-blur-xl p-4 sm:p-5 rounded-2xl shrink-0">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                <path
+                  className="text-white/10"
+                  strokeWidth="3.5"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  className="text-[#68D346]"
+                  strokeDasharray={`${indiceGlobalProntidao}, 100`}
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  fill="none"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+              </svg>
+              <span className="absolute font-mono text-sm sm:text-base font-black text-white">
+                {indiceGlobalProntidao}%
+              </span>
             </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* ═══ MÓDULO EXECUTIVO & OPERACIONAL DE Extintores SIGER ═══ */}
-      <ExtintoresManagementDashboard />
-
-      {/* Estatísticas por Setor e Logs Recentes */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Tabela de inspeções recentes */}
-        <div className="lg:col-span-8 bg-white border border-[#CFD8DC] rounded-2xl p-5 shadow-sm">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-100 mb-4 gap-4">
-            <h3 className="font-['Hanken_Grotesk'] font-bold text-lg text-[#37474F] flex items-center gap-1.5">
-              📋 Registros de Inspeção Recentes
-            </h3>
-            <div className="flex gap-2.5">
-              <button 
-                onClick={handleExportInspectionCSV} 
-                className="bg-[#2E7D32] hover:bg-green-700 text-white font-['Hanken_Grotesk'] font-bold text-xs uppercase px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 border-none"
-              >
-                📥 Exportar CSV
-              </button>
-              <button 
-                onClick={() => router.push('/ronda')} 
-                className="bg-[#af101a] hover:bg-red-700 text-white font-['Hanken_Grotesk'] font-bold text-xs uppercase px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 border-none"
-              >
-                📝 Iniciar Ronda
-              </button>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left font-sans text-xs">
-              <thead>
-                <tr className="bg-slate-50 border-b border-[#CFD8DC]">
-                  <th className="p-3 font-semibold text-slate-600">Ativo</th>
-                  <th className="p-3 font-semibold text-slate-600">Modelagem</th>
-                  <th className="p-3 font-semibold text-slate-600">Laudo / Notas</th>
-                  <th className="p-3 font-semibold text-slate-600">Data</th>
-                  <th className="p-3 font-semibold text-slate-600">Status</th>
-                  <th className="p-3 font-semibold text-slate-600 text-right">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {complianceLogs.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="p-4 text-center text-slate-400">Nenhum registro de ronda efetuado nesta sessão. Use a aba de Ronda de Campo.</td>
-                  </tr>
-                ) : (
-                  complianceLogs.map((log, index) => (
-                    <tr key={index} className="border-b transition-colors hover:bg-slate-50">
-                      <td className="p-3 font-bold text-[#af101a] font-mono">{log.assetId}</td>
-                      <td className="p-3 text-slate-800">{log.model}</td>
-                      <td className="p-3 text-slate-500 italic">{log.notes}</td>
-                      <td className="p-3 text-slate-600 font-mono">{log.date} {log.time}</td>
-                      <td className="p-3">
-                        <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${log.status === 'Conforme' || log.status === 'Operacional' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100'}`}>
-                          {log.status === 'Conforme' || log.status === 'Operacional' ? '🟢 OK' : '🛑 FALHA'}
-                        </span>
-                      </td>
-                      <td className="p-3 text-right">
-                        <button 
-                          onClick={() => {
-                            const code = log.assetId;
-                            const ext = extintores.find(x => x.idAtivo === code || x.id === code);
-                            const hid = hidrantes.find(x => x.idAtivo === code || x.id === code);
-                            const sin = sinalizacoes.find(x => x.idAtivo === code || x.id === code);
-                            const lum = iluminacoes.find(x => x.idAtivo === code || x.id === code);
-                            const asset = ext ? { ...ext, category: 'Extintor' } : hid ? { ...hid, category: 'Hidrante' } : sin ? { ...sin, category: 'Sinalização' } : lum ? { ...lum, category: 'Iluminação' } : null;
-                            
-                            if (asset) {
-                              setSelectedAssetForHistory(asset);
-                            } else {
-                              setSelectedAssetForHistory({ 
-                                id: code, 
-                                idAtivo: code, 
-                                model: log.model, 
-                                location: 'Indefinido', 
-                                subLocation: 'Log do Sistema', 
-                                status: log.status 
-                              });
-                            }
-                          }}
-                          className="px-2.5 py-1 text-[10px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 rounded-lg font-['Hanken_Grotesk'] uppercase tracking-wider transition-all inline-flex items-center gap-1 cursor-pointer border-none"
-                        >
-                          📜 Linha Tempo
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Banner de Ronda Offline */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-gradient-to-tr from-[#253238] to-[#121c21] text-white p-6 rounded-2xl border border-[#CFD8DC]/20 shadow-xl relative overflow-hidden flex flex-col justify-between h-full space-y-4">
             <div>
-              <div className="flex gap-2 mb-2 items-center">
-                <span className="bg-[#af101a] text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">Extensão Campo</span>
-                <span className="text-xs">📱 Link Rápido</span>
-              </div>
-              <h3 className="font-['Hanken_Grotesk'] font-bold text-lg text-white">QR Ronda de Campo</h3>
-              <p className="text-[11px] text-slate-350 mt-1">Selecione um ativo para gerar o QR Code de vistoria e copiar o link de envio rápido.</p>
+              <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                Índice de Prontidão
+              </span>
+              <span className="text-sm sm:text-base font-extrabold text-[#B7F365] font-['Hanken_Grotesk']">
+                Complexo Homologado
+              </span>
+              <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
+                Conformidade Global Ativa
+              </span>
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[9px] text-slate-400 uppercase tracking-wider block font-mono">Despachar Ativo para Campo:</label>
-              <select
-                value={selectedAssetId}
-                onChange={(e) => {
-                  setSelectedAssetId(e.target.value);
-                  setCopiedLink(false);
-                }}
-                className="w-full bg-[#1c262c] text-white text-xs px-3 py-2.5 border border-slate-700 rounded-lg focus:outline-none focus:border-red-500 font-mono"
-              >
-                <option value="">-- Selecione o Ativo --</option>
-                {assetsSelectOptions.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col items-center justify-center bg-white p-4 rounded-xl min-h-[170px] relative border border-slate-200 shadow-inner">
-              {selectedAssetId ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getQrCodeUrl(selectedAssetId)}
-                    alt="QR Code de Vistoria"
-                    width={130}
-                    height={130}
-                    className="object-contain animate-fade-in"
-                  />
-                  <span className="text-[8px] text-slate-400 font-mono mt-2 uppercase tracking-wider font-bold">Aponte o celular do Técnico</span>
-                </>
-              ) : (
-                <div className="text-center p-4">
-                  <span className="text-4xl block mb-2 animate-pulse">📱</span>
-                  <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider block">Aguardando Seleção de Ativo</span>
-                </div>
-              )}
-            </div>
-
-            {selectedAssetId && (
-              <div className="flex gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    const link = `${window.location.origin}/inspecao/${selectedAssetId}`;
-                    copyToClipboard(link)
-                      .then(() => {
-                        setCopiedLink(true);
-                        setTimeout(() => setCopiedLink(false), 2000);
-                      })
-                      .catch((err) => {
-                        console.error('Erro ao copiar link:', err);
-                      });
-                  }}
-                  className={`flex-1 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all font-mono cursor-pointer border-none active:scale-[0.98] ${
-                    copiedLink ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
-                  }`}
-                >
-                  {copiedLink ? 'Copiado! ✓' : 'Copiar Link'}
-                </button>
-                <button
-                  onClick={() => {
-                    router.push(`/inspecao/${selectedAssetId}`);
-                  }}
-                  className="py-2 px-3 bg-[#af101a] hover:bg-red-700 text-white text-[10px] font-bold uppercase tracking-wider font-mono cursor-pointer border-none rounded-lg active:scale-[0.98]"
-                  title="Abrir Inspeção"
-                >
-                  Abrir ↗
-                </button>
-              </div>
-            )}
           </div>
         </div>
+
+        {/* Tiras Resumo dos 4 Pilares */}
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0">
+              <Flame className="w-5 h-5 text-red-400" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-slate-400 uppercase block">SPCI Legal</span>
+              <span className="text-xs sm:text-sm font-black text-white">{compliancePercentage}% Conforme</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
+              <Truck className="w-5 h-5 text-[#68D346]" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-slate-400 uppercase block">Frotas 4x4</span>
+              <span className="text-xs sm:text-sm font-black text-white">{frotaStats.operacionais}/{frotaStats.totalViaturas} Prontas</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center shrink-0">
+              <Radio className="w-5 h-5 text-cyan-400" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-slate-400 uppercase block">CAD / CECOM</span>
+              <span className="text-xs sm:text-sm font-black text-white">{cadStats.tempoMedioResposta} TMR</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center shrink-0">
+              <HeartPulse className="w-5 h-5 text-amber-400" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono text-slate-400 uppercase block">ePCR Clínico</span>
+              <span className="text-xs sm:text-sm font-black text-white">{epcrStats.atendimentosHoje} Atendimentos</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================================= */}
+      {/* 2. BENTO GRID DOS 4 PILARES MESTRES DO SISTEMA                            */}
+      {/* ========================================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        {/* ----------------------------------------------------------------------- */}
+        {/* PILAR 1: SPCI ATIVOS & ENGENHARIA (Col 7 / 12)                          */}
+        {/* ----------------------------------------------------------------------- */}
+        <section className="lg:col-span-7 bg-white dark:bg-[#121418] rounded-3xl border border-slate-200/90 dark:border-white/10 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900/60 flex items-center justify-center text-red-600">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-red-600 dark:text-red-400 tracking-wider">
+                    PILAR 01 • ENGENHARIA CONTRA INCÊNDIO
+                  </span>
+                  <h2 className="text-base font-extrabold text-slate-900 dark:text-white font-['Hanken_Grotesk']">
+                    SPCI Ativos & Conformidade Legal
+                  </h2>
+                </div>
+              </div>
+
+              <Link
+                href="/extintores"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-xs font-mono font-bold text-slate-700 dark:text-zinc-300 transition-colors flex items-center gap-1.5"
+              >
+                <span>Módulo</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Estatísticas Chave em Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/70 border border-slate-100 dark:border-zinc-800">
+                <span className="text-[10px] font-mono text-slate-500 uppercase block">Total Ativos</span>
+                <span className="text-xl font-black text-slate-900 dark:text-white font-mono mt-0.5 block">
+                  {totalAssets}
+                </span>
+                <span className="text-[9px] text-slate-400 font-mono">5 categorias</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/50">
+                <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 uppercase block">Conformes</span>
+                <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 block">
+                  {totalConformes}
+                </span>
+                <span className="text-[9px] text-emerald-600/80 dark:text-emerald-400/80 font-mono">100% aptos</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50">
+                <span className="text-[10px] font-mono text-amber-700 dark:text-amber-400 uppercase block">Em Atenção</span>
+                <span className="text-xl font-black text-amber-600 dark:text-amber-400 font-mono mt-0.5 block">
+                  {totalAtencao}
+                </span>
+                <span className="text-[9px] text-amber-600/80 dark:text-amber-400/80 font-mono">Manutenção</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-red-50/70 dark:bg-red-950/30 border border-red-200/80 dark:border-red-900/50">
+                <span className="text-[10px] font-mono text-red-700 dark:text-red-400 uppercase block">Vencidos</span>
+                <span className="text-xl font-black text-red-600 dark:text-red-400 font-mono mt-0.5 block">
+                  {totalVencidos}
+                </span>
+                <span className="text-[9px] text-red-600/80 dark:text-red-400/80 font-mono">Prazo Crítico</span>
+              </div>
+            </div>
+
+            {/* Barra de Progresso por Categoria */}
+            <div className="space-y-2 pt-2">
+              <div className="flex justify-between items-center text-xs font-mono">
+                <span className="text-slate-500 dark:text-zinc-400">Extintores ({extintores?.length || 0})</span>
+                <span className="text-slate-500 dark:text-zinc-400">Hidrantes ({hidrantes?.length || 0})</span>
+                <span className="text-slate-500 dark:text-zinc-400">Bombas ({bombas?.length || 0})</span>
+                <span className="text-slate-500 dark:text-zinc-400">Sinalização ({sinalizacoes?.length || 0})</span>
+              </div>
+              <div className="w-full h-2.5 rounded-full bg-slate-100 dark:bg-zinc-800 overflow-hidden flex">
+                <div style={{ width: '45%' }} className="bg-red-500" title="Extintores" />
+                <div style={{ width: '25%' }} className="bg-sky-500" title="Hidrantes" />
+                <div style={{ width: '15%' }} className="bg-emerald-500" title="Bombas" />
+                <div style={{ width: '15%' }} className="bg-amber-500" title="Sinalização & Iluminação" />
+              </div>
+            </div>
+
+            {/* MÓDULOS INTEGRANTES RELOCADOS DENTRO DO PILAR SPCI ATIVOS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <Link
+                href="/spci/dashboard"
+                className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/80 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700/80 transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center shrink-0">
+                    <LayoutDashboard className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-black uppercase text-slate-800 dark:text-zinc-200 font-['Hanken_Grotesk'] block">
+                      Dashboard & Setores
+                    </span>
+                    <span className="text-[9px] text-slate-500 dark:text-zinc-400 font-mono">
+                      Mapa de calor e conformidade NBR
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <Link
+                href="/gestao-ativo"
+                className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/80 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700/80 transition-all flex items-center justify-between group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center shrink-0">
+                    <Boxes className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-black uppercase text-slate-800 dark:text-zinc-200 font-['Hanken_Grotesk'] block">
+                      Gestão de Ativos & Planta
+                    </span>
+                    <span className="text-[9px] text-slate-500 dark:text-zinc-400 font-mono">
+                      Setores, almoxarifado & estoque
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Rodapé de Ação Rápida */}
+          <div className="mt-5 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+            <span className="text-[11px] font-mono text-slate-500 dark:text-zinc-400 flex items-center gap-1.5">
+              <CheckCheck className="w-4 h-4 text-emerald-500" />
+              <span>Normas NBR 12962 / 13434 / 13714</span>
+            </span>
+            <Link
+              href="/inspecao/novo"
+              className="text-xs font-extrabold text-[#1C4E26] dark:text-[#68D346] hover:underline flex items-center gap-1"
+            >
+              <span>Iniciar Vistoria Rápida</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </section>
+
+        {/* ----------------------------------------------------------------------- */}
+        {/* PILAR 2: FROTAS 4x4 & RESGATE (Col 5 / 12)                              */}
+        {/* ----------------------------------------------------------------------- */}
+        <section className="lg:col-span-5 bg-white dark:bg-[#121418] rounded-3xl border border-slate-200/90 dark:border-white/10 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/60 flex items-center justify-center text-emerald-600">
+                  <Truck className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
+                    PILAR 02 • PRONTIDÃO DE RESGATE
+                  </span>
+                  <h2 className="text-base font-extrabold text-slate-900 dark:text-white font-['Hanken_Grotesk']">
+                    Frotas 4x4 & Telemetria
+                  </h2>
+                </div>
+              </div>
+
+              <Link
+                href="/viaturas"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-xs font-mono font-bold text-slate-700 dark:text-zinc-300 transition-colors flex items-center gap-1.5"
+              >
+                <span>Frota</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Destaque de Prontidão da Frota */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-mono uppercase text-emerald-700 dark:text-emerald-400 font-bold block">
+                  Prontidão Tática
+                </span>
+                <div className="flex items-baseline gap-2 mt-0.5">
+                  <span className="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-300">
+                    {frotaStats.operacionais} de {frotaStats.totalViaturas}
+                  </span>
+                  <span className="text-xs font-mono font-bold text-emerald-600">
+                    Viaturas Aptas
+                  </span>
+                </div>
+              </div>
+              <span className="px-2.5 py-1 rounded-xl bg-emerald-600 text-white font-mono text-xs font-black">
+                {frotaStats.prontidaoPercent}%
+              </span>
+            </div>
+
+            {/* Sub-métricas: Pneus TWI e Combustível */}
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/frota/pneus"
+                className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/70 hover:bg-slate-100 dark:hover:bg-zinc-900 border border-slate-100 dark:border-zinc-800 transition-colors block"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase flex items-center gap-1">
+                    <Disc className="w-3.5 h-3.5 text-amber-500" />
+                    Pneus TWI
+                  </span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                </div>
+                <span className="text-base font-black text-slate-900 dark:text-white font-mono mt-1 block">
+                  {frotaStats.pneusAtencao} em Atenção
+                </span>
+                <span className="text-[9px] text-emerald-600 font-mono">0 proibidos (&lt;1.6mm)</span>
+              </Link>
+
+              <Link
+                href="/frota/abastecer"
+                className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/70 hover:bg-slate-100 dark:hover:bg-zinc-900 border border-slate-100 dark:border-zinc-800 transition-colors block"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase flex items-center gap-1">
+                    <Fuel className="w-3.5 h-3.5 text-[#68D346]" />
+                    Autonomia
+                  </span>
+                  <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                </div>
+                <span className="text-base font-black text-slate-900 dark:text-white font-mono mt-1 block">
+                  {frotaStats.combustivelMedio}% Média
+                </span>
+                <span className="text-[9px] text-slate-400 font-mono">Diesel S10 / Arla</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Rodapé do Pilar */}
+          <div className="mt-5 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+            <span className="font-mono text-slate-500 dark:text-zinc-400 truncate max-w-[200px]">
+              {frotaStats.viaturaDestaque}
+            </span>
+            <Link
+              href="/ronda"
+              className="font-extrabold text-[#1C4E26] dark:text-[#68D346] hover:underline flex items-center gap-1"
+            >
+              <span>Despacho & Ronda</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </section>
+
+        {/* ----------------------------------------------------------------------- */}
+        {/* PILAR 3: CAD / CECOM DESPACHO & MAPA TÁTICO (Col 6 / 12)                */}
+        {/* ----------------------------------------------------------------------- */}
+        <section className="lg:col-span-6 bg-white dark:bg-[#121418] rounded-3xl border border-slate-200/90 dark:border-white/10 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-cyan-50 dark:bg-cyan-950/50 border border-cyan-200 dark:border-cyan-900/60 flex items-center justify-center text-cyan-600">
+                  <Radio className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-cyan-600 dark:text-cyan-400 tracking-wider">
+                    PILAR 03 • CENTRAL TÁTICA & DESPACHO
+                  </span>
+                  <h2 className="text-base font-extrabold text-slate-900 dark:text-white font-['Hanken_Grotesk']">
+                    CAD / CECOM Operacional
+                  </h2>
+                </div>
+              </div>
+
+              <Link
+                href="/mapa"
+                className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-xs font-mono font-bold text-slate-700 dark:text-zinc-300 transition-colors flex items-center gap-1.5"
+              >
+                <span>Mapa</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* Informações de Chamadas 193 */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/70 border border-slate-100 dark:border-zinc-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase">Chamados Ativos</span>
+                  <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                </div>
+                <span className="text-xl font-black text-slate-900 dark:text-white font-mono mt-1 block">
+                  {cadStats.ocorrenciasAtivas} Ocorrência
+                </span>
+                <span className="text-[9px] text-slate-400 font-mono">14 finalizadas no turno</span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/70 border border-slate-100 dark:border-zinc-800">
+                <span className="text-[10px] font-mono text-slate-500 uppercase block">Tempo de Resposta</span>
+                <span className="text-xl font-black text-cyan-600 dark:text-cyan-400 font-mono mt-1 block">
+                  {cadStats.tempoMedioResposta}
+                </span>
+                <span className="text-[9px] text-slate-400 font-mono">Padrão Ouro (&lt; 05 min)</span>
+              </div>
+            </div>
+
+            {/* Mini Radar / Mapa Tático Visual */}
+            <div className="p-4 rounded-2xl bg-slate-900 text-white relative overflow-hidden border border-slate-800">
+              <div className="flex items-center justify-between text-xs font-mono mb-2">
+                <span className="text-[#68D346] font-bold flex items-center gap-1.5">
+                  <Compass className="w-4 h-4 animate-spin text-[#68D346]" style={{ animationDuration: '10s' }} />
+                  Radar de Recursos em Campo
+                </span>
+                <span className="text-[10px] text-slate-400">{cadStats.statusLinha193}</span>
+              </div>
+
+              <div className="h-24 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center justify-center relative overflow-hidden">
+                {/* Grid de Coordenadas */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:16px_16px] opacity-40" />
+                
+                {/* Pulsos simulados no mapa */}
+                <div className="absolute top-1/2 left-1/3 flex items-center gap-1 z-10">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#68D346] animate-ping" />
+                  <span className="text-[9px] font-mono font-bold bg-slate-900 px-1 py-0.5 rounded border border-slate-700">Vtr 02</span>
+                </div>
+
+                <div className="absolute top-1/3 right-1/4 flex items-center gap-1 z-10">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="text-[9px] font-mono font-bold bg-slate-900 px-1 py-0.5 rounded border border-slate-700">Brigada B</span>
+                </div>
+
+                <span className="relative z-10 text-[11px] font-mono text-slate-400">
+                  Geolocalização Ativa de Viaturas & Ativos
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Rodapé do Pilar */}
+          <div className="mt-5 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+            <span className="font-mono text-slate-500 dark:text-zinc-400 truncate">
+              {cadStats.rondaVolante}
+            </span>
+            <Link
+              href="/alertas-criticos"
+              className="font-extrabold text-[#1C4E26] dark:text-[#68D346] hover:underline flex items-center gap-1"
+            >
+              <span>Alertas Críticos</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </section>
+
+        {/* ----------------------------------------------------------------------- */}
+        {/* PILAR 4: ePCR CLÍNICO RESGATE APH (Col 6 / 12)                          */}
+        {/* ----------------------------------------------------------------------- */}
+        <section className="lg:col-span-6 bg-white dark:bg-[#121418] rounded-3xl border border-slate-200/90 dark:border-white/10 p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900/60 flex items-center justify-center text-amber-600">
+                  <HeartPulse className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400 tracking-wider">
+                    PILAR 04 • CLÍNICO & REGULAÇÃO APH
+                  </span>
+                  <h2 className="text-base font-extrabold text-slate-900 dark:text-white font-['Hanken_Grotesk']">
+                    ePCR Prontuário Vivo 24h
+                  </h2>
+                </div>
+              </div>
+
+              <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-xs font-mono font-black">
+                {epcrStats.estabilidadeGeral}
+              </span>
+            </div>
+
+            {/* Protocolo de Manchester (Distribuição de Risco) */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-zinc-400 font-bold block">
+                Classificação de Risco Manchester (Hoje)
+              </span>
+              
+              <div className="grid grid-cols-5 gap-2 text-center">
+                <div className="p-2 rounded-xl bg-red-500/10 border border-red-500/30">
+                  <span className="w-2 h-2 rounded-full bg-red-600 mx-auto block mb-1" />
+                  <span className="text-xs font-mono font-bold text-red-600 dark:text-red-400 block">
+                    {epcrStats.manchester.vermelho}
+                  </span>
+                  <span className="text-[8px] font-mono uppercase text-slate-500">Imediato</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-orange-500/10 border border-orange-500/30">
+                  <span className="w-2 h-2 rounded-full bg-orange-500 mx-auto block mb-1" />
+                  <span className="text-xs font-mono font-bold text-orange-600 dark:text-orange-400 block">
+                    {epcrStats.manchester.laranja}
+                  </span>
+                  <span className="text-[8px] font-mono uppercase text-slate-500">10 min</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 mx-auto block mb-1" />
+                  <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400 block">
+                    {epcrStats.manchester.amarelo}
+                  </span>
+                  <span className="text-[8px] font-mono uppercase text-slate-500">60 min</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 mx-auto block mb-1" />
+                  <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 block">
+                    {epcrStats.manchester.verde}
+                  </span>
+                  <span className="text-[8px] font-mono uppercase text-slate-500">120 min</span>
+                </div>
+
+                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 mx-auto block mb-1" />
+                  <span className="text-xs font-mono font-bold text-blue-600 dark:text-blue-400 block">
+                    {epcrStats.manchester.azul}
+                  </span>
+                  <span className="text-[8px] font-mono uppercase text-slate-500">240 min</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Último Atendimento Registrado */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/70 border border-slate-100 dark:border-zinc-800">
+              <span className="text-[10px] font-mono text-slate-500 uppercase block">Última Ocorrência Clínica</span>
+              <p className="text-xs font-bold text-slate-800 dark:text-zinc-200 mt-0.5">
+                {epcrStats.ultimoAtendimento}
+              </p>
+              <div className="flex items-center gap-2 mt-2 text-[10px] font-mono text-slate-400">
+                <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Sinais vitais normotensos • Triagem digital validada</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Rodapé do Pilar */}
+          <div className="mt-5 pt-4 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+            <span className="font-mono text-slate-500 dark:text-zinc-400">
+              Total de Atendimentos: <strong>{epcrStats.atendimentosHoje}</strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => triggerSuccessNotification('Prontuário APH Ativo', 'Módulo clínico ePCR pronto para novo atendimento.')}
+              className="font-extrabold text-[#1C4E26] dark:text-[#68D346] hover:underline flex items-center gap-1 cursor-pointer border-none bg-transparent"
+            >
+              <span>Novo Prontuário APH</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </section>
       </div>
-    </motion.div>
+
+      {/* ========================================================================= */}
+      {/* 3. FEED DE ATIVIDADES E TELEMETRIA DO COMPLEXO EM TEMPO REAL               */}
+      {/* ========================================================================= */}
+      <section className="bg-white dark:bg-[#121418] rounded-3xl border border-slate-200/90 dark:border-white/10 p-6 shadow-sm">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-zinc-800 mb-4">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-[#1C4E26] dark:text-[#68D346]" />
+            <h2 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase font-['Hanken_Grotesk'] tracking-wider">
+              Linha do Tempo de Atividades • Telemetria do Complexo
+            </h2>
+          </div>
+          <span className="text-[10px] font-mono text-slate-500 dark:text-zinc-400">
+            Atualização Automática Contínua
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[9px] font-mono text-slate-400 uppercase block">Hoje, 21:40</span>
+              <p className="text-xs font-bold text-slate-800 dark:text-zinc-200">Inspeção Conforme: EXT-014</p>
+              <p className="text-[10px] text-slate-500">Manganês - Subestação Elétrica</p>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center shrink-0 mt-0.5">
+              <Truck className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[9px] font-mono text-slate-400 uppercase block">Hoje, 20:15</span>
+              <p className="text-xs font-bold text-slate-800 dark:text-zinc-200">Checklist de Viatura: VTR-02</p>
+              <p className="text-[10px] text-slate-500">Prontidão operacional 100% aprovada</p>
+            </div>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-100 dark:border-zinc-800 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+              <Fuel className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[9px] font-mono text-slate-400 uppercase block">Hoje, 18:30</span>
+              <p className="text-xs font-bold text-slate-800 dark:text-zinc-200">Abastecimento Registrado</p>
+              <p className="text-[10px] text-slate-500">65 Litros Diesel S10 • Tanque Cheio</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
   );
 }

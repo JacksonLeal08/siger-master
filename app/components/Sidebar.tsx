@@ -18,6 +18,7 @@ import {
   LogOut,
   X,
   Boxes,
+  Compass,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -303,7 +304,8 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
 
   // Itens da navegação padrão (satélites unificados fora dos módulos mestres Extintores e Viaturas)
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard SPCI (Setores & Conformidade)', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
+    { id: 'home', label: 'Home Geral Unificada (360°)', icon: <Compass className="w-5 h-5 text-emerald-500" />, path: '/dashboard' },
+    { id: 'dashboard', label: 'Dashboard SPCI (Setores & Conformidade)', icon: <LayoutDashboard className="w-5 h-5" />, path: '/spci/dashboard' },
     { id: 'gestao-ativo', label: 'Gestão de Ativo & Setores da Planta', icon: <Boxes className="w-5 h-5" />, path: '/gestao-ativo' },
     { id: 'hidrantes', label: 'Hidrantes & Abrigos', icon: <Droplet className="w-5 h-5" />, path: '/hidrantes' },
     { id: 'sinalizacao', label: 'Sinalização NBR', icon: <AlertTriangle className="w-5 h-5" />, path: '/sinalizacao' },

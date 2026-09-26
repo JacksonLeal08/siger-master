@@ -144,7 +144,7 @@ export const Header = ({
       modules: [
         { 
           label: 'Dashboard / Visão Geral SPCI', 
-          path: '/dashboard', 
+          path: '/spci/dashboard', 
           icon: LayoutDashboard, 
           desc: 'Monitoramento de conformidade NBR, mapa de calor e setores da planta', 
           isRelocated: true 
