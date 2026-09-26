@@ -181,9 +181,19 @@ export interface OrdemServicoFrota {
   notas_fiscais_json?: NotaFiscalAnexo[];
   status_os?: 'ABERTA' | 'EM_ORCAMENTO' | 'APROVADA' | 'EM_EXECUCAO' | 'CONCLUIDA' | 'CANCELADA' | string;
 
+  // Campos do Motor de Workflow e Matriz de Aprovadores
+  prioridade?: 'NORMAL' | 'URGENTE' | 'EMERGENCIA';
+  etapa_atual?: string; // '1_ABERTURA_TRIAGEM' ... '6_CONCLUIDA_LIBERADA'
+  numero_etapa?: number; // 1 a 6
+  valor_estimado?: number;
+  aprovador_imediato_id?: string | null;
+  status_aprovacao?: 'PENDENTE' | 'APROVADA' | 'REJEITADA' | 'EM_REVISAO';
+  origem_abertura?: 'MANUAL' | 'CHECKLIST_8_SISTEMAS' | 'LAUDO_TWI_PNEUS' | string;
+
   // Relações em tempo de execução
   viatura?: Viatura;
   oficina?: OficinaPrestador;
+  aprovador_imediato?: any;
 }
 
 export interface Abastecimento {

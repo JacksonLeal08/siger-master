@@ -31,7 +31,8 @@ import {
   SlidersHorizontal,
   QrCode,
   Disc,
-  Fuel
+  Fuel,
+  Wrench
 } from 'lucide-react';
 import { SYSTEM_VERSION } from '@/config/version';
 import WhatsNewModal from './WhatsNewModal';
@@ -299,6 +300,14 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
       icon: <Fuel className="w-4 h-4 shrink-0 text-amber-500" />,
       path: '/frota/abastecer',
       isActive: pathname.startsWith('/frota/abastecer')
+    },
+    {
+      id: 'frota-os',
+      label: 'Ordens de Serviço (OS)',
+      shortLabel: 'Ordens Serviço',
+      icon: <Wrench className="w-4 h-4 shrink-0 text-cyan-400" />,
+      path: '/frota/os',
+      isActive: pathname.startsWith('/frota/os')
     }
   ];
 

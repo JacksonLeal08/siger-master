@@ -12,6 +12,7 @@ import ProfileManagementBento from '@/app/components/ProfileManagementBento';
 import UsersManagementBento from '@/app/components/UsersManagementBento';
 import SuppliersManagementBento from '@/app/components/SuppliersManagementBento';
 import ContractsManagementBento from '@/app/components/ContractsManagementBento';
+import ConfigAprovadoresOSTab from '@/app/components/ConfigAprovadoresOSTab';
 import { Moon, Sun } from 'lucide-react';
 
 const DEFAULT_SITES = [
@@ -29,7 +30,7 @@ export default function ConfiguracoesPage() {
   } = useSpci();
 
   // Estado da aba ativa
-  const [activeTab, setActiveTab] = useState<'profile' | 'users' | 'suppliers' | 'contratos'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'users' | 'suppliers' | 'contratos' | 'aprovadores_os'>('profile');
 
   // Estado do tema local para garantir alta fidelidade de contraste (Dark Cockpit vs Executive Light)
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
@@ -237,6 +238,20 @@ export default function ConfiguracoesPage() {
             <span>📋</span> Gestão de Contratos (SITES)
           </button>
         )}
+
+        {/* Aba 5: Matriz de Aprovadores & Alçadas */}
+        <button 
+          onClick={() => setActiveTab('aprovadores_os')}
+          className={`px-5 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer rounded-t-xl flex items-center gap-2 ${
+            activeTab === 'aprovadores_os' 
+              ? theme === 'dark'
+                ? 'bg-zinc-900 border-t-2 border-t-[#68D346] border-x border-x-zinc-800 text-[#68D346] font-black shadow-xs'
+                : 'bg-white border-t-2 border-t-[#1C4E26] border-x border-x-slate-200 text-[#1C4E26] font-extrabold shadow-xs'
+              : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200 hover:bg-slate-100/50 dark:hover:bg-zinc-800/40'
+          }`}
+        >
+          <span>⚡</span> Aprovadores & Alçadas OS
+        </button>
       </div>
 
       {/* 3. CONTEÚDO DA ABA ATIVA (COMPONENTES BENTO MODULARES) */}
@@ -293,6 +308,18 @@ export default function ConfiguracoesPage() {
             transition={{ duration: 0.15 }}
           >
             <ContractsManagementBento theme={theme} />
+          </motion.div>
+        )}
+
+        {activeTab === 'aprovadores_os' && (
+          <motion.div
+            key="tab-aprovadores-os"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.15 }}
+          >
+            <ConfigAprovadoresOSTab theme={theme} sitesList={sitesList} />
           </motion.div>
         )}
       </AnimatePresence>

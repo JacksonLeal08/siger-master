@@ -36,12 +36,14 @@ import {
   Lightbulb,
   ExternalLink,
   Activity,
-  ShieldAlert
+  ShieldAlert,
+  Wrench
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NotificationItem } from '@/lib/types';
 import ThemeToggle from './ThemeToggle';
 import NetworkSyncIndicator from './NetworkSyncIndicator';
+import NotificationBell from './NotificationBell';
 
 interface HeaderProps {
   onScanClick: () => void;
@@ -172,6 +174,7 @@ export const Header = ({
       metric: 'Prontidão Operacional',
       modules: [
         { label: 'Catálogo & Gestão de Frota', path: '/viaturas', icon: Truck, desc: 'Status de prontidão, viaturas operacionais e reserva' },
+        { label: 'Ordens de Serviço & Workflow (OS)', path: '/frota/os', icon: Wrench, desc: 'Aprovações por alçada, etapas e histórico imutável' },
         { label: 'Despacho & Ronda Campo', path: '/ronda', icon: Smartphone, desc: 'Checklists embarcados e vistorias volantes', isRelocated: true },
         { label: 'Metrologia de Pneus (TWI)', path: '/frota/pneus', icon: Disc, desc: 'Mapeamento digital de sulcos e segurança CONTRAN' },
         { label: 'Registro de Abastecimento', path: '/frota/abastecer', icon: Fuel, desc: 'Controle de autonomia e consumo de combustível' },
@@ -360,115 +363,9 @@ export const Header = ({
         {/* Indicador Elegante de Rede / Sincronização SPCI */}
         <NetworkSyncIndicator />
 
-        {/* Sino de Notificações */}
+        {/* Sino de Notificações Inteligente com Aprovação de OS */}
         {currentUser && (
-          <div className="relative">
-            <button 
-              type="button"
-              onClick={() => {
-                setShowNotifs(!showNotifs);
-                setShowUserDropdown(false);
-                setActiveFlyout(null);
-              }}
-              className="p-2 bg-slate-100/90 dark:bg-zinc-900/90 hover:bg-slate-200/80 dark:hover:bg-zinc-800/80 active:scale-95 transition-all rounded-xl border border-slate-200/90 dark:border-zinc-800 flex items-center justify-center relative cursor-pointer text-slate-600 dark:text-zinc-300 shadow-xs"
-              aria-label="Abrir notificações"
-            >
-              <Bell className="w-4 h-4" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-red-600 text-[8px] font-black text-white shadow-md animate-pulse">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-            
-            <AnimatePresence>
-              {showNotifs && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                  className="absolute right-0 mt-2.5 w-80 bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 shadow-2xl rounded-2xl p-4 z-50 text-slate-800 dark:text-zinc-100 text-left font-sans"
-                >
-                  <div className="flex justify-between items-center pb-2.5 border-b border-slate-150 dark:border-zinc-800 mb-2">
-                    <h4 className="font-extrabold text-xs uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <span>🔔</span> Notificações
-                    </h4>
-                    <div className="flex gap-2">
-                      {unreadCount > 0 && (
-                        <button 
-                          onClick={markAllNotificationsAsRead}
-                          className="text-[9px] font-bold text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center gap-1 border-none bg-transparent cursor-pointer"
-                          title="Marcar todas como lidas"
-                        >
-                          <CheckCheck className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                      {notifications && notifications.length > 0 && (
-                        <button 
-                          onClick={clearAllNotifications}
-                          className="text-[9px] font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 border-none bg-transparent cursor-pointer"
-                          title="Limpar tudo"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="max-h-64 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
-                    {!notifications || notifications.length === 0 ? (
-                      <div className="py-8 text-center text-[10px] text-slate-400 font-sans">
-                        Nenhuma notificação recebida
-                      </div>
-                    ) : (
-                      notifications.map(notif => (
-                        <div 
-                          key={notif.id}
-                          onClick={() => {
-                            markNotificationAsRead(notif.id);
-                            setSelectedNotif(notif);
-                          }}
-                          className={`p-2.5 rounded-xl border transition-all duration-200 flex items-start gap-2.5 relative cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-900 group ${
-                            notif.read ? 'bg-white dark:bg-zinc-900/60 border-slate-100 dark:border-zinc-800' : 'bg-slate-50/60 dark:bg-zinc-900 border-red-200 dark:border-red-900/60'
-                          }`}
-                        >
-                          {!notif.read && (
-                            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-red-600" />
-                          )}
-                          
-                          <div className={`p-1.5 rounded-lg shrink-0 ${
-                            notif.type === 'cadastro' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600' :
-                            notif.type === 'inspecao' ? 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600' : 'bg-amber-50 dark:bg-amber-950/60 text-amber-600'
-                          }`}>
-                            {notif.type === 'cadastro' ? <Plus className="w-3.5 h-3.5" /> : <ClipboardCheck className="w-3.5 h-3.5" />}
-                          </div>
-                          
-                          <div className="min-w-0 flex-1 leading-normal pr-3">
-                            <p className="text-[10px] font-bold text-slate-800 dark:text-zinc-200 truncate">{notif.title}</p>
-                            <p className="text-[9px] text-slate-500 dark:text-zinc-400 truncate mt-0.5">{notif.message}</p>
-                            <p className="text-[8px] text-slate-400 font-mono mt-1">
-                              {new Date(notif.created_at).toLocaleTimeString('pt-BR')}
-                            </p>
-                          </div>
-                          
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteNotification(notif.id);
-                            }}
-                            className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 border-none bg-transparent cursor-pointer p-0.5 self-center transition-opacity"
-                            title="Excluir"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <NotificationBell />
         )}
 
         {/* ===================================================================== */}
