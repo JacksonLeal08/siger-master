@@ -35,10 +35,10 @@ import {
 import ThemeToggle from '@/app/components/ThemeToggle';
 import { COMPANY_NAME, SYSTEM_VERSION } from '@/config/version';
 
-type ToolbarOption = 'opcao1' | 'opcao2' | 'opcao3';
+type ToolbarOption = 'hibrido' | 'opcao1' | 'opcao2' | 'opcao3';
 
 export default function PreviewToolbarsPage() {
-  const [selectedOption, setSelectedOption] = useState<ToolbarOption>('opcao1');
+  const [selectedOption, setSelectedOption] = useState<ToolbarOption>('hibrido');
   const [activePillar, setActivePillar] = useState<string | null>(null);
   const [activeSite, setActiveSite] = useState('UNIDADE INDUSTRIAL CARAJÁS - PARAUAPEBAS');
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -126,8 +126,19 @@ export default function PreviewToolbarsPage() {
             </div>
           </div>
 
-          {/* Seletor dos 3 Modelos */}
-          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-800/90 dark:bg-zinc-950/80 border border-slate-700 dark:border-white/10">
+          {/* Seletor dos Modelos */}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-800/90 dark:bg-zinc-950/80 border border-slate-700 dark:border-white/10 flex-wrap sm:flex-nowrap">
+            <button
+              type="button"
+              onClick={() => { setSelectedOption('hibrido'); setActivePillar(null); }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold uppercase transition-all cursor-pointer ${
+                selectedOption === 'hibrido'
+                  ? 'bg-gradient-to-r from-[#1C4E26] via-[#246831] to-[#1C4E26] text-[#B7F365] shadow-[0_0_12px_rgba(104,211,70,0.45)] border border-[#68D346]/60'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+            >
+              🌟👑 Híbrido Premium (Opção 1 + 2)
+            </button>
             <button
               type="button"
               onClick={() => { setSelectedOption('opcao1'); setActivePillar(null); }}
@@ -137,7 +148,7 @@ export default function PreviewToolbarsPage() {
                   : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }`}
             >
-              🌟 Opção 1: Ilha Flutuante
+              Opção 1: Ilha Flutuante
             </button>
             <button
               type="button"
@@ -148,7 +159,7 @@ export default function PreviewToolbarsPage() {
                   : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }`}
             >
-              🏛️ Opção 2: Barra Contínua
+              Opção 2: Barra Contínua
             </button>
             <button
               type="button"
@@ -159,7 +170,7 @@ export default function PreviewToolbarsPage() {
                   : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }`}
             >
-              ⚡ Opção 3: Barra Tática HUD
+              Opção 3: Tática HUD
             </button>
           </div>
 
@@ -180,6 +191,163 @@ export default function PreviewToolbarsPage() {
       {/* ÁREA DA BARRA DE FERRAMENTAS SELECIONADA                                  */}
       {/* ========================================================================= */}
       <div className="relative z-50">
+        {selectedOption === 'hibrido' && (
+          /* MODELO HÍBRIDO PREMIUM: BARRA SUPERIOR CONTÍNUA COM DOCK FLUTUANTE CENTRAL DOS 4 PILARES */
+          <header className="w-full bg-white/85 dark:bg-[#121418]/85 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 shadow-[0_4px_25px_rgba(0,0,0,0.04)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.45)] px-5 sm:px-6 lg:px-8 py-3.5 transition-all">
+            <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
+              
+              {/* Zona 1: Logo Oficial JIMMP Info + Planta Ativa */}
+              <div className="flex items-center gap-4">
+                <Link href="/" className="flex items-center gap-3.5 group cursor-pointer">
+                  <Image 
+                    src="/assets/branding/logo-jimmp-info.png" 
+                    alt="Logo JIMMP Info" 
+                    width={130} 
+                    height={38} 
+                    priority
+                    className="h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_2px_10px_rgba(104,211,70,0.3)]" 
+                  />
+                  <div className="border-l border-slate-300 dark:border-zinc-800 pl-3.5 hidden 2xl:block text-left">
+                    <span className="text-[9.5px] font-mono font-black text-[#1C4E26] dark:text-[#68D346] tracking-[0.25em] block uppercase leading-none">
+                      ECOSSISTEMA OFICIAL
+                    </span>
+                    <span className="text-sm font-black text-slate-900 dark:text-white font-['Hanken_Grotesk'] tracking-wider leading-none mt-1 block">
+                      SIGER MASTER
+                    </span>
+                  </div>
+                </Link>
+
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 dark:bg-zinc-900/90 border border-slate-200/90 dark:border-zinc-800 text-xs shadow-xs transition-all">
+                  <span className="w-2 h-2 rounded-full bg-[#68D346] animate-pulse shadow-[0_0_8px_#68D346]" />
+                  <Building2 className="w-3.5 h-3.5 text-[#1C4E26] dark:text-[#68D346] shrink-0" />
+                  <span className="text-[10px] uppercase text-slate-500 dark:text-zinc-400 font-mono font-bold hidden xl:inline">
+                    Planta:
+                  </span>
+                  <span className="font-mono text-[11px] font-black text-slate-800 dark:text-zinc-200 tracking-wide truncate max-w-[190px]">
+                    {activeSite}
+                  </span>
+                </div>
+              </div>
+
+              {/* Zona 2: A Ilha Flutuante dos 4 Pilares (Dock Central Segmented) */}
+              <div className="hidden md:flex items-center">
+                <nav className="flex items-center gap-1 p-1 rounded-2xl bg-slate-100/90 dark:bg-zinc-900/90 border border-slate-200/90 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.04)] backdrop-blur-xl">
+                  {Object.values(pillarsInfo).map((pilar) => {
+                    const Icon = pilar.icon;
+                    const isOpened = activePillar === pilar.id;
+                    return (
+                      <div key={pilar.id} className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setActivePillar(isOpened ? null : pilar.id)}
+                          className={`flex items-center gap-2 px-3.5 lg:px-4 py-2 rounded-xl text-xs font-black uppercase font-['Hanken_Grotesk'] tracking-wider transition-all duration-200 cursor-pointer ${
+                            isOpened
+                              ? 'bg-gradient-to-r from-[#1C4E26] via-[#246831] to-[#1C4E26] text-[#B7F365] shadow-[0_0_15px_rgba(104,211,70,0.35)] border border-[#68D346]/50'
+                              : 'text-slate-600 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-zinc-800/60'
+                          }`}
+                        >
+                          <Icon className={`w-3.5 h-3.5 transition-colors ${isOpened ? 'text-[#B7F365]' : 'text-[#1C4E26] dark:text-[#68D346]'}`} />
+                          <span className="hidden lg:inline">{pilar.title}</span>
+                          <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpened ? 'rotate-180 text-[#B7F365]' : 'text-slate-400 dark:text-zinc-500'}`} />
+                        </button>
+
+                        <AnimatePresence>
+                          {isOpened && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                              transition={{ duration: 0.15 }}
+                              className="absolute left-1/2 -translate-x-1/2 mt-3 w-84 rounded-2xl bg-white/95 dark:bg-zinc-950/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] p-4 space-y-3 z-50 text-left"
+                            >
+                              <div className="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-zinc-800">
+                                <div>
+                                  <span className="text-[10px] font-mono font-black text-[#1C4E26] dark:text-[#68D346] tracking-widest block uppercase leading-none">
+                                    {pilar.badge}
+                                  </span>
+                                  <h4 className="text-sm font-black text-slate-900 dark:text-white font-['Hanken_Grotesk'] mt-1">
+                                    {pilar.title}
+                                  </h4>
+                                </div>
+                                <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#1C4E26]/10 dark:bg-[#68D346]/15 text-[#1C4E26] dark:text-[#68D346] border border-[#1C4E26]/20 dark:border-[#68D346]/30 font-bold">
+                                  {pilar.metric}
+                                </span>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                {pilar.items.map((item, idx) => (
+                                  <div
+                                    key={idx}
+                                    onClick={() => setActivePillar(null)}
+                                    className="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-900 transition-colors group cursor-pointer"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 group-hover:text-[#1C4E26] dark:group-hover:text-[#68D346] transition-colors">
+                                        {item.label}
+                                      </span>
+                                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#68D346] group-hover:translate-x-0.5 transition-all" />
+                                    </div>
+                                    <p className="text-[11px] text-slate-500 dark:text-zinc-400 line-clamp-1 mt-0.5">
+                                      {item.desc}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* Zona 3: Ações Rápidas, Busca Spotlight & Perfil */}
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSearchModal(true)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100/90 dark:bg-zinc-900/90 hover:bg-slate-200 dark:hover:bg-zinc-800 border border-slate-200/90 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 hover:text-[#1C4E26] dark:hover:text-[#68D346] text-xs font-mono font-bold uppercase transition-all cursor-pointer shadow-xs active:scale-95"
+                  title="Busca Spotlight (Ctrl + K)"
+                >
+                  <Search className="w-3.5 h-3.5 text-[#1C4E26] dark:text-[#68D346]" />
+                  <span className="hidden sm:inline">Buscar...</span>
+                  <kbd className="hidden lg:inline text-[9px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-500 dark:text-zinc-400 font-mono">
+                    Ctrl+K
+                  </kbd>
+                </button>
+
+                <ThemeToggle />
+
+                <button
+                  type="button"
+                  onClick={() => setShowNotifMenu(!showNotifMenu)}
+                  className="p-2.5 rounded-xl bg-slate-100/90 dark:bg-zinc-900/90 hover:bg-slate-200 dark:hover:bg-zinc-800 border border-slate-200/90 dark:border-zinc-800 text-slate-700 dark:text-zinc-300 hover:text-[#1C4E26] dark:hover:text-[#68D346] transition-all cursor-pointer relative shadow-xs active:scale-95"
+                  title="Notificações Operacionais"
+                >
+                  <Bell className="w-4 h-4" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#68D346] shadow-[0_0_6px_#68D346] animate-pulse" />
+                </button>
+
+                <div className="flex items-center gap-2.5 border-l border-slate-200 dark:border-zinc-800 pl-3.5 cursor-pointer p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-900 transition-all hover:scale-[1.02]">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#1C4E26] to-[#68D346] text-white font-mono font-bold flex items-center justify-center text-xs uppercase shadow-xs shrink-0 border border-[#68D346]/40">
+                    JL
+                  </div>
+                  <div className="hidden sm:block text-left leading-tight">
+                    <p className="text-[11px] font-bold text-slate-800 dark:text-zinc-100 uppercase tracking-wide truncate max-w-[130px] font-['Hanken_Grotesk']">
+                      Jackson Leal
+                    </p>
+                    <p className="text-[9px] font-mono text-[#1C4E26] dark:text-[#68D346] uppercase tracking-wider font-bold">
+                      🛡️ Administrador
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </header>
+        )}
+
         {selectedOption === 'opcao1' && (
           /* OPÇÃO 1: ILHA FLUTUANTE EXECUTIVA (FLOATING COMMAND DOCK) */
           <div className="w-full px-4 sm:px-6 pt-5 pb-2">
@@ -539,14 +707,16 @@ export default function PreviewToolbarsPage() {
         <div className="p-6 rounded-3xl bg-white/70 dark:bg-zinc-900/50 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-1 text-left">
             <span className="text-[10px] font-mono font-black uppercase tracking-widest text-[#1C4E26] dark:text-[#68D346]">
-              MODELO EM EXIBIÇÃO: {selectedOption === 'opcao1' ? 'Opção 1 (Ilha Flutuante)' : selectedOption === 'opcao2' ? 'Opção 2 (Barra Contínua)' : 'Opção 3 (Barra Tática HUD)'}
+              MODELO EM EXIBIÇÃO: {selectedOption === 'hibrido' ? '🌟👑 Híbrido Premium (Opção 1 + 2)' : selectedOption === 'opcao1' ? 'Opção 1 (Ilha Flutuante)' : selectedOption === 'opcao2' ? 'Opção 2 (Barra Contínua)' : 'Opção 3 (Barra Tática HUD)'}
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase font-['Hanken_Grotesk']">
+              {selectedOption === 'hibrido' && 'Híbrido Premium: Vidro Contínuo com Dock Central dos 4 Pilares'}
               {selectedOption === 'opcao1' && 'Ilha Flutuante de Luxo Silencioso (Floating Dock)'}
               {selectedOption === 'opcao2' && 'Barra Superior Contínua Corporativa (Executive Full Glass)'}
               {selectedOption === 'opcao3' && 'Cockpit de Prontidão Operacional Tática (HUD Status Bar)'}
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-zinc-300 font-sans max-w-3xl">
+              {selectedOption === 'hibrido' && 'A fusão perfeita: base de vidro translúcido de ponta a ponta com desfoque 2xl, abrigando no centro um Dock Flutuante esculpido com os 4 Pilares Operacionais, flyouts de alta precisão e suíte lateral de ferramentas.'}
               {selectedOption === 'opcao1' && 'Focada em leveza, visual moderno e flutuação. Deixa a página mais arejada e agrupa os 4 pilares em botões táteis elegantes com menus suspensos integrados.'}
               {selectedOption === 'opcao2' && 'Focada em estabilidade corporativa e máxima densidade de controle. Ideal para gestores que preferem a barra clássica de topo com menus detalhados.'}
               {selectedOption === 'opcao3' && 'Focada em comando e monitoramento ao vivo. Traz indicadores de saúde de cada pilar (conformidade, viaturas e ocorrências) à vista direta do operador.'}
@@ -556,7 +726,7 @@ export default function PreviewToolbarsPage() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => alert(`Você selecionou a ${selectedOption === 'opcao1' ? 'Opção 1 (Ilha Flutuante)' : selectedOption === 'opcao2' ? 'Opção 2 (Barra Contínua)' : 'Opção 3 (Barra Tática HUD)'}! Podemos aplicá-la ao sistema inteiro.`)}
+              onClick={() => alert(`Modelo ${selectedOption === 'hibrido' ? 'Híbrido Premium' : selectedOption} ativado com sucesso!`)}
               className="px-6 py-3 bg-gradient-to-r from-[#1C4E26] via-[#246831] to-[#1C4E26] hover:from-[#246831] hover:to-[#2e7d3d] text-white border border-[#68D346]/60 font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(104,211,70,0.3)] transition-all cursor-pointer"
             >
               <span className="text-[#B7F365]">Aprovar Este Modelo ✅</span>
