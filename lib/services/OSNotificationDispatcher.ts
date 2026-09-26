@@ -43,28 +43,42 @@ export class OSNotificationDispatcher {
 
     const linkAprovacao = `${baseUrl}/frota/os?id=${os.id}&action=approve`;
 
-    const message = 
-`${emojiPrioridade} *SIGER MASTER • ALERTA DE ORDEM DE SERVIÇO [${tagPrioridade}]* ${emojiPrioridade}
+    const naturezatxt = os.tipo_manutencao || os.natureza_manutencao || 'CORRETIVA';
 
-Olá, *${aprovador.nome_aprovador}*, uma Ordem de Serviço requer sua atenção imediata:
+    // Monta o bloco anatômico
+    let resumoCompTxt = '';
+    if (os.resumo_anatomico && os.resumo_anatomico.trim()) {
+      resumoCompTxt = os.resumo_anatomico;
+    } else if (os.descricao_motivo || os.descricao_servico) {
+      resumoCompTxt = `• ${os.descricao_motivo || os.descricao_servico}`;
+    } else {
+      resumoCompTxt = '• Manutenção geral da viatura';
+    }
+
+    const message = 
+`${emojiPrioridade} *SIGER MASTER • ALERTA DE ORDEM DE SERVIÇO [PRIORIDADE: ${tagPrioridade}]* ${emojiPrioridade}
+
+Olá, *${aprovador.nome_aprovador}*, uma Ordem de Serviço foi aberta e aguarda sua aprovação:
 
 📋 *Número da OS:* #${os.numero_os || 'OS-PENDENTE'}
+🛠️ *Natureza:* Manutenção ${naturezatxt.toUpperCase()}
 📅 *Data/Hora de Abertura:* ${dataAberturaFormatada}
-${prioridade === 'EMERGENCIA' ? '🔴' : prioridade === 'URGENTE' ? '🟠' : '🟢'} *Prioridade:* *${prioridade}*
+${prioridade === 'EMERGENCIA' ? '🔴' : prioridade === 'URGENTE' ? '🟠' : '🟢'} *Classificação de Risco:* *${prioridade}*
 🔄 *Status Atual:* ${os.status_os || os.status || 'AGUARDANDO APROVAÇÃO'}
-📍 *Etapa do Fluxo:* ${os.etapa_atual || '3_AGUARDANDO_APROVACAO'} (Alçada Nível ${aprovador.nivel_alcada})
+📍 *Etapa do Fluxo:* Etapa ${os.numero_etapa || 3}/6 — ${os.etapa_atual || '3_AGUARDANDO_APROVACAO'}
 
-🚓 *Dados da Viatura:*
-• *Veículo:* ${viatura.prefixo_frota} - ${viatura.marca} ${viatura.modelo}
+🚓 *DADOS DO VEÍCULO:*
+• *Viatura:* ${viatura.prefixo_frota} — ${viatura.marca} ${viatura.modelo}
 • *Placa:* ${viatura.placa} | *Odômetro:* ${viatura.odometro_atual_km || 0} km
-• *Contrato/Base:* ${viatura.contrato_id || os.contrato_id || 'ONÇA PUMA'}
+• *Unidade/Base:* ${viatura.contrato_id || os.contrato_id || 'PARAUAPEBAS'}
 
-🔧 *Origem / Defeito Relatado:*
-"${os.descricao_motivo || os.descricao_servico || 'Manutenção veicular requerida'}"
+🔩 *COMPONENTES & SUBCOMPONENTES FLEGADOS:*
+${resumoCompTxt}
 
-💰 *Valor Estimado:* ${valorEst} (Dentro da sua alçada: ${alcadaMin} a ${alcadaMax})
+💰 *Valor Total Estimado:* ${valorEst}
+⚖️ *Sua Alçada Configurada:* ${alcadaMin} até ${alcadaMax}
 
-👉 *Acesse o Cockpit para Aprovar ou Analisar em 1 clique:*
+👉 *Acesse o Cockpit SIGER Master para Aprovar ou Analisar:*
 ${linkAprovacao}`;
 
     const recipientNumber = this.cleanPhoneNumber(aprovador.whatsapp);
@@ -174,11 +188,20 @@ ${linkAprovacao}`;
       </div>
 
       <div class="card">
+        <h4 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; color: #68D346; font-family: monospace; letter-spacing: 1px;">
+          🔩 Componentes & Subcomponentes Flegados
+        </h4>
+        <div style="background-color: #18191c; border-left: 4px solid #68D346; padding: 15px; border-radius: 6px; font-size: 12px; color: #e4e4e7; line-height: 1.6; white-space: pre-line; font-family: monospace;">
+${os.resumo_anatomico || os.descricao_motivo || os.descricao_servico || 'Nenhum detalhamento anatômico informado.'}
+        </div>
+      </div>
+
+      <div class="card">
         <h4 style="margin: 0 0 5px 0; font-size: 12px; text-transform: uppercase; color: #a1a1aa; font-family: monospace;">
           Descrição do Diagnóstico / Defeito:
         </h4>
         <div class="desc-box">
-          "${os.descricao_motivo || os.descricao_servico || 'Manutenção corretiva necessária'}"
+          "${os.descricao_motivo || os.descricao_servico || 'Manutenção veicular necessária'}"
         </div>
       </div>
 

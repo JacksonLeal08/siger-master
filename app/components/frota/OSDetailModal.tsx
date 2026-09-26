@@ -481,6 +481,24 @@ export const OSDetailModal: React.FC<OSDetailModalProps> = ({
                 </div>
 
               </div>
+
+              {/* Card de Componentes & Subcomponentes Flegados (Anatomia do Veículo) */}
+              {os.resumo_anatomico && (
+                <div className="p-4 rounded-2xl bg-white dark:bg-[#181A1E] border border-slate-200 dark:border-[#3C3F45] space-y-2">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-[#282A2F]">
+                    <span className="text-[10px] font-mono uppercase text-[#68D346] font-bold flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-[#68D346]" />
+                      Detalhamento Anatômico dos Subcomponentes Flegados
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      Natureza: <strong>{os.tipo_manutencao || os.natureza_manutencao || 'CORRETIVA'}</strong>
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-700 dark:text-zinc-200 font-mono whitespace-pre-line leading-relaxed bg-slate-50 dark:bg-[#121418] p-3 rounded-xl border border-slate-200/60 dark:border-[#282A2F]">
+                    {os.resumo_anatomico}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

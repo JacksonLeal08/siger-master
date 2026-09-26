@@ -41,7 +41,7 @@ interface ConfigAprovadoresOSTabProps {
 
 export const ConfigAprovadoresOSTab: React.FC<ConfigAprovadoresOSTabProps> = ({
   theme = 'dark',
-  sitesList = ['GLOBAL', 'SALOBO', 'ONÇA PUMA', 'UNIDADE INDUSTRIAL CARAJÁS - PAR']
+  sitesList = ['GLOBAL', 'PARAUAPEBAS', 'SALOBO', 'ONÇA PUMA', 'UNIDADE INDUSTRIAL CARAJÁS - PAR']
 }) => {
   const { triggerSuccessNotification } = useSpci();
 
@@ -50,6 +50,19 @@ export const ConfigAprovadoresOSTab: React.FC<ConfigAprovadoresOSTabProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterContrato, setFilterContrato] = useState<string>('TODOS');
   const [filterNivel, setFilterNivel] = useState<string>('TODOS');
+
+  // Testar envio de notificação
+  const handleTestAlert = (ap: ConfigAprovadorOS) => {
+    triggerSuccessNotification(
+      'Teste de Alerta Homologado!',
+      `Simulação enviada para ${ap.nome_aprovador} (${ap.whatsapp} / ${ap.email}).`
+    );
+    if (ap.notificar_whatsapp && ap.whatsapp) {
+      const num = ap.whatsapp.replace(/\D/g, '').replace(/^55/, '');
+      const msg = encodeURIComponent(`🚨 *SIGER MASTER • TESTE DE ALERTA DE ALÇADA*\n\nOlá *${ap.nome_aprovador}*, este é um teste de homologação do motor de notificações da sua alçada de OS (Faixa: R$ ${ap.valor_minimo} até R$ ${ap.valor_maximo}).\n\n✅ Canal de Notificação Operacional.`);
+      window.open(`https://api.whatsapp.com/send?phone=55${num}&text=${msg}`, '_blank');
+    }
+  };
 
   // Modal de edição / criação
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -398,7 +411,7 @@ export const ConfigAprovadoresOSTab: React.FC<ConfigAprovadoresOSTabProps> = ({
                           title="Alternar se este usuário é o aprovador imediato para esta faixa"
                           className={`px-2.5 py-1 rounded-xl text-[10px] font-mono font-extrabold uppercase transition-all cursor-pointer border ${
                             ap.is_aprovador_imediato 
-                              ? 'bg-rose-500/20 text-rose-500 border-rose-500 shadow-xs' 
+                              ? 'bg-[#1C4E26] text-[#B7F365] border-[#68D346] shadow-[0_0_10px_rgba(104,211,70,0.35)]' 
                               : 'bg-slate-100 dark:bg-zinc-800/80 text-slate-400 border-transparent hover:border-slate-300'
                           }`}
                         >
@@ -447,6 +460,16 @@ export const ConfigAprovadoresOSTab: React.FC<ConfigAprovadoresOSTabProps> = ({
                       {/* Ações */}
                       <td className="p-3.5 pr-5 text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleTestAlert(ap)}
+                            className="px-2 py-1.5 rounded-lg text-emerald-700 dark:text-[#B7F365] bg-emerald-50 dark:bg-[#1C4E26]/40 hover:brightness-110 transition-all cursor-pointer border border-emerald-500/30 text-[10px] font-mono font-bold uppercase flex items-center gap-1"
+                            title="Simular e testar envio de notificação para este aprovador"
+                          >
+                            <Send className="w-3 h-3 text-[#68D346]" />
+                            <span className="hidden sm:inline">Testar Alerta</span>
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(ap)}

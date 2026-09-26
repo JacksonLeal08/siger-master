@@ -189,6 +189,8 @@ export interface OrdemServicoFrota {
   aprovador_imediato_id?: string | null;
   status_aprovacao?: 'PENDENTE' | 'APROVADA' | 'REJEITADA' | 'EM_REVISAO';
   origem_abertura?: 'MANUAL' | 'CHECKLIST_8_SISTEMAS' | 'LAUDO_TWI_PNEUS' | string;
+  resumo_anatomico?: string | null;
+  itens_componentes_json?: any[];
 
   // Relações em tempo de execução
   viatura?: Viatura;

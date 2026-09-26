@@ -7,8 +7,30 @@ import {
   OrigemAberturaOS 
 } from '@/lib/types/osWorkflow';
 import { OrdemServicoFrota, Viatura } from '@/lib/types/frota';
+import { 
+  SubcomponenteSelecionado, 
+  avaliarCriticidadeAutomatica, 
+  formatarResumoAnatomico 
+} from '@/lib/types/vehicleAnatomy';
 
 export class OSWorkflowEngine {
+  /**
+   * Avalia a criticidade sugerida da OS a partir dos componentes flegados e natureza
+   */
+  static evaluateSeverity(
+    natureza: 'PREVENTIVA' | 'CORRETIVA',
+    subcomponentes: SubcomponenteSelecionado[]
+  ) {
+    return avaliarCriticidadeAutomatica(natureza, subcomponentes);
+  }
+
+  /**
+   * Gera resumo compacto e estruturado dos subcomponentes
+   */
+  static formatAnatomicalSummary(subcomponentes: SubcomponenteSelecionado[]): string {
+    return formatarResumoAnatomico(subcomponentes);
+  }
+
   /**
    * Retorna o número ordinal (1 a 6) da etapa atual
    */

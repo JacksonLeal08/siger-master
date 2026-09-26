@@ -446,12 +446,13 @@ export async function saveOrdemServicoAction(os: Partial<OrdemServicoFrota>): Pr
   try {
     const supabase = getSupabaseAdminClient();
     
-    // Normaliza status
+    // Normaliza status e valores
     const statusFinal = os.status_os || os.status || 'ABERTA';
+    const prioridadeFinal = os.prioridade || 'NORMAL';
     const custoPecas = Number(os.custo_pecas || 0);
     const custoMaoDeObra = Number(os.custo_mao_de_obra || 0);
     const custoPneus = Number(os.custo_pneus || 0);
-    const custoTotal = Number(os.custo_total || (custoPecas + custoMaoDeObra + custoPneus));
+    const custoTotal = Number(os.custo_total || os.valor_estimado || (custoPecas + custoMaoDeObra + custoPneus));
 
     const payload = {
       ...os,
@@ -459,12 +460,18 @@ export async function saveOrdemServicoAction(os: Partial<OrdemServicoFrota>): Pr
       contrato_id: os.contrato_id || 'ONÇA PUMA',
       status: statusFinal,
       status_os: statusFinal,
+      prioridade: prioridadeFinal,
+      tipo_manutencao: os.tipo_manutencao || os.natureza_manutencao || 'CORRETIVA',
       custo_pecas: custoPecas,
       custo_mao_de_obra: custoMaoDeObra,
       custo_pneus: custoPneus,
       custo_total: custoTotal,
+      valor_estimado: os.valor_estimado || custoTotal,
+      resumo_anatomico: os.resumo_anatomico || null,
+      itens_componentes_json: os.itens_componentes_json || [],
       orcamentos_json: os.orcamentos_json || [],
       notas_fiscais_json: os.notas_fiscais_json || [],
+      data_abertura: os.data_abertura || new Date().toISOString(),
       data_conclusao: (statusFinal === 'CONCLUIDA' && !os.data_conclusao) ? new Date().toISOString() : os.data_conclusao
     };
 
@@ -476,9 +483,34 @@ export async function saveOrdemServicoAction(os: Partial<OrdemServicoFrota>): Pr
 
     if (error) throw error;
 
-    // Atualiza status da viatura se em oficina externa ou manutenção
+    // Se itens de subcomponentes foram fornecidos, persiste na tabela relacional de itens de componentes
+    if (data?.id && os.itens_componentes_json && Array.isArray(os.itens_componentes_json) && os.itens_componentes_json.length > 0) {
+      try {
+        const itensToInsert = os.itens_componentes_json.map((item: any) => ({
+          os_id: data.id,
+          codigo_sistema: item.codigo_sistema || '01_MOTOR',
+          nome_componente_macro: item.nome_componente_macro || '',
+          nome_subcomponente: item.nome_subcomponente || '',
+          acao_requerida: item.acao || 'SUBSTITUICAO',
+          posicao_eixo: item.posicao || 'COMPLETO',
+          quantidade: item.quantidade || 1,
+          valor_unitario_estimado: item.valor_unitario_estimado || 0,
+          observacao_tecnica: item.observacao || null
+        }));
+
+        // Limpa itens antigos desta OS e insere os novos
+        await supabase.from('os_itens_componentes').delete().eq('os_id', data.id);
+        await supabase.from('os_itens_componentes').insert(itensToInsert);
+      } catch (errItens) {
+        console.warn('[frotaActions] Aviso: tabela os_itens_componentes pode requerer migração:', errItens);
+      }
+    }
+
+    // Atualiza status da viatura conforme status e prioridade da OS
     if (os.viatura_id) {
-      if (statusFinal === 'EM_EXECUCAO' || statusFinal === 'EM_ANDAMENTO') {
+      if (prioridadeFinal === 'EMERGENCIA') {
+        await supabase.from('viaturas').update({ status_operacional: 'EM_MANUTENCAO_INTERNA' }).eq('id', os.viatura_id);
+      } else if (statusFinal === 'EM_EXECUCAO' || statusFinal === 'EM_ANDAMENTO') {
         const novoStatus = os.tipo_os === 'EXTERNA' || os.origem_execucao === 'EXTERNA_CREDENCIADA' 
           ? 'EM_OFICINA_EXTERNA' 
           : 'EM_MANUTENCAO_INTERNA';

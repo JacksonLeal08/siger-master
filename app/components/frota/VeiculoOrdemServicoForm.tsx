@@ -18,6 +18,9 @@ import {
   Car
 } from 'lucide-react';
 import { compressImageToCanvas } from './DualPhotoCapture';
+import { VehicleAnatomySelector } from './VehicleAnatomySelector';
+import { SubcomponenteSelecionado, formatarResumoAnatomico } from '@/lib/types/vehicleAnatomy';
+import { CriticidadeOS } from '@/lib/types/osWorkflow';
 
 interface VeiculoOrdemServicoFormProps {
   viatura: Viatura;
@@ -38,6 +41,10 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
 
   const [tipoOs, setTipoOs] = useState<'INTERNA' | 'EXTERNA'>('INTERNA');
   const [natureza, setNatureza] = useState<'PREVENTIVA' | 'CORRETIVA'>('CORRETIVA');
+  const [prioridade, setPrioridade] = useState<CriticidadeOS>('NORMAL');
+  const [subcomponentes, setSubcomponentes] = useState<SubcomponenteSelecionado[]>([]);
+  const [resumoAnatomico, setResumoAnatomico] = useState('');
+  const [valorEstimado, setValorEstimado] = useState(0);
   const [odometro, setOdometro] = useState(String(viatura.odometro_atual_km || 0));
   const [descricao, setDescricao] = useState('');
   const [solicitanteNome, setSolicitanteNome] = useState('');
@@ -103,9 +110,17 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
         viatura_id: viatura.id,
         tipo_os: tipoOs,
         natureza_manutencao: natureza,
+        tipo_manutencao: natureza,
+        prioridade: prioridade,
+        resumo_anatomico: resumoAnatomico,
+        itens_componentes_json: subcomponentes as any,
+        valor_estimado: valorEstimado,
+        custo_pecas: valorEstimado,
+        custo_total: valorEstimado,
         odometro_km: parseFloat(odometro) || 0,
         descricao_servico: `[Abertura Mobile via Terminal] Solicitante: ${solicitanteNome.trim() || 'Motorista Operacional'}\nRelato: ${descricao.trim()}`,
         status: 'ABERTA',
+        status_os: 'ABERTA',
         oficina_id: tipoOs === 'EXTERNA' ? oficinaId : null,
         comprovantes_urls: fotoEvidencia ? [fotoEvidencia] : [],
         data_abertura: new Date().toISOString()
@@ -307,6 +322,25 @@ export const VeiculoOrdemServicoForm: React.FC<VeiculoOrdemServicoFormProps> = (
                 />
               </div>
             </div>
+          </div>
+
+          {/* Árvore Anatômica do Veículo */}
+          <div className="pt-2">
+            <VehicleAnatomySelector
+              natureza={natureza}
+              onNaturezaChange={(novaNat) => setNatureza(novaNat)}
+              selectedItems={subcomponentes}
+              onItemsChange={(newItems, valorTotal, prioridadeSugerida) => {
+                setSubcomponentes(newItems);
+                setValorEstimado(valorTotal);
+                setPrioridade(prioridadeSugerida);
+                const resumo = formatarResumoAnatomico(newItems);
+                setResumoAnatomico(resumo);
+                if (!descricao.trim() && newItems.length > 0) {
+                  setDescricao(`Manutenção: ${newItems.map(i => i.nome_subcomponente).join(', ')}`);
+                }
+              }}
+            />
           </div>
 
           <div>

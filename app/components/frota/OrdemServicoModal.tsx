@@ -40,8 +40,12 @@ import {
   ChevronRight,
   Camera,
   Sparkles,
-  Paperclip
+  Paperclip,
+  Layers
 } from 'lucide-react';
+import { VehicleAnatomySelector } from './VehicleAnatomySelector';
+import { SubcomponenteSelecionado, formatarResumoAnatomico } from '@/lib/types/vehicleAnatomy';
+import { CriticidadeOS } from '@/lib/types/osWorkflow';
 
 interface OrdemServicoModalProps {
   isOpen: boolean;
@@ -89,6 +93,11 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
   const [descricao, setDescricao] = useState('');
   const [status, setStatus] = useState<StatusOrdemServico>('ABERTA');
   
+  // Governança, Criticidade e Anatomia Veicular
+  const [prioridade, setPrioridade] = useState<CriticidadeOS>('NORMAL');
+  const [subcomponentes, setSubcomponentes] = useState<SubcomponenteSelecionado[]>([]);
+  const [resumoAnatomico, setResumoAnatomico] = useState<string>('');
+
   // Rateio de Custos
   const [custoPecas, setCustoPecas] = useState<string>('0');
   const [custoMaoObra, setCustoMaoObra] = useState<string>('0');
@@ -143,6 +152,9 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
       setTipoOs(osToEdit.tipo_os || 'EXTERNA');
       setOficinaId(osToEdit.oficina_id || '');
       setNatureza(osToEdit.natureza_manutencao || 'PREVENTIVA');
+      setPrioridade(((osToEdit.prioridade || 'NORMAL').toUpperCase()) as CriticidadeOS);
+      setSubcomponentes((osToEdit as any).itens_componentes_json || []);
+      setResumoAnatomico(osToEdit.resumo_anatomico || '');
       setOdometro(String(osToEdit.odometro_km || 0));
       setDescricao(osToEdit.descricao_servico || osToEdit.descricao_motivo || '');
       setCustoPecas(String(osToEdit.custo_pecas || 0));
@@ -160,6 +172,9 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
       setSelectedViaturaId(viatura?.id || (viaturas.length > 0 ? viaturas[0].id : ''));
       setTipoOs('EXTERNA');
       setNatureza('PREVENTIVA');
+      setPrioridade('NORMAL');
+      setSubcomponentes([]);
+      setResumoAnatomico('');
       setOdometro(String(viatura?.odometro_atual_km || 0));
       setDescricao('');
       setCustoPecas('0');
@@ -355,6 +370,11 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
         oficina_id: tipoOs === 'EXTERNA' ? (oficinaId || null) : null,
         tipo_os: tipoOs,
         natureza_manutencao: natureza,
+        tipo_manutencao: natureza === 'PREVENTIVA' ? 'PREVENTIVA' : 'CORRETIVA',
+        prioridade: prioridade,
+        resumo_anatomico: resumoAnatomico,
+        itens_componentes_json: subcomponentes as any,
+        valor_estimado: parseFloat(custoTotal) || 0,
         odometro_km: parseFloat(odometro) || 0,
         descricao_servico: descricao,
         custo_pecas: parseFloat(custoPecas) || 0,
@@ -409,6 +429,15 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">
                   Ordem de Serviço: {numeroOs}
                 </h3>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                  prioridade === 'EMERGENCIA' 
+                    ? 'bg-red-600 text-white shadow-[0_0_10px_#ef4444] animate-pulse' 
+                    : prioridade === 'URGENTE' 
+                      ? 'bg-amber-500 text-white font-black' 
+                      : 'bg-[#1C4E26] text-[#B7F365] border border-[#68D346]'
+                }`}>
+                  {prioridade}
+                </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">
                   {status.replace('_', ' ')}
                 </span>
@@ -656,6 +685,28 @@ export const OrdemServicoModal: React.FC<OrdemServicoModalProps> = ({
                   />
                 </div>
               )}
+
+              {/* Seletor Anatômico de Componentes Principais e Subcomponentes */}
+              <div className="pt-2">
+                <VehicleAnatomySelector
+                  natureza={natureza === 'PREVENTIVA' ? 'PREVENTIVA' : 'CORRETIVA'}
+                  onNaturezaChange={(novaNatureza) => setNatureza(novaNatureza)}
+                  selectedItems={subcomponentes}
+                  onItemsChange={(newItems, valorTotal, prioridadeSugerida) => {
+                    setSubcomponentes(newItems);
+                    setPrioridade(prioridadeSugerida);
+                    const resumo = formatarResumoAnatomico(newItems);
+                    setResumoAnatomico(resumo);
+                    if (valorTotal > 0) {
+                      setCustoPecas(valorTotal.toFixed(2));
+                    }
+                    // Se a descrição estiver vazia, pré-preenche com o resumo dos itens
+                    if (!descricao.trim() && newItems.length > 0) {
+                      setDescricao(`Manutenção veicular: ${newItems.map(i => i.nome_subcomponente).join(', ')}`);
+                    }
+                  }}
+                />
+              </div>
 
               {/* Escopo dos Serviços */}
               <div>

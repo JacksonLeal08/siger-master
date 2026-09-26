@@ -19,13 +19,17 @@ import {
   Sparkles,
   Zap,
   CheckCircle2,
-  DollarSign
+  DollarSign,
+  Phone,
+  Mail,
+  Layers
 } from 'lucide-react';
 import { useSpci } from '@/app/context/SpciContext';
 import { OrdemServicoFrota } from '@/lib/types/frota';
 import { 
   listPendingOSForApprovalAction, 
-  quickApproveOSAction 
+  quickApproveOSAction,
+  dispatchOSAlertsAction
 } from '@/app/actions/osWorkflowActions';
 
 interface NotificationBellProps {
@@ -141,6 +145,24 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onInspectOS 
     }
   };
 
+  const [dispatchingId, setDispatchingId] = useState<string | null>(null);
+
+  const handleWhatsAppAlert = async (osId: string) => {
+    setDispatchingId(osId);
+    try {
+      const res = await dispatchOSAlertsAction(osId, ['WHATSAPP']);
+      if (res.success && res.whatsAppPayload?.url) {
+        window.open(res.whatsAppPayload.url, '_blank');
+      } else {
+        alert(res.error || 'Não foi possível gerar link do WhatsApp');
+      }
+    } catch (e: any) {
+      alert('Erro: ' + e?.message);
+    } finally {
+      setDispatchingId(null);
+    }
+  };
+
   const formatRelativeTime = (dateStr?: string) => {
     if (!dateStr) return 'Recente';
     const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 60000);
@@ -149,6 +171,12 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onInspectOS 
     const hours = Math.floor(diff / 60);
     if (hours < 24) return `Há ${hours}h`;
     return new Date(dateStr).toLocaleDateString('pt-BR');
+  };
+
+  const formatDataHoraAbertura = (dateStr?: string) => {
+    if (!dateStr) return 'Data não informada';
+    const d = new Date(dateStr);
+    return `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
   };
 
   return (
@@ -185,7 +213,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onInspectOS 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2.5 w-[380px] sm:w-[420px] max-w-[95vw] bg-white dark:bg-[#1E2024] border border-slate-200 dark:border-[#3C3F45] shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl z-50 text-left overflow-hidden"
+            className="absolute right-0 mt-2.5 w-[380px] sm:w-[440px] max-w-[95vw] bg-white dark:bg-[#1E2024] border border-slate-200 dark:border-[#3C3F45] shadow-[0_20px_50px_rgba(0,0,0,0.4)] rounded-2xl z-50 text-left overflow-hidden"
           >
             {/* Topo do Painel */}
             <div className="p-3.5 bg-slate-50 dark:bg-[#181A1E] border-b border-slate-150 dark:border-[#282A2F] flex items-center justify-between">
@@ -244,7 +272,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onInspectOS 
 
             {/* CONTEÚDO DA ABA 1: ORDENS DE SERVIÇO PENDENTES */}
             {activeTab === 'os' && (
-              <div className="max-h-[380px] overflow-y-auto p-3 space-y-2.5 scrollbar-thin">
+              <div className="max-h-[420px] overflow-y-auto p-3 space-y-3 scrollbar-thin">
                 {loadingOS ? (
                   <div className="py-10 text-center text-xs font-mono text-slate-400 animate-pulse">
                     Verificando ordens de serviço pendentes...
@@ -260,6 +288,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onInspectOS 
                     const prioridade = (os.prioridade || 'NORMAL').toUpperCase();
                     const isEmergencia = prioridade === 'EMERGENCIA';
                     const isUrgente = prioridade === 'URGENTE';
+                    const natureza = os.tipo_manutencao || os.natureza_manutencao || 'CORRETIVA';
                     const valorEst = Number(os.valor_estimado || os.custo_total || 0).toLocaleString('pt-BR', {
                       style: 'currency',
                       currency: 'BRL'
@@ -268,81 +297,109 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({ onInspectOS 
                     return (
                       <div
                         key={os.id}
-                        className={`p-3 rounded-2xl border transition-all text-left space-y-2 relative overflow-hidden ${
+                        className={`p-3.5 rounded-2xl border transition-all text-left space-y-2.5 relative overflow-hidden ${
                           isEmergencia 
-                            ? 'bg-red-50/50 dark:bg-red-950/20 border-red-500/50 shadow-xs' 
+                            ? 'bg-red-50/50 dark:bg-red-950/20 border-red-500/50 shadow-sm' 
                             : isUrgente 
                               ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-500/50' 
                               : 'bg-slate-50/80 dark:bg-[#121418] border-slate-200 dark:border-[#3C3F45]'
                         }`}
                       >
-                        {/* Linha 1: OS #, Relativo e Badge */}
+                        {/* Linha 1: OS #, Data/Hora Exata e Badges */}
                         <div className="flex items-center justify-between text-[10px] font-mono">
                           <span className="font-black text-slate-800 dark:text-zinc-200">
-                            #{os.numero_os || 'OS-SEM-NUM'}
+                            OS #{os.numero_os || 'OS-PENDENTE'}
                           </span>
 
                           <div className="flex items-center gap-1.5">
-                            <span className="text-slate-400">
-                              {formatRelativeTime(os.data_abertura)}
-                            </span>
-
                             <span className={`px-2 py-0.5 rounded-md font-bold uppercase ${
                               isEmergencia 
-                                ? 'bg-red-600 text-white' 
+                                ? 'bg-red-600 text-white animate-pulse' 
                                 : isUrgente 
                                   ? 'bg-amber-500 text-white' 
                                   : 'bg-emerald-600 text-white'
                             }`}>
                               {prioridade}
                             </span>
-                          </div>
-                        </div>
 
-                        {/* Linha 2: Viatura e Defeito */}
-                        <div>
-                          <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
-                            <Truck className="w-3.5 h-3.5 text-slate-400" />
-                            <span>{os.viatura?.prefixo_frota || 'VTR'}</span>
-                            <span className="text-[10px] font-mono text-slate-500">
-                              • {os.viatura?.placa || 'PLACA'}
+                            <span className="px-1.5 py-0.5 rounded-md bg-slate-200 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 font-mono text-[9px] uppercase font-bold">
+                              {natureza}
                             </span>
                           </div>
-
-                          <p className="text-[11px] text-slate-600 dark:text-zinc-300 mt-1 line-clamp-2 leading-relaxed">
-                            {os.descricao_motivo || os.descricao_servico || 'Manutenção corretiva necessária.'}
-                          </p>
                         </div>
 
-                        {/* Linha 3: Valor e Etapa Atual */}
+                        {/* Linha 2: Data/Hora de Abertura */}
+                        <p className="text-[10px] text-slate-400 font-mono">
+                          Aberta em {formatDataHoraAbertura(os.data_abertura)} ({formatRelativeTime(os.data_abertura)})
+                        </p>
+
+                        {/* Linha 3: Viatura Identificada */}
+                        <div className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                          <Truck className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{os.viatura?.prefixo_frota || 'VTR'}</span>
+                          <span className="text-[10px] font-mono text-slate-500">
+                            • Placa: {os.viatura?.placa || 'PLACA'}
+                          </span>
+                        </div>
+
+                        {/* Linha 4: Resumo Anatômico dos Componentes Flegados */}
+                        {os.resumo_anatomico ? (
+                          <div className="p-2 rounded-xl bg-slate-100 dark:bg-[#181A1E] border border-slate-200/60 dark:border-[#282A2F] text-[10px] font-mono space-y-0.5">
+                            <span className="text-[#68D346] font-bold block text-[9px] uppercase flex items-center gap-1">
+                              <Layers className="w-3 h-3 text-[#68D346]" />
+                              Componentes Flegados:
+                            </span>
+                            <p className="text-slate-700 dark:text-zinc-300 whitespace-pre-line line-clamp-2 leading-tight">
+                              {os.resumo_anatomico}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-[11px] text-slate-600 dark:text-zinc-300 line-clamp-2 leading-relaxed">
+                            "{os.descricao_motivo || os.descricao_servico || 'Manutenção corretiva necessária.'}"
+                          </p>
+                        )}
+
+                        {/* Linha 5: Status, Etapa e Orçamento */}
                         <div className="flex items-center justify-between text-[10px] font-mono pt-1 border-t border-slate-200/50 dark:border-white/5">
                           <span className="text-slate-500 dark:text-zinc-400">
-                            Etapa 3/6: Aguardando Aprovação
+                            Status: AGUARDANDO APROVAÇÃO • Etapa {os.numero_etapa || 3}/6
                           </span>
                           <span className="font-bold text-[#1C4E26] dark:text-[#68D346]">
                             {valorEst}
                           </span>
                         </div>
 
-                        {/* Linha 4: Botões de Ação Rápida */}
-                        <div className="flex items-center gap-2 pt-1">
+                        {/* Linha 6: Botões de Ações Semi-Automáticas Rápidas */}
+                        <div className="flex items-center gap-1.5 pt-1">
                           <button
                             type="button"
                             disabled={approvingId === os.id}
                             onClick={() => handleQuickApprove(os)}
-                            className="flex-1 py-1.5 px-3 rounded-xl bg-gradient-to-r from-[#1C4E26] to-[#68D346] hover:brightness-110 active:scale-95 text-white font-mono font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer border-none disabled:opacity-50"
+                            className="flex-1 py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-[#1C4E26] to-[#68D346] hover:brightness-110 active:scale-95 text-white font-mono font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1 shadow-xs transition-all cursor-pointer border-none disabled:opacity-50"
+                            title="Aprovar OS em 1 clique"
                           >
                             <Check className="w-3 h-3" />
-                            <span>{approvingId === os.id ? 'Aprovando...' : 'Aprovar Agora'}</span>
+                            <span>{approvingId === os.id ? 'Aprovando...' : 'Aprovar OS'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={dispatchingId === os.id}
+                            onClick={() => handleWhatsAppAlert(os.id)}
+                            className="py-1.5 px-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-[#68D346] border border-emerald-500/30 font-mono font-bold text-[10px] uppercase flex items-center gap-1 transition-all cursor-pointer"
+                            title="Disparar ficha estruturada no WhatsApp"
+                          >
+                            <Phone className="w-3 h-3" />
+                            <span>WhatsApp</span>
                           </button>
 
                           <button
                             type="button"
                             onClick={() => handleInspect(os.id)}
-                            className="py-1.5 px-3 rounded-xl bg-slate-200 dark:bg-[#282A2F] hover:bg-slate-300 dark:hover:bg-[#3C3F45] text-slate-700 dark:text-zinc-200 font-mono font-bold text-[10px] uppercase flex items-center gap-1 transition-all cursor-pointer border-none"
-                            title="Abrir detalhes completos da OS"
+                            className="py-1.5 px-2.5 rounded-xl bg-slate-200 dark:bg-[#282A2F] hover:bg-slate-300 dark:hover:bg-[#3C3F45] text-slate-700 dark:text-zinc-200 font-mono font-bold text-[10px] uppercase flex items-center gap-1 transition-all cursor-pointer border-none"
+                            title="Abrir ficha completa da OS"
                           >
-                            <span>Inspecionar</span>
+                            <span>Ficha</span>
                             <ArrowRight className="w-3 h-3" />
                           </button>
                         </div>
