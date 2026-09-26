@@ -15,6 +15,7 @@ import {
   Plus, 
   ClipboardCheck,
   Building2,
+  LayoutDashboard,
   Flame,
   Truck,
   Radio,
@@ -137,23 +138,30 @@ export const Header = ({
     spci: {
       id: 'spci',
       title: 'SPCI Ativos',
-      badge: 'ENGENHARIA CONTRA INCÊNDIO',
+      badge: 'ENGENHARIA CONTRA INCÊNDIO & SETORES',
       icon: Flame,
       metric: `${totalAssetsCount} Ativos`,
       modules: [
+        { 
+          label: 'Dashboard / Visão Geral SPCI', 
+          path: '/dashboard', 
+          icon: LayoutDashboard, 
+          desc: 'Monitoramento de conformidade NBR, mapa de calor e setores da planta', 
+          isRelocated: true 
+        },
+        { 
+          label: 'Gestão de Ativo & Setores da Planta', 
+          path: '/gestao-ativo', 
+          icon: Boxes, 
+          desc: 'Cadastro de setores, almoxarifado, movimentações e substituições', 
+          isRelocated: true,
+          action: onGestaoAtivosClick 
+        },
         { label: 'Extintores & Vistorias NBR 12962', path: '/extintores', icon: Flame, desc: 'Inspeções mensais, recargas e selos Inmetro' },
         { label: 'Hidrantes, Abrigos & Mangueiras', path: '/hidrantes', icon: Droplet, desc: 'Lances, esguichos e testes de estanqueidade' },
         { label: 'Casa de Bombas & Automação', path: '/bombas', icon: Sliders, desc: 'Bombas Jockey/Diesel e pressostatos' },
         { label: 'Sinalização Fotoluminescente', path: '/sinalizacao', icon: AlertTriangle, desc: 'Rotas de fuga e conformidade NBR 13434' },
         { label: 'Iluminação de Emergência', path: '/iluminacao', icon: Lightbulb, desc: 'Blocos autônomos e autonomia de baterias' },
-        { 
-          label: 'Gestão de Ativo & Estoque', 
-          path: '/gestao-ativo', 
-          icon: Boxes, 
-          desc: 'Almoxarifado, movimentações e substituições', 
-          isRelocated: true,
-          action: onGestaoAtivosClick 
-        },
       ]
     },
     frotas: {

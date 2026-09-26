@@ -45,10 +45,13 @@ A interface adota a consagrada diagramação **Bento Grid** em Dark/Light Glassm
 
 ## 📊 3. Especificação dos Dados e Métricas por Pilar
 
-### Pilar 1: SPCI Ativos & Engenharia
+### Pilar 1: SPCI Ativos & Engenharia (Gestão de Ativos e Setores da Planta)
+- **Módulos Integrantes Reagrupados:**
+  - 📊 **Dashboard / Visão Geral SPCI:** Painel tático com mapa de calor por setor da planta (Manganês, Barragem, Sala Elétrica, Almoxarifado, Recepção, Cobre, Ferro, Produção, Logística), conformidade legal NBR e gerador de QR Code dinâmico para vistorias.
+  - 📦 **Gestão de Ativos & Setores da Planta:** Administração de localizações, setores físicos, movimentações, almoxarifado/estoque e substituições de cilindros.
+  - 🧯 **Equipamentos Críticos:** Extintores (NBR 12962), Hidrantes & Mangueiras (NBR 13714), Casa de Bombas & Automação, Sinalização Fotoluminescente (NBR 13434) e Iluminação de Emergência.
 - **KPI Mestre:** % de Conformidade NBR (Cálculo: `((Total - Vencidos) / Total) * 100`).
-- **Composição:** Extintores (NBR 12962), Hidrantes (NBR 13714), Bombas de Incêndio, Sinalização (NBR 13434) e Iluminação de Emergência.
-- **Destaques:** Cartão de criticidade com contagem de equipamentos vencidos com prazo de tolerância zero.
+- **Destaques:** Cartão de criticidade com contagem de equipamentos vencidos com prazo de tolerância zero e monitoramento de setores operacionais.
 
 ### Pilar 2: Frotas 4x4 & Resgate
 - **KPI Mestre:** % de Prontidão da Frota (`Viaturas Operacionais / Total de Viaturas`).

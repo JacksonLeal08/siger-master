@@ -303,14 +303,14 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
 
   // Itens da navegação padrão (satélites unificados fora dos módulos mestres Extintores e Viaturas)
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard / Visão Geral', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
+    { id: 'dashboard', label: 'Dashboard SPCI (Setores & Conformidade)', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
+    { id: 'gestao-ativo', label: 'Gestão de Ativo & Setores da Planta', icon: <Boxes className="w-5 h-5" />, path: '/gestao-ativo' },
     { id: 'hidrantes', label: 'Hidrantes & Abrigos', icon: <Droplet className="w-5 h-5" />, path: '/hidrantes' },
     { id: 'sinalizacao', label: 'Sinalização NBR', icon: <AlertTriangle className="w-5 h-5" />, path: '/sinalizacao' },
     { id: 'iluminacao', label: 'Iluminação Emergência', icon: <Lightbulb className="w-5 h-5" />, path: '/iluminacao' },
     { id: 'bombas', label: 'Casa de Bombas', icon: <Sliders className="w-5 h-5" />, path: '/bombas' },
     { id: 'ronda', label: 'Despacho & Ronda Campo', icon: <Smartphone className="w-5 h-5" />, path: '/ronda' },
     { id: 'mapa', label: 'Mapa Operacional', icon: <MapPin className="w-5 h-5" />, path: '/mapa' },
-    { id: 'gestao-ativo', label: 'Gestão de Ativo', icon: <Boxes className="w-5 h-5" />, path: '/gestao-ativo' },
     ...(userProfile?.role === 'Desenvolvedor' ? [{ id: 'logs', label: 'Logs do Sistema', icon: <History className="w-5 h-5" />, path: '/logs' }] : []),
     ...(isAdmin ? [{ id: 'configuracoes', label: 'Configurações', icon: <Settings className="w-5 h-5" />, path: '/configuracoes' }] : [])
   ];

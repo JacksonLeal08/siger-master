@@ -15,6 +15,7 @@ import {
   Sparkles, 
   ShieldCheck, 
   Boxes, 
+  LayoutDashboard,
   MapPin, 
   Clock, 
   Settings, 
@@ -58,7 +59,8 @@ export default function PreviewEstilosPage() {
       color: '#68D346',
       metric: '99.2% Conforme (230 Ativos)',
       modules: [
-        { label: 'Gestão de Ativo & Estoque', tag: 'ITEM RELOCADO', icon: Boxes, desc: 'Catálogo de extintores, mangueiras e lotes de manutenção' },
+        { label: 'Dashboard / Visão Geral SPCI', tag: 'ITEM RELOCADO', icon: LayoutDashboard, desc: 'Conformidade legal NBR, mapa de calor e setores da planta' },
+        { label: 'Gestão de Ativo & Setores da Planta', tag: 'ITEM RELOCADO', icon: Boxes, desc: 'Cadastro de setores, almoxarifado, movimentações e substituições' },
         { label: 'Extintores NBR 12962', tag: 'INSPEÇÃO', icon: Flame, desc: 'Metrologia, anel e vistorias offline-first' },
         { label: 'Hidrantes & Abrigos NBR 13714', tag: 'TESTES', icon: CheckCircle2, desc: 'Válvulas, esguichos e testes de vazão' },
         { label: 'Casa de Bombas & Reservatórios', tag: 'AUTOMAÇÃO', icon: Cpu, desc: 'Telemetria de pressão, diesel e recalque' },

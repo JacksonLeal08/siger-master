@@ -42,7 +42,8 @@ import {
   ShieldAlert,
   Boxes,
   Zap,
-  CheckCheck
+  CheckCheck,
+  LayoutDashboard
 } from 'lucide-react';
 import ThemeToggle from '@/app/components/ThemeToggle';
 
@@ -369,6 +370,49 @@ export default function PreviewHomeGeralPage() {
                   <div style={{ width: '15%' }} className="bg-emerald-500" title="Bombas" />
                   <div style={{ width: '15%' }} className="bg-amber-500" title="Sinalização & Iluminação" />
                 </div>
+              </div>
+
+              {/* Módulos Integrantes Relocados no Pilar SPCI */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <Link
+                  href="/dashboard"
+                  className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/80 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700/80 transition-all flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-600 flex items-center justify-center shrink-0">
+                      <LayoutDashboard className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-black uppercase text-slate-800 dark:text-zinc-200 font-['Hanken_Grotesk'] block">
+                        Dashboard & Setores
+                      </span>
+                      <span className="text-[9px] text-slate-500 dark:text-zinc-400 font-mono">
+                        Mapa de calor e conformidade
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+
+                <Link
+                  href="/gestao-ativo"
+                  className="p-3 rounded-2xl bg-slate-50 dark:bg-zinc-900/80 hover:bg-slate-100 dark:hover:bg-zinc-800 border border-slate-200/80 dark:border-zinc-700/80 transition-all flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center shrink-0">
+                      <Boxes className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-black uppercase text-slate-800 dark:text-zinc-200 font-['Hanken_Grotesk'] block">
+                        Gestão de Ativos & Planta
+                      </span>
+                      <span className="text-[9px] text-slate-500 dark:text-zinc-400 font-mono">
+                        Setores, almoxarifado & estoque
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
               </div>
             </div>
 
