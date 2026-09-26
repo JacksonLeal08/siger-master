@@ -454,7 +454,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsMobileSidebarOpen(false)}
-            className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-40 lg:hidden"
+            className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-40"
             aria-hidden="true"
           />
         )}
@@ -478,6 +478,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onProfileClick={() => setShowProfileModal(true)}
             onMenuClick={() => setIsMobileSidebarOpen(true)}
             onGestaoAtivosClick={() => setIsGestaoAtivosOpen(true)}
+            onLogoutClick={() => setShowLogoutConfirmation(true)}
           />
         </div>
 

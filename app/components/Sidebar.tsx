@@ -319,18 +319,18 @@ export const Sidebar = ({ onProfileClick, onLogoutClick, isOpen, onClose, onColl
 
   return (
     <aside 
-      className={`bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col py-6 shrink-0 shadow-xl border-r border-slate-200 dark:border-slate-800 z-40 h-screen select-none font-sans fixed lg:static inset-y-0 left-0 transform lg:transform-none transition-all duration-300 ${
+      className={`bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col py-6 shrink-0 shadow-2xl border-r border-slate-200 dark:border-slate-800 z-50 h-screen select-none font-sans fixed inset-y-0 left-0 transform transition-all duration-300 ${
         isCollapsed ? 'w-20 px-2' : 'w-72 px-3'
       } ${
-        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
       aria-label="Menu principal"
     >
-      {/* Botão de Fechar no Mobile */}
+      {/* Botão de Fechar */}
       {onClose && (
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 lg:hidden text-slate-400 hover:text-slate-900 dark:hover:text-white border-none bg-transparent cursor-pointer p-1"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white border-none bg-transparent cursor-pointer p-1"
           aria-label="Fechar menu"
         >
           <X className="w-5 h-5" />
